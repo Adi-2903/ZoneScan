@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 import unittest
 
 from zonescan.fixtures import SyntheticFixtureProvider
-from zonescan.models import Candle, ScoreInputs
+from zonescan.models import Candle, ScoreInputs, Zone
 from zonescan.scoring import calculate_strength
 from zonescan.structure import confirmed_swings
 
@@ -32,14 +32,19 @@ class FoundationTests(unittest.TestCase):
         self.assertTrue(all("synthetic" in c.quality_flags for c in first.candles))
 
     def test_strength_missing_required_input_is_unavailable(self):
+        timestamp = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        order_block = Zone("z", "x", "bullish", 109, 110, "5m", timestamp, timestamp)
         result = calculate_strength(ScoreInputs(.01, .02, 1.5, .01, "bullish",
-                                                 True, True, "bullish", "bullish", 1.0))
+                                                 True, True, "bullish", "bullish", 111, 1,
+                                                 order_block))
         self.assertTrue(result.available)
         self.assertIsNotNone(result.strength)
         missing = calculate_strength(ScoreInputs(.01, .02, None, .01, "bullish",
-                                                  True, True, "bullish", "bullish", 1.0))
+                                                  True, True, "bullish", "bullish", 111, 1,
+                                                  order_block))
         self.assertFalse(missing.available)
-        self.assertEqual("required_input_missing", missing.reason)
+        self.assertEqual("required_component_unavailable", missing.reason)
+        self.assertEqual("missing_rvol", missing.component_reasons["V"])
 
 
 if __name__ == "__main__":

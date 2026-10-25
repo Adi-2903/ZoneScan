@@ -36,7 +36,15 @@ Suggested fields: `instrument_id`, `ts`, `atr14_5m`, `adx14_5m`, `vwap`, `ema20_
 
 ### `zones`
 
-Suggested fields: `id`, `instrument_id`, `side`, `low`, `high`, `timeframe`, `formed_at`, `confirmed_at`, `state`, `has_fvg`, `last_touched_at`, `mitigated_at`, `expired_at`, `algorithm_version`, `parameter_version`.
+Suggested fields: `id`, `instrument_id`, `side`, `low`, `high`, `timeframe`, `formed_at`, `recognized_at`, `state`, `has_fvg`, `last_touched_at`, `mitigated_at`, `expired_at`, `active`, `algorithm_version`, `parameter_version`. `recognized_at` is when replay/live processing had enough information to emit the zone; it may not precede the displacement close. `active=false` retains history for a zone mitigated, expired, or deactivated by timeframe overlap/active-zone cap. The current in-memory prototype uses a deterministic hash ID and does not persist zones.
+
+### Replay inputs (in-memory prototype)
+
+Each `ReplayBar` wraps a completed/incomplete `Candle`, optional ATR/RVOL, a `5m`/`15m` timeframe, an optional exchange session date, and optional point-in-time score inputs (`day_return`, `daily_sigma20`, `oi_change_daily_pct`, VWAP/EMA side booleans, and categorical sector direction). Missing values remain `None`; they are not imputed. Replay derives structure only from swings confirmed by that candle's timestamp, derives direction from the documented rule, and uses the candle close as current price. `ReplayScore` pairs instrument/timestamp with the existing `ScoreResult`; incomplete candles have an explicit unavailable score result. `ScoreInputs` and all results remain in-memory only. Replay events store timestamp, event kind, optional zone ID/state, and diagnostic detail. These are transient Python models, not a database schema or a provider-normalized historical store.
+
+### Historical evaluation input contract (prototype)
+
+`HistoricalDataset` accepts point-in-time `ReplayBar` records, an explicit `(instrument_id, symbol)` mapping, session bounds and expected instrument IDs per session, a supported 5m/15m interval, and `DatasetProvenance`. Provenance must identify a dataset, source/reference, and written usage permission reference, with an explicit internal-evaluation permission attestation. This attestation is supplied by the data owner; the code cannot verify a contract. Timestamps must carry the India `+05:30` offset and session-aligned close timestamps in `(session open, session close]`. No missing candle, volume, indicator, or OI is imputed. Required volume is carried by `Candle.volume`; OI absence remains a warning and produces the shared score function's unavailable OI component. Incomplete point-in-time universe coverage is reported. Synthetic datasets can exercise replay but all forward-performance outcomes are explicitly unavailable. This is an in-memory evaluation contract, not persistence or provider integration.
 
 ### `liquidity_levels`
 
@@ -47,6 +55,8 @@ Kinds include: `swing_high`, `swing_low`, `equal_high`, `equal_low`, `pdh`, `pdl
 ### `scores`
 
 Suggested fields: `instrument_id`, `ts`, `direction`, `strength_raw`, `strength_smoothed`, `early_move_score`, `component_m`, `component_v`, `component_o`, `component_t`, `component_s`, `component_z`, `choppy_flag`, `classification_reason`, `quality_flags`, `algorithm_version`, `parameter_version`.
+
+The in-memory `ScoreInputs` contract takes fractional `day_return`, `daily_sigma20`, `rvol`, fractional `oi_change_daily_pct`, explicit direction/VWAP/EMA/structure/sector classifications, and current price/ATR/nearest `Zone` for proximity. Missing inputs remain `None`. `ComponentResult` distinguishes unavailable values (`value=None` plus reason) from valid zero. `ScoreResult` carries computed components, unavailable-component reasons, OI context labels, and algorithm/parameter versions. Persistence and replay integration for score snapshots are not implemented yet.
 
 ### `board_snapshots`
 

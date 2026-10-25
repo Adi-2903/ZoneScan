@@ -70,6 +70,20 @@ Additional rules:
 - Record formation time, timeframe, high/low, state transitions and algorithm version.
 - Live/preview updates may update the last price, but an unfinished candle cannot create or confirm a zone.
 
+#### Implemented v0.1 prototype semantics
+
+`services/api/src/zonescan/order_blocks.py` implements the rules above for completed 5m/15m candles. The displacement range is the maximum high minus minimum low across the run; the latest run candle's ATR is used for the `1.5 × ATR` comparison, and mean run RVOL must be at least `1.2`. The final displacement candle must close through the most recent relevant swing that was already confirmed by the timestamp of the immediately preceding opposing candle. A zone uses that opposing candle's full low/high range. Missing ATR or RVOL, nonpositive ATR, an incomplete candle, or missing confirmed structure produces no zone. A three-candle FVG means the first candle's high is below the third candle's low for bullish displacement (mirrored for bearish).
+
+Lifecycle details: only a completed candle strictly after formation can touch a zone. An intersection with the zone changes Fresh to Tested and records `last_touched_at`; a close strictly beyond the far boundary changes either active state to Mitigated, even when a gap leaves the candle's range wholly beyond the zone. Mitigated and Expired zones never reactivate. A zone is Expired only while still Fresh, after five subsequent distinct observed session dates without a touch; dates come from the supplied session calendar date, or the candle timestamp in `Asia/Kolkata` when absent. Calendar dates with no candles do not count as sessions.
+
+Overlap means a positive-width intersection (`a.low < b.high` and `b.low < a.high`) for the same instrument and side. An overlapping 15m zone deactivates overlapping 5m zones; an overlapping 5m candidate is suppressed when an active 15m zone exists. Historical zones are retained with `active=false`. If a side exceeds three active zones, the oldest by formation timestamp (then stable zone ID) is deactivated. These tie-breaking rules are deterministic. Session calendars, candle aggregation and exchange holiday validation remain upstream responsibilities.
+
+The replay implementation emits a zone only at the displacement close, after its BOS and required inputs are known. It feeds one chronological candle at a time into the same swing and detection functions used by a live caller. Replay records missing same-session intervals as `data_gap` events and never fabricates replacement candles. Algorithm/parameter versions are stored on each zone. These are implemented prototype semantics, not validated market signals.
+
+#### Sequential Strength Score replay
+
+For each completed replay candle, the engine derives market structure only from swings whose three right-side candles have closed by that candle's timestamp. Direction uses the documented day-return/structure/VWAP classification rule. It calls the same `calculate_strength` implementation as other consumers and attaches a `ReplayScore` with the candle timestamp, `ScoreResult`, six components, unavailable reasons and score versions. Current close supplies the price input; the replay bar supplies time-aligned day return, daily sigma, RVOL, OI change, VWAP/EMA side booleans, ATR and an optional categorical sector direction. The nearest eligible zone is selected from zones active by that timestamp. Incomplete candles receive an explicit unavailable result and are not scored. Missing inputs remain unavailable, except no eligible zone is the documented valid `Z=0`. Sector classification is not aggregated in replay; a missing sector input makes S unavailable, and future sector values are never read for earlier scores. Callers supplying the per-candle fields must ensure each is point-in-time and uses the documented units. This is deterministic fixture replay, not historical performance validation.
+
 ## 5. Chart liquidity levels and sweeps
 
 Candidate levels:
@@ -86,7 +100,7 @@ The word “liquidity” in the UI must refer to these price levels, not to an a
 
 ## 6. Strength Score (0–100)
 
-Each component is intended to be in `[0, 1]`. Clip all inputs to the stated range and record component values for explainability.
+Each component is in `[0, 1]`. Inputs use decimal fractions for returns and OI changes (`0.025` means 2.5%), ratios for RVOL, price units for price/ATR, and explicit direction labels. Component functions validate inputs and preserve raw component precision; display/serialization layers may round separately.
 
 ### Components
 
@@ -94,13 +108,13 @@ Each component is intended to be in `[0, 1]`. Clip all inputs to the stated rang
 
 `M = min(abs(day_return) / (1.5 × daily_sigma20), 1)`
 
-If `daily_sigma20` is zero or unavailable, M is unavailable and the symbol cannot receive a complete score.
+`daily_sigma20` must be finite and positive. Missing, non-finite, zero, or negative sigma makes M unavailable; a genuine zero return with valid sigma produces `M=0`.
 
 **V — Relative volume (weight 0.15)**
 
 `V = clip((RVOL - 1) / 2, 0, 1)`
 
-Thus normal volume or lower contributes zero; 3× baseline or more reaches one.
+RVOL must be finite and nonnegative. Missing or invalid RVOL makes V unavailable. Thus normal volume or lower contributes zero; 3× baseline or more reaches one.
 
 **O — Open-interest participation (weight 0.20)**
 
@@ -115,15 +129,15 @@ Use price direction and OI direction to classify the context:
 | Down | Up | Short buildup | 1.0 |
 | Down | Down | Long unwinding | 0.5 |
 
-`O = OI_magnitude × factor` only if the OI/price context can be classified for the scored direction. Otherwise O is unavailable or zero according to a versioned rule; do not hide poor data quality.
+O = OI_magnitude * factor only when price direction agrees with the scored direction. Rising OI uses factor 1.0 (long buildup when price rises; short buildup when price falls); falling OI uses factor 0.5 (short covering when price rises; long unwinding when price falls). A flat OI change is valid zero. Nonzero OI change with zero price return, or a scored direction that conflicts with price-return sign, makes O unavailable. OI changes are decimal fractions: 0.025 is 2.5%. Deriving OI percent change requires finite OI values and a strictly positive reference OI; otherwise it is unavailable.
 
 **T — Trend alignment (weight 0.20)**
 
-Use three direction-alignment checks: price is on the correct side of VWAP; price is on the correct side of EMA20; market-structure label agrees with direction. For structure, assign 1 when structure matches, 0.5 for range, and 0 when it opposes. `T = (VWAP_check + EMA_check + structure_value) / 3`.
+Use three direction-alignment checks: price is on the correct side of VWAP; price is on the correct side of EMA20; market-structure label agrees with direction. For structure, assign 1 when structure matches, 0.5 for range, and 0 when it opposes. `T = (VWAP_check + EMA_check + structure_value) / 3`. Direction must be `bullish` or `bearish`, indicators must be actual booleans, and structure must be `bullish`, `bearish`, or `range`; missing or invalid values make T unavailable.
 
 **S — Sector participation (weight 0.10)**
 
-`S = 1` if sector direction aligns, `0.5` if neutral/mixed, and `0` if it opposes. Proposed sector direction uses a traded-value-weighted aggregate and a configurable participation threshold. Initial default: call sector aligned only when at least 60% of covered sector members (by count) share the direction; otherwise neutral unless the opposite direction itself reaches the threshold. The 60% rule is provisional and must be tested.
+`S = 1` if sector direction aligns, `0.5` if neutral/mixed, and `0` if it opposes. Input classification must be `bullish`, `bearish`, `neutral`, or `mixed`; missing/unknown classification makes S unavailable. Proposed sector direction uses a traded-value-weighted aggregate and a configurable participation threshold. Initial default: call sector aligned only when at least 60% of covered sector members (by count) share the direction; otherwise neutral unless the opposite direction itself reaches the threshold. The 60% rule is provisional and must be tested.
 
 **Z — Zone proximity (weight 0.10)**
 
@@ -133,11 +147,13 @@ Let `d` be the distance to the nearest eligible fresh/tested order block in the 
 - `Z=(4-d)/3` when `1 < d < 4`.
 - `Z=0` when `d >= 4`.
 
+The scorer receives current price, ATR, and a candidate zone. No zone, inactive/mitigated/expired zone, or wrong-direction zone contributes valid `Z=0`. A valid fresh/tested supporting zone requires finite positive current price and ATR, valid bounds, and correct side relative to price; missing or nonpositive ATR for such a zone makes Z unavailable. For bullish direction, an eligible zone is below or contains current price; bearish is mirrored. Distance is to the nearest zone edge (zero while price is inside). The linear interpolation above is the existing v0.1 formula.
+
 ### Final score
 
 `Strength = 100 × (0.25M + 0.15V + 0.20O + 0.20T + 0.10S + 0.10Z)`
 
-All six component weights sum to 1. If a required component is unavailable, do not silently renormalize the remaining weights; mark the score unavailable and exclude the symbol until the policy is explicitly changed and versioned.
+All six component weights sum to 1. If a required component is unavailable, do not silently renormalize the remaining weights; mark the score unavailable and exclude the symbol until the policy is explicitly changed and versioned. `ScoreResult.components` preserves computed values and stores `null` for unavailable components; `component_reasons` identifies each unavailable component. A genuine zero remains numeric zero. Component values are not rounded before weighting; the final score is clamped only for floating-point boundary noise and carries algorithm/parameter versions. The current implementation reports `v0.1-score` and `2026-10-26.3`.
 
 ## 7. Early-Move Score (provisional name)
 

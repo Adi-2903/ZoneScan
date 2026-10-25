@@ -20,11 +20,20 @@ Create hand-built OHLCV/OI sequences for:
 - Overlapping 5m/15m zones, max active zones and nearest-zone selection.
 - Equal-high/equal-low cluster tolerance and sweep definition.
 - All Strength Score components at lower/upper boundaries and missing-input behavior.
+- Strength Score boundaries: zero/half-sigma/1.5-sigma moves; RVOL 0/1/1.5/2/3+; OI zero/2.5%/5%/above-5% and all four price/OI contexts; trend/sector classifications; zone interpolation, wrong-side/inactive zones, invalid denominators, non-finite inputs, fixed weights, exact extrema and repeated calculations.
 - Early-Move Score normalization, run penalty boundaries and OI interpretation.
 - Choppy classification when 0, 1, 2, 3 or 4 conditions hold.
 - Smoothing, top-20 sorting, tie-breaks, hysteresis, removals and data-invalid exclusions.
 
 Use golden fixtures: fixed input session → expected outputs with versioned expected values. When a rule changes, update fixture outputs only with an explanation and parameter/algorithm version change.
+
+`services/api/tests/test_scoring.py` uses independently calculated expected values rather than values copied from the scorer. It tests each component, unavailable reasons, no early rounding, fixed-weight contribution, exact zero/100 results, and repeatability. Passing these tests does not validate provider data quality or out-of-sample value.
+
+`services/api/tests/test_replay_scoring.py` verifies that completed replay bars receive scores at their own timestamps; confirmed structure is unavailable before its right-side bars close; future bars and future sector classifications do not change earlier score outputs; missing required fields propagate component reasons; repeated replay is identical; and scoring records coexist with order-block lifecycle events. Inputs are hand-built synthetic observations, not historical market results.
+
+### Historical evaluation prototype
+
+The in-memory `zonescan.evaluation` module validates provenance/permission attestations, instrument mapping, `+05:30` timestamps, session bounds, chronological uniqueness, OHLC/volume validity, expected candle intervals, OI availability, and point-in-time expected-universe coverage before invoking the same chronological production replay. It reports per-score forward close returns only for exact 30m/60m/session-close candles and directional MFE/MAE over subsequent candles in ATR units. Missing candles, ATR, direction, OI, sector classification, or session completion remain explicit unavailable states; values are never filled. An order-block touch label requires a zone emitted at the score timestamp and later lifecycle events establishing a touch; bounce outcome is unsupported. Permission references are owner-supplied metadata, not legal verification. Synthetic fixtures suppress performance outcome metrics and cannot support a Gate 2 or edge claim. Without a historically accurate point-in-time universe, survivorship bias remains unresolved. Fixture tests validate mechanics only, not historical performance.
 
 ## 2. Ingestion and provider tests
 
@@ -73,6 +82,8 @@ Use provider sandbox/replay data where allowed; use synthetic fixtures otherwise
 - Capture board snapshots at predeclared times (initial proposal: 09:30, 10:30, 11:30 and 13:30 IST) and evaluate forward windows of 30 minutes, 60 minutes and session close.
 - Record maximum favorable/adverse excursion in ATR units, zone touch/bounce state, rank stability and symbol exclusions.
 - Keep parameter tuning on an early period, validation on the next period and a final untouched test period. A suggested first split is 6 months / 3 months / 3 months; adjust for data availability before running, then freeze the dates.
+
+The implemented Python prototype in `services/api/src/zonescan/replay.py` accepts chronological `ReplayBar` records and returns timestamped swing/zone/lifecycle/data-gap events plus retained zones. It uses the same `confirmed_swings`, order-block detector, overlap resolver and lifecycle updater as other callers. It does not aggregate raw ticks into candles or calculate ATR/RVOL; callers must provide those values or leave them unavailable. Missing same-session candle intervals are reported, not filled. Unit coverage includes both directions, required-input and threshold failures, prior-opposing-candle selection, non-repainting recognition timing, lifecycle transitions, session-based expiry, overlap/cap rules, input ordering, and identical reruns. This fixture coverage does not validate signal performance or a live feed.
 
 ### Metrics
 

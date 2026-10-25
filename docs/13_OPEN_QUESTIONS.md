@@ -22,6 +22,7 @@ Do not silently decide the items marked **BLOCKER**. The owner should assign a p
 | Q-016 | What public backtest statistics, if any, may be shown and under what review process? | Methodology and data rights must support them. | Algorithm owner + counsel. | Open |
 | Q-017 | Is community needed at all? | Adds moderation, privacy and regulatory risk. | Product owner after closed beta. Default: no in-app community for MVP. | Open; default documented |
 | Q-018 | What team capacity, launch window, cloud region and monthly operating budget are available? | Determines deployment and schedule; costs depend strongly on data licensing. | Product owner. | Open |
+| Q-019 | Should sector direction classification use traded-value weighting, member-count participation, or both, and what timestamp/coverage makes a sector state available? | The provisional Strength Score specifies a traded-value-weighted aggregate but describes its initial 60% participation threshold by member count; the scoring function currently consumes an upstream categorical state. | Algorithm owner: define and version the sector aggregation before integrating board scoring. | Open |
 
 ## Work that can proceed while blockers are open
 
