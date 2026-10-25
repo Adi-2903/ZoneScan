@@ -12,6 +12,12 @@
 
 # Documentation Changelog
 
+## 2026-10-26 — Analytical engine API prototype
+
+- Added a cached synthetic analytics service that aggregates the fixed fixture, calculates indicators, and calls chronological production replay/board functions once per process.
+- Exposed read-only market status, bullish/bearish board, and stock-detail endpoints with explicit synthetic metadata, score/component availability, indicator reasons, zones, and liquidity levels; retained health and development snapshot routes.
+- Added offline API tests for direction, timestamps/source, validation, unknown symbols, unavailable inputs, and deterministic responses. This remains a local prototype; no live source or performance validation is implied.
+
 ## 2026-10-26 — Q-009 resolution and Choppy filter
 
 - Defined 12-candle overlap as the mean normalized range intersection across 11 adjacent pairs; zero-range pairs contribute zero, and missing/nonconsecutive bars are unavailable.

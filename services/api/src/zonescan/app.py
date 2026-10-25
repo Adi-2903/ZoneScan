@@ -117,9 +117,10 @@ def market_status(service: AnalyticsService = Depends(get_analytics_service)):
 
 
 @app.get("/api/v1/board")
-def board(side: str = Query(...), service: AnalyticsService = Depends(get_analytics_service)):
+def board(side: str = Query(...)):
     if side not in ("bull", "bear"):
         return _error(400, "INVALID_SIDE", "side must be 'bull' or 'bear'.")
+    service = get_analytics_service()
     rows = []
     for row in service.board_rows(side):
         score = row.score
