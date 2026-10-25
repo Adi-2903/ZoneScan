@@ -202,7 +202,11 @@ A stock is `Choppy` when **at least two** of these conditions hold:
 3. RVOL is below 1.0.
 4. The last 12 completed 5-minute candles overlap more than 70% by the agreed overlap metric and no BOS has occurred in the current session.
 
-When Choppy, both scores are set to zero for ranking purposes and the stock is omitted from bullish/bearish boards. Keep a separate reason code for diagnostics. The exact candle-overlap metric must be unit-tested and documented in code before production.
+For Q-009, overlap is calculated across the 11 adjacent pairs in those 12 candles. For each pair, compute `max(0, min(high_a, high_b) - max(low_a, low_b)) / min(high_a - low_a, high_b - low_b)`, then take the arithmetic mean. A pair with either candle range equal to zero contributes `0`. The 12 candles must be complete, consecutive 5-minute candles from the same Asia/Kolkata session; a gap, incomplete candle, or insufficient history makes the overlap condition unavailable. The test is strict: the mean must be `> 0.70`.
+
+The no-BOS part of condition 4 is false once a confirmed BOS is observed in the current session. To establish that no BOS occurred, replay requires the supplied session calendar and complete candles from session open through the current timestamp; otherwise that subcondition is unavailable. Conditions use three-valued results (`true`, `false`, unavailable) and carry per-condition reasons. Classification is Choppy if at least two conditions are true; it is valid non-Choppy if true conditions plus unavailable conditions cannot reach two; otherwise the classification is unavailable. Missing conditions never count as true or false.
+
+Replay attaches `ChoppyResult` and `filtered_strength` to each `ReplayScore`. When Choppy, `filtered_strength` is zero, while the original `ScoreResult` and its component breakdown are retained. A valid non-Choppy classification passes through the available raw Strength Score; an unavailable classification leaves `filtered_strength` unavailable. Early-Move Score is not implemented and is not changed by this milestone. Ranking and board omission remain downstream work.
 
 ## 9. Direction, smoothing and ranking
 

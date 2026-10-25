@@ -87,6 +87,8 @@ The implemented Python prototype in `services/api/src/zonescan/replay.py` accept
 
 `services/api/src/zonescan/indicators.py` provides deterministic one-minute to 5m/15m aggregation and point-in-time indicator frames. `tests/test_indicators.py` covers aggregate OHLCV and close timestamps, session isolation, missing/incomplete intervals, warm-up and known-value checks, daily sigma/RVOL history, separate contract OI and rollover availability, explicit zero-volume/missing-OI states, and invariance of earlier outputs when future candles change. These are mechanics tests on fixed fixtures, not historical performance validation.
 
+`services/api/src/zonescan/choppy.py` defines the Q-009 overlap calculation and tri-state four-condition classification. `tests/test_choppy.py` covers each strict condition boundary, exactly-two classification, missing/incomplete inputs, zero-range candles, BOS behavior, raw-score preservation with zero filtered strength, replay determinism, and future-bar isolation. These fixture tests validate mechanics only.
+
 The replay liquidity prototype uses existing confirmed swings and an explicit session calendar for period/opening levels. `tests/test_liquidity.py` checks high/low and equal-level formation, ATR tolerance and outer-price convention, sweep timing within three completed candles, timeout invalidation, missing-history/gap availability, opening-range boundaries, deterministic replay, and confirmation-time causality. These tests establish implementation behavior only; they are not historical performance validation.
 
 ### Metrics

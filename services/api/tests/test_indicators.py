@@ -159,7 +159,17 @@ class IndicatorTests(unittest.TestCase):
         bars = to_replay_bars(all_frames)
         self.assertEqual(tuple(bar.candle.timestamp for bar in bars),
                          tuple(frame.timestamp for frame in all_frames))
+        self.assertEqual(bars[-1].adx14, all_frames[-1].adx14.value)
         self.assertEqual(len(replay(bars).scores), len(bars))
+
+    def test_replay_mapper_preserves_adx_unavailable_reason(self):
+        s = session(5, 5)
+        agg = aggregate_candles(minute_candles(s), [s], "5m")
+        frame = calculate_indicators(agg, [s])[0]
+        replay_bar = to_replay_bars((frame,))[0]
+        self.assertIsNone(replay_bar.adx14)
+        self.assertIn(("adx14", "insufficient_history_or_zero_directional_movement"),
+                      replay_bar.indicator_unavailable_reasons)
 
     def test_missing_oi_and_zero_volume_are_explicit(self):
         s = session(5, 5)

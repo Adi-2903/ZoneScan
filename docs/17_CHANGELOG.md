@@ -1,5 +1,11 @@
 # Documentation Changelog
 
+## 2026-10-26 — Q-009 resolution and Choppy filter
+
+- Defined 12-candle overlap as the mean normalized range intersection across 11 adjacent pairs; zero-range pairs contribute zero, and missing/nonconsecutive bars are unavailable.
+- Added point-in-time tri-state evaluation of the four documented Choppy conditions, using confirmed same-session BOS and session-calendar coverage to establish BOS absence.
+- Added a filtered Strength value of zero for Choppy while retaining the raw `ScoreResult` and components. Early-Move Score and ranking remain unimplemented; fixture tests make no performance claim.
+
 ## 2026-10-26 — Chart liquidity levels and sweeps
 
 - Added retained swing, equal-high/low, prior-day/week, and first-15-minute levels to chronological replay, with session-calendar/history requirements and explicit unavailable diagnostics.

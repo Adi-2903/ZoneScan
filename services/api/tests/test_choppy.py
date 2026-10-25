@@ -121,13 +121,43 @@ class ChoppyTests(unittest.TestCase):
         self.assertEqual(result.scores[0].choppy.reason, "incomplete_candle")
         self.assertIsNone(result.scores[0].filtered_strength)
 
+    def test_replay_without_calendar_keeps_bos_absence_explicitly_unavailable(self):
+        s = session(5, 12)
+        bars = [bar(s, i, adx=17, day_return=.01, sigma=.01, rvol=1.1)
+                for i in range(12)]
+        result = replay(bars)
+        choppy = result.scores[-1].choppy
+        self.assertFalse(choppy.available)
+        self.assertEqual(choppy.unavailable_reasons[CONDITIONS[3]],
+                         "missing_session_calendar_for_bos")
+
     def test_replay_prefix_is_unchanged_by_future_bars(self):
         s = session(5, 14)
-        bars = [bar(s, i, adx=20, day_return=.01, sigma=.02, rvol=1.1)
-                for i in range(14)]
+        highs = [100.6, 100.7, 100.8, 101.2, 100.8, 100.7, 100.6,
+                 100.8, 100.9, 101.3, 100.9, 100.8, 100.7, 100.6]
+        lows = [99.5, 99.4, 99.3, 99.4, 99.2, 99.1, 99.3,
+                99.5, 99.4, 99.3, 99.0, 99.4, 99.6, 99.7]
+        bars = [bar(s, i, high, low, adx=20, day_return=.01, sigma=.02, rvol=1.1)
+                for i, (high, low) in enumerate(zip(highs, lows))]
         full = replay(bars, trading_sessions=[s])
         prefix = replay(bars[:12], trading_sessions=[s])
         self.assertEqual(full.scores[:12], prefix.scores)
+
+    def test_replay_uses_confirmed_same_session_bos_for_fourth_condition(self):
+        s = session(5, 14)
+        highs = [100.6, 100.7, 100.8, 101.2, 100.8, 100.7, 100.6,
+                 100.8, 100.9, 101.3, 100.9, 100.8, 100.7]
+        lows = [99.5, 99.4, 99.3, 99.4, 99.2, 99.1, 99.3,
+                99.5, 99.4, 99.3, 99.0, 99.4, 99.6]
+        bars = [bar(s, i, high, low, adx=20, day_return=.01, sigma=.01, rvol=1.1)
+                for i, (high, low) in enumerate(zip(highs, lows))]
+        bars.append(bar(s, 13, 102, 99.7, 101.8, adx=20,
+                        day_return=.01, sigma=.01, rvol=1.1))
+        result = replay(bars, trading_sessions=[s])
+        final = result.scores[-1].choppy
+        self.assertFalse(final.condition_values[CONDITIONS[3]])
+        self.assertTrue(final.available)
+        self.assertFalse(final.is_choppy)
 
 
 if __name__ == "__main__":
