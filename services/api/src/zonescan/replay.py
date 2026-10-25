@@ -2,15 +2,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta
+from statistics import fmean
 from zoneinfo import ZoneInfo
 
 from .boards import build_board_snapshots, smooth_score
 from .choppy import (candle_overlap_ratio, classify_choppy,
                      unavailable_choppy)
+from .early_move import (EarlyMoveInputs, calculate_early_move,
+                         unavailable_early_move)
 from .liquidity import (equal_level_for_swing, expected_candle_timestamps,
                         invalidate_levels_for_gap, level_from_extreme,
                         level_from_swing, session_complete, update_sweep)
-from .models import (BoardSnapshot, ChoppyResult, LiquidityLevel, ReplayBar, ReplayEvent, ReplayScore,
+from .models import (BoardSnapshot, ChoppyResult, EarlyMoveResult, LiquidityLevel,
+                     ReplayBar, ReplayEvent, ReplayScore,
                      ScoreInputs, ScoreResult, Swing, TradingSession, Zone)
 from .order_blocks import (OrderBlockParameters, _session_day,
                            detect_order_blocks, resolve_zone_overlap,
@@ -59,6 +63,7 @@ def _nearest_supporting_zone(zones: list[Zone], direction: str | None,
 
 def _choppy_for_bar(bar: ReplayBar, stream: list[ReplayBar],
                     swings: tuple[Swing, ...],
+                    bos_today: bool,
                     trading_sessions: tuple[TradingSession, ...] | list[TradingSession]
                     ) -> ChoppyResult:
     if not bar.candle.complete:
@@ -67,18 +72,13 @@ def _choppy_for_bar(bar: ReplayBar, stream: list[ReplayBar],
         return unavailable_choppy("choppy_filter_requires_5m_replay")
 
     day = _session_day(bar)
-    current_records = [(index, item) for index, item in enumerate(stream)
-                       if _session_day(item) == day]
-    session_records = [item for _, item in current_records]
+    session_records = [item for item in stream if _session_day(item) == day]
     if len(session_records) < 12:
         overlap, overlap_reason = None, "insufficient_12_completed_5m_candles"
     else:
         overlap, overlap_reason = candle_overlap_ratio(
             tuple(item.candle for item in session_records[-12:]))
 
-    session_start_index = current_records[0][0] if current_records else len(stream)
-    bos_events = break_of_structure(tuple(item.candle for item in stream), swings)
-    bos_today = any(index >= session_start_index for index, _ in bos_events)
     session = next((item for item in trading_sessions
                     if item.instrument_id == bar.candle.instrument_id
                     and item.session_date == day), None)
@@ -107,6 +107,118 @@ def _choppy_for_bar(bar: ReplayBar, stream: list[ReplayBar],
                            overlap, no_bos, reasons, overlap_reason, bos_reason)
 
 
+def _early_move_for_score(
+        score: ReplayScore,
+        bars_by_key: dict[tuple[str, str, datetime], ReplayBar],
+        sessions_by_key: dict[tuple[str, date], TradingSession],
+        prior_sessions_by_key: dict[tuple[str, date], tuple[TradingSession, ...]],
+        ) -> EarlyMoveResult:
+    if score.result.reason == "incomplete_candle":
+        return unavailable_early_move("incomplete_candle")
+    if score.timeframe != "5m":
+        return unavailable_early_move("early_move_requires_5m_replay")
+    current = bars_by_key.get((score.instrument_id, "5m", score.timestamp))
+    if current is None or not current.candle.complete:
+        return unavailable_early_move("incomplete_or_missing_5m_candle")
+    at = score.timestamp
+    current_day = _session_day(current)
+    current_session = sessions_by_key.get((score.instrument_id, current_day))
+    reasons: dict[str, str] = {}
+    current_volume: float | None = None
+    slot = 0
+
+    previous = bars_by_key.get((score.instrument_id, "5m",
+                                at - timedelta(minutes=15)))
+    if previous is not None and _session_day(previous) != current_day:
+        previous = None
+    previous_price = previous.candle.close if previous and previous.candle.complete else None
+    if previous_price is None:
+        reasons["missing_price_15m_ago"] = "missing_or_incomplete_previous_15m_candle"
+
+    atr = current.atr if current.candle.complete else None
+    if atr is None:
+        reasons["missing_atr14_5m"] = "missing_or_incomplete_aligned_5m_atr"
+
+    baseline: float | None = None
+    if current_session is None:
+        reasons["missing_baseline_volume_15m"] = "missing_current_session_calendar"
+        reasons["missing_current_volume_15m"] = "missing_current_session_calendar"
+    else:
+        elapsed = at - current_session.opens_at
+        slot = int(elapsed.total_seconds() // timedelta(minutes=15).total_seconds())
+        if at <= current_session.opens_at or at > current_session.closes_at:
+            reasons["missing_baseline_volume_15m"] = "timestamp_outside_current_session"
+            reasons["missing_current_volume_15m"] = "timestamp_outside_current_session"
+        elif elapsed.total_seconds() % 300:
+            reasons["missing_baseline_volume_15m"] = "timestamp_not_aligned_to_5m_session_slot"
+            reasons["missing_current_volume_15m"] = "timestamp_not_aligned_to_5m_session_slot"
+        elif slot < 1:
+            reasons["missing_baseline_volume_15m"] = "no_completed_15m_volume_slot"
+            reasons["missing_current_volume_15m"] = "no_completed_15m_volume_slot"
+        else:
+            period_end = current_session.opens_at + timedelta(minutes=15 * slot)
+
+            def period_volume(session: TradingSession, end: datetime) -> float | None:
+                start = end - timedelta(minutes=10)
+                period_bars = [bars_by_key.get((score.instrument_id, "5m", stamp))
+                               for stamp in (start, start + timedelta(minutes=5), end)]
+                if any(bar is None or not bar.candle.complete
+                       or _session_day(bar) != session.session_date
+                       for bar in period_bars):
+                    return None
+                return sum(bar.candle.volume for bar in period_bars if bar is not None)
+
+            current_volume = period_volume(current_session, period_end)
+            if current_volume is None:
+                reasons["missing_baseline_volume_15m"] = "missing_or_incomplete_current_15m_window"
+                reasons["missing_current_volume_15m"] = "missing_or_incomplete_current_15m_window"
+            prior_sessions = prior_sessions_by_key.get(
+                (score.instrument_id, current_session.session_date), ())[-20:]
+            if len(prior_sessions) < 20:
+                reasons["missing_baseline_volume_15m"] = "insufficient_20_prior_sessions"
+            elif current_volume is not None:
+                reference_volumes: list[float] = []
+                for session in prior_sessions:
+                    reference_end = session.opens_at + timedelta(minutes=15 * slot)
+                    if reference_end > session.closes_at:
+                        reference_volumes = []
+                        reasons["missing_baseline_volume_15m"] = "prior_session_slot_outside_session"
+                        break
+                    volume = period_volume(session, reference_end)
+                    if volume is None:
+                        reference_volumes = []
+                        reasons["missing_baseline_volume_15m"] = "missing_prior_session_15m_volume"
+                        break
+                    reference_volumes.append(volume)
+                if len(reference_volumes) == 20:
+                    baseline = fmean(reference_volumes)
+                    if baseline <= 0:
+                        reasons["missing_baseline_volume_15m"] = "zero_prior_session_volume_baseline"
+                        baseline = None
+
+    unavailable = dict(current.indicator_unavailable_reasons)
+    if current.oi_change_30m_pct is None:
+        reasons["missing_oi_change_30m_pct"] = unavailable.get(
+            "oi_change_30m_pct", "missing_oi_change_30m_pct")
+    if current.day_return is None:
+        reasons["missing_day_return"] = unavailable.get("day_return", "missing_day_return")
+    if current.daily_sigma20 is None:
+        reasons["missing_daily_sigma20"] = unavailable.get(
+            "daily_sigma20", "missing_daily_sigma20")
+
+    return calculate_early_move(EarlyMoveInputs(
+        direction=score.direction,
+        day_return=current.day_return,
+        daily_sigma20=current.daily_sigma20,
+        oi_change_30m_pct=current.oi_change_30m_pct,
+        current_price=current.candle.close,
+        price_15m_ago=previous_price,
+        atr14_5m=atr,
+        current_volume_15m=current_volume if current_session and slot >= 1 else None,
+        baseline_volume_15m=baseline,
+        unavailable_reasons=tuple(reasons.items())))
+
+
 def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
            parameters: OrderBlockParameters = OrderBlockParameters(),
            swing_left: int = 3, swing_right: int = 3,
@@ -120,6 +232,7 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
     zones: list[Zone] = []
     scores: list[ReplayScore] = []
     previous_smoothed: dict[tuple[str, str, date], float] = {}
+    session_bos_seen: set[tuple[str, str, date]] = set()
     symbols: dict[str, str] = {}
     zone_formation_sessions: dict[str, int] = {}
     events: list[ReplayEvent] = []
@@ -309,6 +422,10 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
         candles = tuple(item.candle for item in stream)
         swings = confirmed_swings(candles, swing_left, swing_right,
                                   decision_time=candle.timestamp)
+        bos_key = (candle.instrument_id, bar.timeframe, day)
+        if (candle.complete and bar.timeframe == "5m"
+                and break_of_structure((candle,), swings)):
+            session_bos_seen.add(bos_key)
         for swing in swings:
             swing_key = (candle.instrument_id, bar.timeframe, swing.kind, swing.timestamp)
             if swing_key not in all_swings:
@@ -427,7 +544,8 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
                 nearest_zone=nearest_zone,
             )
             score = calculate_strength(score_inputs)
-            choppy = _choppy_for_bar(bar, stream, swings, trading_sessions)
+            choppy = _choppy_for_bar(bar, stream, swings,
+                                     bos_key in session_bos_seen, trading_sessions)
             filtered_strength = None
             if choppy.available:
                 filtered_strength = (0.0 if choppy.is_choppy else score.strength)
@@ -456,6 +574,23 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
                                       choppy=unavailable_choppy("incomplete_candle"),
                                       session_date=day, timeframe=bar.timeframe))
 
-    boards = build_board_snapshots(scores, symbols)
-    return ReplayResult(tuple(events), tuple(all_swings.values()), tuple(zones), tuple(scores),
+    bars_by_key = {(bar.candle.instrument_id, bar.timeframe, bar.candle.timestamp): bar
+                   for bar in bars}
+    sessions_by_key = {(session.instrument_id, session.session_date): session
+                       for session in trading_sessions}
+    sessions_by_instrument: dict[str, list[TradingSession]] = {}
+    for session in trading_sessions:
+        sessions_by_instrument.setdefault(session.instrument_id, []).append(session)
+    prior_sessions_by_key = {
+        key: tuple(sorted((session for session in values
+                           if session.session_date < key[1]),
+                          key=lambda session: session.session_date))
+        for instrument_id, values in sessions_by_instrument.items()
+        for key in ((instrument_id, session.session_date) for session in values)
+    }
+    scored = [replace(score, early_move=_early_move_for_score(
+        score, bars_by_key, sessions_by_key, prior_sessions_by_key))
+              for score in scores]
+    boards = build_board_snapshots(scored, symbols)
+    return ReplayResult(tuple(events), tuple(all_swings.values()), tuple(zones), tuple(scored),
                         tuple(liquidity_levels), boards)

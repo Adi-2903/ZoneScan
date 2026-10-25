@@ -4,7 +4,7 @@
 **Transport:** HTTPS JSON for REST; SSE for one-way live updates.  
 **Time:** ISO 8601 with explicit `+05:30` offset for all market timestamps.
 
-This is the proposed contract. Keep schemas centralized and validate request/response models in tests. Any breaking change requires a version or migration plan.
+This document describes the proposed product contract. The local API prototype below implements only read-only synthetic status, board, and stock detail; it does not implement authentication, subscriber access, or public/live service.
 
 ## Endpoint inventory
 
@@ -32,6 +32,14 @@ This is the proposed contract. Keep schemas centralized and validate request/res
 | GET | `/api/v1/stream` | Subscriber | SSE stream for board/status changes |
 
 An endpoint not implemented in the current phase should be omitted or return a documented not-available response. Do not expose dummy endpoints that pretend to work.
+
+### Local analytical prototype
+
+`GET /api/v1/market/status`, `GET /api/v1/board?side=bull|bear`, and `GET /api/v1/stocks/{symbol}` are implemented for local development. They use a process-cached, fixed synthetic dataset, a chronological indicator/replay pass, and the production scoring and board functions. Every response reports `data_mode: synthetic`, `data_status: synthetic`, and `data_source: deterministic_synthetic_fixture`; `market_state` is `unknown`. The fixture's fixed `as_of` time is not a current market timestamp. Sector labels are explicit fixture inputs, not sector aggregation.
+
+Board rows include raw/component Strength Score output, filtered and smoothed values, Early-Move availability/breakdown, current synthetic close, active-zone state, liquidity levels, direction, and quality flags. Stock detail includes the same timestamp/source/version metadata, indicator availability/value/reason fields, score details, zones, and levels. Missing analytics remain `null` with explicit availability/reason metadata. Board side must be `bull` or `bear` (400 otherwise); unknown stock symbols return 404. Invalid requests use `{ "error": { "code", "message", "request_id" } }`.
+
+This local fixture API does not enable Upstox as an API source. The optional Upstox workflow remains a separately invoked historical sample; it is not a live feed. The local endpoints do not imply data rights, Gate approval, or performance validation.
 
 ## Common board response shape
 

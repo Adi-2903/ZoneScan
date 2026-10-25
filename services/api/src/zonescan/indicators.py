@@ -289,11 +289,13 @@ def to_replay_bars(frames: tuple[IndicatorFrame, ...],
             continue
         get = lambda name: getattr(frame, name).value if getattr(frame, name).available else None
         unavailable = tuple((name, getattr(frame, name).reason or f"missing_{name}")
-                            for name in ("atr14", "daily_sigma20", "day_return", "rvol", "adx14")
+                            for name in ("atr14", "daily_sigma20", "day_return", "rvol", "adx14",
+                                         "oi_change_30m_pct")
                             if not getattr(frame, name).available)
         result.append(ReplayBar(frame.candle, get("atr14"), get("rvol"), frame.timeframe,
             frame.timestamp.astimezone(IST).date(), get("day_return"), get("daily_sigma20"),
             get("oi_change_daily_pct"), get("price_above_vwap"), get("price_above_ema20"),
             (sector_directions or {}).get((frame.instrument_id, frame.timestamp)),
-            get("adx14"), unavailable))
+            get("adx14"), unavailable,
+            oi_change_30m_pct=get("oi_change_30m_pct")))
     return tuple(result)

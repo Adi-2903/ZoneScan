@@ -109,6 +109,10 @@ Use REST for snapshots and changes initiated by a user. Use Server-Sent Events f
 
 WebSockets are not needed for the first version unless a measured requirement justifies bi-directional, high-frequency interaction.
 
+### Local fixture API prototype
+
+The optional FastAPI boundary exposes read-only status, board, and stock-detail routes over `AnalyticsService`. The service aggregates fixed synthetic 1-minute fixture candles, calculates point-in-time indicators, then invokes the shared chronological replay and board implementation once per process. Requests read its cached immutable snapshot instead of replaying the data again. The legacy health and development-snapshot routes remain available. This is local prototype behavior only: it has no live provider, persistence, authentication, entitlement enforcement, or production worker and must label all fixture output synthetic. The optional Upstox historical sample remains a separate command/workflow.
+
 ## Environments
 
 - `local`: synthetic fixtures only by default; no production credentials.

@@ -142,6 +142,31 @@ class IndicatorFrame:
 
 
 @dataclass(frozen=True, slots=True)
+class EarlyMoveResult:
+    available: bool
+    score: float | None
+    components: dict[str, float | None]
+    component_reasons: dict[str, str]
+    reason: str | None = None
+    algorithm_version: str = "v0.1-early-move"
+    parameter_version: str = "2026-10-26.1"
+
+    def __post_init__(self) -> None:
+        if self.available:
+            if self.score is None or not isfinite(self.score) or not 0 <= self.score <= 100:
+                raise ValueError("available Early-Move score must be finite and in [0, 100]")
+            if self.reason is not None or self.component_reasons:
+                raise ValueError("available Early-Move result cannot have unavailable reasons")
+            if any(value is None or not isfinite(value) for value in self.components.values()):
+                raise ValueError("available Early-Move result requires finite components")
+        else:
+            if self.score is not None:
+                raise ValueError("unavailable Early-Move result cannot carry a score")
+            if not self.reason or not self.component_reasons:
+                raise ValueError("unavailable Early-Move result requires reasons")
+
+
+@dataclass(frozen=True, slots=True)
 class ChoppyResult:
     available: bool
     is_choppy: bool | None
@@ -243,6 +268,7 @@ class ReplayBar:
     adx14: float | None = None
     indicator_unavailable_reasons: tuple[tuple[str, str], ...] = ()
     symbol: str | None = None
+    oi_change_30m_pct: float | None = None
 
     def __post_init__(self) -> None:
         if self.timeframe not in ("5m", "15m"):
@@ -276,6 +302,7 @@ class ReplayScore:
     traded_value: float | None = None
     session_date: date | None = None
     timeframe: str = "5m"
+    early_move: EarlyMoveResult | None = None
 
 
 @dataclass(frozen=True, slots=True)

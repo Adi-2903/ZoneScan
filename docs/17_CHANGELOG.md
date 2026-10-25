@@ -1,3 +1,9 @@
+## 2026-10-26 ? Early-Move Score replay prototype
+
+- Added an independent Early-Move score with OI30, 15m momentum, 15m volume burst, run-penalty breakdown, and explicit unavailable reasons.
+- Wired 5m replay to the shared OI interpretation, exact prior 15m close, aligned ATR14_5m, and same-slot completed 15m volume from 20 prior supplied sessions.
+- Kept Strength, board ranking, and chart liquidity outputs separate. Deterministic fixture tests only; no historical performance claim.
+
 ## 2026-10-26 ? Direction classification and deterministic boards
 
 - Tightened directional classification to require signed day return with matching structure/VWAP context, distinguishing neutral from unavailable inputs.

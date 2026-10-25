@@ -180,18 +180,18 @@ All six component weights sum to 1. If a required component is unavailable, do n
 
 ## 7. Early-Move Score (provisional name)
 
-This is a separate heuristic intended to reward early directional acceleration and penalize a move that has already run. It is **not** a chart-liquidity measurement.
+This is a separate heuristic intended to reward early directional acceleration and penalize a move that has already run. It is not a chart-liquidity measurement and does not alter Strength Score or board ranking.
 
-`EarlyMove = 100 × (0.40 × OI30 + 0.35 × Mom15 + 0.25 × Burst15) × (1 - RunPenalty)`
+`EarlyMove = 100 * (0.40 * OI30 + 0.35 * Mom15 + 0.25 * Burst15) * (1 - RunPenalty)`
 
-Proposed deterministic component definitions:
+The implemented v0.1 components are:
 
-- `OI30`: `min(abs(OI_change_30m_pct)/0.05, 1) × same-side OI factor`, using the table above.
-- `Mom15`: `clip(abs(price_now - price_15m_ago) / ATR14_5m, 0, 1)`, provided the movement aligns with the scored direction; otherwise 0.
-- `Burst15`: compare the last completed 15-minute volume with the average 15-minute volume for the same elapsed time over the previous 20 sessions; `clip((ratio - 1)/1, 0, 1)`. This maps normal baseline volume to 0 and 2× baseline or higher to 1.
-- `RunPenalty`: let `x = abs(day_return)/daily_sigma20`. `RunPenalty=0` for `x <= 1.5`; increase linearly from 0 to 0.6 for `1.5 < x < 3`; cap at `0.6` for `x >= 3`.
+- `OI30`: use the shared `calculate_oi_component(day_return, OI_change_30m_pct, direction)` function: `min(abs(OI_change_30m_pct)/0.05, 1) * same-side OI factor`. It uses the same price/OI interpretation table as Strength. A genuine zero OI change is valid zero; missing OI or unavailable direction context makes the component unavailable.
+- `Mom15`: `clip(abs(price_now - price_15m_ago) / ATR14_5m, 0, 1)`, using completed 15m closes and the aligned completed 5m ATR. Movement in the classified direction contributes the normalized value; opposing or flat movement is valid zero. Missing prior close, ATR, or bullish/bearish direction makes this component unavailable.
+- `Burst15`: divide the current completed 15m window volume by the mean volume of the same elapsed 15m slot in the previous 20 supplied sessions, then `clip((ratio - 1), 0, 1)`. All 20 prior session candles must be present and complete; a missing baseline candle or zero mean makes it unavailable. A zero current volume is valid zero when the baseline is valid.
+- `RunPenalty`: with `x = abs(day_return)/daily_sigma20`, the penalty is `0` for `x <= 1.5`, rises linearly to `0.6` between `1.5` and `3`, and is `0.6` for `x >= 3`. Missing return/sigma or nonpositive sigma makes it unavailable.
 
-These component normalizations are proposed defaults where the original brief was not dimensionally or operationally precise. They must be validated against historical data and kept versioned. If required OI or baseline volume is unavailable, the score is unavailable.
+Sequential replay emits an `EarlyMoveResult` on each replay output. It calculates a value only for completed 5m bars, using the same-timestamp replay direction and ATR, the close exactly 15 minutes earlier, and the latest fully completed session-anchored 15m window derived from three completed 5m candles. Its baseline uses the matching elapsed 15m window in the prior 20 supplied sessions. A 15m-only output carries an explicit `early_move_requires_5m_replay` unavailable state. The result contains all four component values/reasons and its algorithm/parameter versions. If any required component is unavailable, the total is unavailable; components are not renormalized. These are provisional direction and cadence conventions (D-027), tested on deterministic fixtures only, not historical performance validation.
 
 ## 8. Choppy filter
 

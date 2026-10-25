@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 import unittest
@@ -188,7 +189,14 @@ class LiquidityTests(unittest.TestCase):
         second = replay(bars, trading_sessions=[previous, current])
         self.assertEqual(first, second)
         self.assertEqual(len(first.scores), len(bars))
-        self.assertEqual(first.scores, replay(bars).scores)
+        without_calendar = replay(bars)
+        self.assertEqual(tuple(replace(score, early_move=None) for score in first.scores),
+                         tuple(replace(score, early_move=None)
+                               for score in without_calendar.scores))
+        self.assertEqual("no_completed_15m_volume_slot",
+                         first.scores[0].early_move.component_reasons["Burst_15m"])
+        self.assertEqual("missing_current_session_calendar",
+                         without_calendar.scores[0].early_move.component_reasons["Burst_15m"])
 
 
 if __name__ == "__main__":

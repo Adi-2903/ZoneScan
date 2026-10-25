@@ -129,6 +129,8 @@ class IndicatorTests(unittest.TestCase):
         current_frame = [f for f in frames if f.timestamp.date() == current.session_date][-1]
         self.assertAlmostEqual(current_frame.oi_change_daily_pct.value, .34)
         self.assertAlmostEqual(current_frame.oi_change_30m_pct.value, 30 / 104)
+        mapped = to_replay_bars((current_frame,))[0]
+        self.assertAlmostEqual(mapped.oi_change_30m_pct, 30 / 104)
 
     def test_future_candles_and_oi_do_not_change_earlier_frames(self):
         s = session(5, 30)
