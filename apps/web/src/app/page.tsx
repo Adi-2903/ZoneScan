@@ -227,8 +227,12 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
         <div className="indicator-grid">{Object.entries(stock.indicators).map(([key, input]) => {
           if (!input || typeof input !== "object" || !("available" in input)) return null;
           const { available, value, reason } = input;
+          const percentMetric = ["day_return", "daily_sigma20", "oi_change_daily_pct", "oi_change_30m_pct"].includes(key);
+          const formattedValue = typeof value === "number"
+            ? percentMetric ? `${(value * 100).toFixed(2)}%` : key === "rvol" ? `${value.toFixed(2)}×` : value.toFixed(3)
+            : typeof value === "boolean" ? value ? "Above" : "Below" : "Unavailable";
           return <div className="indicator-item" key={key}><span>{key.replaceAll("_", " ")}</span>
-            <strong>{available && value !== null ? typeof value === "boolean" ? value ? "Above" : "Below" : Number(value).toFixed(3) : "Unavailable"}</strong>
+            <strong>{available && value !== null ? formattedValue : "Unavailable"}</strong>
             {!available && <small>{reason ?? "Input unavailable"}</small>}
           </div>;
         })}</div>

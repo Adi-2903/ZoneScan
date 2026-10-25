@@ -71,8 +71,8 @@ In a second window, install and start the frontend (Node.js 20.9 or newer):
 ```powershell
 cd apps/web
 Copy-Item .env.example .env.local
-npm install
-npm run dev
+npm.cmd install
+npm.cmd run dev
 ```
 
 Open `http://localhost:3000`. Set `NEXT_PUBLIC_API_BASE_URL` in `apps/web/.env.local` if the API is hosted somewhere other than `http://127.0.0.1:8000`. The dashboard supports bullish/bearish board switching, stock selection, score/indicator/zone/level inspection, theme switching, and fixture-backed 1m/5m/15m/daily chart timeframes. All screens persistently identify the content as synthetic. The API service builds its fixed replay on first analytical request, which can take several seconds.
