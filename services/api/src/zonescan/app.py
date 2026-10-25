@@ -7,12 +7,16 @@ from zoneinfo import ZoneInfo
 
 from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .analytics_service import AnalyticsService, versions
 from .fixtures import SyntheticFixtureProvider
 
 app = FastAPI(title="ZoneScan API", version="0.1.0")
+app.add_middleware(CORSMiddleware, allow_origins=[
+    "http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=False, allow_methods=["GET"], allow_headers=["*"])
 provider = SyntheticFixtureProvider()
 IST = ZoneInfo("Asia/Kolkata")
 
@@ -180,6 +184,22 @@ def stock(symbol: str, service: AnalyticsService = Depends(get_analytics_service
             "strength": _score_payload(score),
             "zones": [_zone_payload(zone) for zone in service.zones_for(instrument_id)],
             "liquidity_levels": [_level_payload(level) for level in service.liquidity_for(instrument_id)]}
+
+
+@app.get("/api/v1/stocks/{symbol}/candles")
+def stock_candles(symbol: str, tf: str = Query("5m", pattern="^(1m|5m|15m|1d)$"),
+                  service: AnalyticsService = Depends(get_analytics_service)):
+    instrument_id = service.instrument_id_for_symbol(symbol)
+    if instrument_id is None:
+        return _error(404, "UNKNOWN_SYMBOL", f"Unknown symbol: {symbol}.")
+    candles = service.candles_for(instrument_id, tf)
+    return {**_metadata(service), "symbol": service.instrument(instrument_id).symbol,
+            "timeframe": tf, "candles": [{
+                "timestamp": candle.timestamp.isoformat(), "open": candle.open,
+                "high": candle.high, "low": candle.low, "close": candle.close,
+                "volume": candle.volume, "complete": candle.complete,
+                "quality_flags": list(candle.quality_flags),
+            } for candle in candles]}
 
 
 @app.get("/api/v1/dev/market")

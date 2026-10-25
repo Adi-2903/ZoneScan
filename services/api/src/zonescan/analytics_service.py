@@ -40,6 +40,14 @@ class AnalyticsService:
                              for item in self.dataset.instruments}
         aggregated = aggregate_candles(self.dataset.one_minute_candles,
                                        self.dataset.sessions, "5m")
+        aggregated_15m = aggregate_candles(self.dataset.one_minute_candles,
+                                           self.dataset.sessions, "15m")
+        self._candles_by_timeframe = {
+            "1m": self.dataset.one_minute_candles,
+            "5m": aggregated.candles,
+            "15m": aggregated_15m.candles,
+            "1d": self.dataset.daily_candles,
+        }
         frames = calculate_indicators(
             aggregated, self.dataset.sessions, self.dataset.daily_candles,
             self.dataset.open_interest, self.dataset.contract_mappings)
@@ -118,6 +126,15 @@ class AnalyticsService:
                             if level.instrument_id == instrument_id
                             and level.confirmed_at <= self.snapshot.as_of),
                             key=lambda level: (level.confirmed_at, level.level_id)))
+
+    def candles_for(self, instrument_id: str, timeframe: str):
+        candles = tuple(candle for candle in self._candles_by_timeframe[timeframe]
+                        if candle.instrument_id == instrument_id)
+        if timeframe == "1d":
+            return candles
+        latest_session = self.snapshot.as_of.date()
+        return tuple(candle for candle in candles
+                     if candle.timestamp.date() == latest_session)
 
 
 def versions() -> dict[str, str]:

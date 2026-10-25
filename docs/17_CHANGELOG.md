@@ -12,6 +12,12 @@
 
 # Documentation Changelog
 
+## 2026-10-26 — Responsive synthetic dashboard prototype
+
+- Added a mobile-first Next.js/TypeScript/Tailwind dashboard for cached synthetic market status, bullish/bearish boards, and stock analytics, with theme extension, loading/error/empty states, accessible text direction labels, and responsive layout.
+- Added fixture-backed 1m/5m/15m/daily candles to the API for an interactive candlestick chart with togglable active-zone and unswept-liquidity overlays; 5m/15m use production aggregation.
+- Documented local backend/frontend setup. The UI remains a synthetic local prototype and does not enable live data, auth, or trading actions.
+
 ## 2026-10-26 — Analytical engine API prototype
 
 - Added a cached synthetic analytics service that aggregates the fixed fixture, calculates indicators, and calls chronological production replay/board functions once per process.

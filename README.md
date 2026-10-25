@@ -54,3 +54,25 @@ See [`docs/08_SECURITY_PRIVACY_COMPLIANCE.md`](./docs/08_SECURITY_PRIVACY_COMPLI
 Python 3.12 or newer is required. From `services/api`, run the standard-library test suite with `python -m unittest discover -s tests` (set `PYTHONPATH=src` in environments that do not install the package). To run the optional HTTP boundary, install `pip install -e ".[api]"`, then run `uvicorn zonescan.app:app --app-dir src --reload`. The app exposes `/health`, `/api/v1/market/status`, `/api/v1/dev/market`, `/api/v1/board?side=bull`, `/api/v1/board?side=bear`, and `/api/v1/stocks/SYNBULL` or `/api/v1/stocks/SYNBEAR`. The analytical endpoints build one fixed synthetic replay per process; the first analytical request takes several seconds. Every response labels the data synthetic; these are not live prices or historical performance evidence. No credentials or network access are needed. The optional Upstox historical sample remains separate and does not change API mode.
 
 The current foundation includes candle validation, a provider protocol, deterministic synthetic fixture data, confirmed swing detection, Strength Score calculation, order-block detection/lifecycle, chronological replay, indicators, liquidity levels, choppy filtering, Early-Move Score, and timestamped boards. Run tests from `services/api` with `$env:PYTHONPATH='src'; python -m unittest discover -s tests -v` in PowerShell. To see a synthetic score breakdown, run `$env:PYTHONPATH='src'; python examples/score_synthetic.py`. To see replay zone creation, test, and mitigation, run `$env:PYTHONPATH='src'; python examples/replay_synthetic.py`. The local API is fixture-backed only; licensed data ingestion, persistence, authentication, and public service remain unimplemented.
+
+### Local dashboard
+
+The responsive Next.js app is in `apps/web` and reads the synthetic API by default. Start the backend in one PowerShell window from the repository root:
+
+```powershell
+cd services/api
+pip install -e ".[api]"
+$env:PYTHONPATH = "src"
+uvicorn zonescan.app:app --app-dir src --reload
+```
+
+In a second window, install and start the frontend (Node.js 20.9 or newer):
+
+```powershell
+cd apps/web
+Copy-Item .env.example .env.local
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`. Set `NEXT_PUBLIC_API_BASE_URL` in `apps/web/.env.local` if the API is hosted somewhere other than `http://127.0.0.1:8000`. The dashboard supports bullish/bearish board switching, stock selection, score/indicator/zone/level inspection, theme switching, and fixture-backed 1m/5m/15m/daily chart timeframes. All screens persistently identify the content as synthetic. The API service builds its fixed replay on first analytical request, which can take several seconds.

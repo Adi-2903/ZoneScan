@@ -62,6 +62,18 @@ class AnalyticalApiTests(unittest.TestCase):
         self.assertIn("zones", body)
         self.assertIn("liquidity_levels", body)
 
+    def test_candles_endpoint_uses_fixture_and_validates_timeframe(self):
+        response = self.client.get("/api/v1/stocks/SYNBULL/candles", params={"tf": "5m"})
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["data_mode"], "synthetic")
+        self.assertEqual(body["timeframe"], "5m")
+        self.assertTrue(body["candles"])
+        self.assertEqual(body["candles"][0]["quality_flags"] and
+                         "aggregated_5m" in body["candles"][0]["quality_flags"], True)
+        invalid = self.client.get("/api/v1/stocks/SYNBULL/candles", params={"tf": "2m"})
+        self.assertEqual(invalid.status_code, 400)
+
     def test_missing_analytical_inputs_stay_unavailable(self):
         from dataclasses import replace
         from zonescan.analytics_service import AnalyticsService
