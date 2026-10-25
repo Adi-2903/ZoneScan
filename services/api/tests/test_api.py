@@ -21,6 +21,9 @@ class AnalyticalApiTests(unittest.TestCase):
         self.assertEqual(payload["data_status"], "synthetic")
         self.assertEqual(payload["data_source"], "deterministic_synthetic_fixture")
         self.assertTrue(payload["as_of"].endswith("+05:30"))
+        cors = self.client.get("/api/v1/market/status",
+                               headers={"Origin": "http://localhost:3000"})
+        self.assertEqual(cors.headers.get("access-control-allow-origin"), "http://localhost:3000")
         self.assertEqual(self.client.get("/api/v1/dev/market").status_code, 200)
 
     def test_bull_and_bear_board_responses(self):

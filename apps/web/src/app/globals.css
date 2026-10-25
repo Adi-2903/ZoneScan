@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme inline {
+  --color-background: var(--page);
+  --color-foreground: var(--text);
+  --color-positive: var(--green);
+  --color-negative: var(--red);
+  --color-warning: var(--amber);
+}
+
 :root {
   color-scheme: dark;
   --page: #080c12;

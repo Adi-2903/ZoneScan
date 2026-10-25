@@ -28,23 +28,29 @@ export default function Dashboard() {
   const [detailError, setDetailError] = useState<string | null>(null);
   const [lightTheme, setLightTheme] = useState(false);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const refresh = useCallback(async (signal?: AbortSignal) => {
     try {
-      const [nextStatus, nextBoard] = await Promise.all([api.status(), api.board(side)]);
+      const [nextStatus, nextBoard] = await Promise.all([api.status(signal), api.board(side, signal)]);
       setStatus(nextStatus);
       setBoard(nextBoard);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to load market data.");
+      if (!signal?.aborted) setError(cause instanceof Error ? cause.message : "Unable to load market data.");
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, [side]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    const controller = new AbortController();
+    void Promise.resolve().then(() => refresh(controller.signal));
+    return () => controller.abort();
+  }, [refresh]);
 
   const openStock = useCallback((symbol: string) => {
+    setStock(null);
+    setCandles(null);
+    setDetailError(null);
+    setDetailLoading(true);
     setSelectedSymbol(symbol);
     setView("stock");
   }, []);
@@ -52,7 +58,6 @@ export default function Dashboard() {
   useEffect(() => {
     if (view !== "stock" || !selectedSymbol) return;
     let active = true;
-    setDetailLoading(true);
     Promise.all([api.stock(selectedSymbol), api.candles(selectedSymbol, timeframe)])
       .then(([detail, chart]) => {
         if (active) { setStock(detail); setCandles(chart); setDetailError(null); }
@@ -65,6 +70,7 @@ export default function Dashboard() {
   }, [view, selectedSymbol, timeframe, detailRefresh]);
 
   const rows = board?.side === side ? board.rows : [];
+  const boardLoading = loading || (!error && board?.side !== side);
   const meta = stock ?? board ?? status;
 
   return <main className={lightTheme ? "app light" : "app"}>
@@ -109,7 +115,7 @@ export default function Dashboard() {
               <p className="subheading">{view === "board" ? "Ranked synthetic examples from the deterministic replay fixture." : "Point-in-time analytics and completed candle context."}</p>
             </div>
             <div className="heading-actions">
-              {view === "board" ? <button className="refresh-button" onClick={() => void refresh()} disabled={loading}>↻ <span>Refresh</span></button>
+              {view === "board" ? <button className="refresh-button" onClick={() => { setError(null); setLoading(true); void refresh(); }} disabled={loading}>↻ <span>Refresh</span></button>
                 : <span className="asof-pill">Snapshot · {meta ? formatTimestamp(meta.as_of) : "—"}</span>}
             </div>
           </div>
@@ -126,17 +132,17 @@ export default function Dashboard() {
             <div className="board-heading-row">
               <div className="tabs" role="tablist" aria-label="Board direction">
                 <button role="tab" aria-selected={side === "bull"} className={side === "bull" ? "selected bull-tab" : ""}
-                  onClick={() => setSide("bull")}>↗ Bullish <span>{side === "bull" ? rows.length : ""}</span></button>
+                  onClick={() => { setError(null); setLoading(true); setSide("bull"); }}>↗ Bullish <span>{side === "bull" ? rows.length : ""}</span></button>
                 <button role="tab" aria-selected={side === "bear"} className={side === "bear" ? "selected bear-tab" : ""}
-                  onClick={() => setSide("bear")}>↘ Bearish <span>{side === "bear" ? rows.length : ""}</span></button>
+                  onClick={() => { setError(null); setLoading(true); setSide("bear"); }}>↘ Bearish <span>{side === "bear" ? rows.length : ""}</span></button>
               </div>
               <div className="board-snapshot">{board ? `Snapshot · ${formatTimestamp(board.as_of)}` : "Snapshot · —"}</div>
             </div>
-            <BoardTable rows={rows} loading={loading} side={side} onSelect={openStock} />
+            <BoardTable rows={rows} loading={boardLoading} side={side} onSelect={openStock} />
             <div className="board-footnote"><span>ⓘ</span> Scores are deterministic heuristics from fixture inputs. They do not indicate certainty or profitability.</div>
           </> : <StockDetail symbol={selectedSymbol} stock={stock} candles={candles}
-            timeframe={timeframe} setTimeframe={setTimeframe} loading={detailLoading}
-            error={detailError} retry={() => setDetailRefresh((value) => value + 1)} />}
+            timeframe={timeframe} setTimeframe={(value) => { setCandles(null); setDetailLoading(true); setTimeframe(value); }} loading={detailLoading}
+            error={detailError} retry={() => { setStock(null); setCandles(null); setDetailLoading(true); setDetailRefresh((value) => value + 1); }} />}
 
           <footer className="footer"><span>ZoneScan · local prototype</span><span>Algorithm {meta?.algorithm_version ?? "—"} · Parameters {meta?.parameter_version ?? "—"}</span></footer>
         </div>
@@ -195,7 +201,8 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
         <div className="timeframe-tabs" aria-label="Chart timeframe">{["1m", "5m", "15m", "1d"].map((tf) => <button key={tf} className={timeframe === tf ? "active" : ""} onClick={() => setTimeframe(tf)}>{tf}</button>)}</div>
       </div>
       {error && <div className="inline-error">{error}</div>}
-      {candles ? <ZoneChart candles={candles.candles} zones={stock.zones} levels={stock.liquidity_levels} timeframe={timeframe} />
+      {loading && !candles ? <div className="empty-chart"><span className="spinner" /> Loading candle data…</div>
+        : candles ? <ZoneChart candles={candles.candles} zones={stock.zones} levels={stock.liquidity_levels} timeframe={timeframe} />
         : <div className="empty-chart">Candle data unavailable for this timeframe.</div>}
     </section>
 

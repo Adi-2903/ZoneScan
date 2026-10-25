@@ -123,11 +123,12 @@ type ErrorEnvelope = { error?: { code?: string; message?: string; request_id?: s
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
 
-async function getJson<T>(path: string): Promise<T> {
+async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
-  } catch {
+    response = await fetch(`${API_BASE}${path}`, { cache: "no-store", signal });
+  } catch (cause) {
+    if (cause instanceof Error && cause.name === "AbortError") throw cause;
     throw new Error(`Cannot reach the ZoneScan API at ${API_BASE}. Start the backend and retry.`);
   }
   if (!response.ok) {
@@ -141,11 +142,11 @@ async function getJson<T>(path: string): Promise<T> {
 }
 
 export const api = {
-  status: () => getJson<MarketStatus>("/api/v1/market/status"),
-  board: (side: "bull" | "bear") => getJson<BoardResponse>(`/api/v1/board?side=${side}`),
-  stock: (symbol: string) => getJson<StockResponse>(`/api/v1/stocks/${encodeURIComponent(symbol)}`),
-  candles: (symbol: string, timeframe: string) => getJson<CandleResponse>(
-    `/api/v1/stocks/${encodeURIComponent(symbol)}/candles?tf=${encodeURIComponent(timeframe)}`),
+  status: (signal?: AbortSignal) => getJson<MarketStatus>("/api/v1/market/status", signal),
+  board: (side: "bull" | "bear", signal?: AbortSignal) => getJson<BoardResponse>(`/api/v1/board?side=${side}`, signal),
+  stock: (symbol: string, signal?: AbortSignal) => getJson<StockResponse>(`/api/v1/stocks/${encodeURIComponent(symbol)}`, signal),
+  candles: (symbol: string, timeframe: string, signal?: AbortSignal) => getJson<CandleResponse>(
+    `/api/v1/stocks/${encodeURIComponent(symbol)}/candles?tf=${encodeURIComponent(timeframe)}`, signal),
 };
 
 export function formatTimestamp(value: string): string {
