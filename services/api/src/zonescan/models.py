@@ -52,6 +52,22 @@ class MarketSnapshot:
 
 
 @dataclass(frozen=True, slots=True)
+class OpenInterestObservation:
+    instrument_id: str
+    timestamp: datetime
+    value: float
+
+
+@dataclass(frozen=True, slots=True)
+class HistoricalCandleBatch:
+    instrument: Instrument
+    candles: tuple[Candle, ...]
+    open_interest: tuple[OpenInterestObservation, ...] = ()
+    missing_open_interest_at: tuple[datetime, ...] = ()
+    warnings: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class Swing:
     index: int
     timestamp: datetime

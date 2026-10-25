@@ -33,6 +33,25 @@ Evaluate official exchange/data products if feasible. Confirm format, fees, usag
 
 **Decision rule:** No provider is approved until there is a written record of fields, latency, historical access, commercial display/derived-output rights, redistribution terms, retention restrictions, fees, support and rate limits.
 
+### Local read-only historical adapter (provisional)
+
+`services/api/src/zonescan/upstox.py` adds an optional Upstox Historical Candle Data V3 adapter for explicitly requested, one-instrument-at-a-time local historical samples. It requests one-minute candles, splits inclusive date ranges into non-overlapping windows of at most one calendar month, combines them chronologically and removes identical duplicate timestamps. It requires `UPSTOX_ACCESS_TOKEN` only when `DATA_PROVIDER=upstox`; `DATA_PROVIDER` defaults to `synthetic`, which keeps the existing fixture/API path independent of credentials and network. The optional adapter does not change the API's current synthetic snapshot provider.
+
+V3 uses `GET /v3/historical-candle/{instrument_key}/minutes/1/{to_date}/{from_date}`. Upstox documents minute data from January 2022 and a one-month maximum request for 1–15 minute intervals. Its response example contains arrays in timestamp, open, high, low, close, volume, open-interest order. The example shows an ISO-8601 timestamp with `+05:30`; the field table inconsistently calls timestamp numeric. The adapter accepts the documented example's timezone-aware ISO text and explicitly rejects other timestamp forms rather than guessing an epoch unit. It does not assume a cash-equity response's optional OI is useful: futures OI must be requested explicitly and is returned separately from price `Candle` records. See the [official Upstox V3 historical candle documentation](https://upstox.com/developer/api-documentation/v3/get-historical-candle-data/).
+
+This is a **provisional local development source only**, not a selected/licensed product source. Use it only for purposes expressly allowed by current Upstox account/API terms. No commercial display, redistribution, derived-score, storage/retention, delisted-universe, or Gate 2 research permission is implied by endpoint access. No live WebSocket or order API is implemented. A small opt-in example is in `services/api/examples/fetch_upstox_sample.py`; it requires a user-supplied instrument key and date range and does not scan a universe.
+
+Example (PowerShell, from `services/api`; replace the token with your authorized local credential and never commit it):
+
+```powershell
+$env:DATA_PROVIDER = "upstox"
+$env:UPSTOX_ACCESS_TOKEN = "<your-authorized-access-token>"
+$env:UPSTOX_INSTRUMENT_KEY = "NSE_EQ|INE848E01016"
+$env:UPSTOX_FROM_DATE = "2025-01-02"
+$env:UPSTOX_TO_DATE = "2025-01-03"
+python examples/fetch_upstox_sample.py
+```
+
 ## Provider evaluation checklist
 
 Ask each candidate:
