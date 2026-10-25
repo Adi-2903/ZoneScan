@@ -68,6 +68,93 @@ class HistoricalCandleBatch:
 
 
 @dataclass(frozen=True, slots=True)
+class TradingSession:
+    instrument_id: str
+    session_date: date
+    opens_at: datetime
+    closes_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class MissingCandleInterval:
+    instrument_id: str
+    timeframe: str
+    timestamp: datetime
+    missing_timestamps: tuple[datetime, ...]
+    reason: str
+
+
+@dataclass(frozen=True, slots=True)
+class CandleAggregation:
+    timeframe: str
+    candles: tuple[Candle, ...]
+    gaps: tuple[MissingCandleInterval, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class FuturesContractMapping:
+    underlying_instrument_id: str
+    contract_instrument_id: str
+    valid_from: date
+    valid_through: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class IndicatorValue:
+    available: bool
+    value: float | bool | None
+    reason: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.available and self.value is None:
+            raise ValueError("available indicator value is required")
+        if not self.available and self.value is not None:
+            raise ValueError("unavailable indicator cannot carry a value")
+        if self.available and self.reason is not None:
+            raise ValueError("available indicator cannot have an unavailable reason")
+        if not self.available and not self.reason:
+            raise ValueError("unavailable indicator requires a reason")
+        if isinstance(self.value, bool):
+            return
+        if self.value is not None and (not isinstance(self.value, (int, float)) or
+                                       not isfinite(self.value)):
+            raise ValueError("indicator value must be finite")
+
+
+@dataclass(frozen=True, slots=True)
+class IndicatorFrame:
+    instrument_id: str
+    timestamp: datetime
+    timeframe: str
+    candle: Candle | None
+    atr14: IndicatorValue
+    daily_sigma20: IndicatorValue
+    day_return: IndicatorValue
+    rvol: IndicatorValue
+    oi_change_daily_pct: IndicatorValue
+    oi_change_30m_pct: IndicatorValue
+    vwap: IndicatorValue
+    price_above_vwap: IndicatorValue
+    ema20: IndicatorValue
+    price_above_ema20: IndicatorValue
+    adx14: IndicatorValue
+    missing_reasons: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class ChoppyResult:
+    available: bool
+    is_choppy: bool | None
+    condition_values: dict[str, bool | None]
+    unavailable_reasons: dict[str, str]
+    overlap_ratio: float | None = None
+    reason: str | None = None
+    satisfied_conditions: tuple[str, ...] = ()
+    algorithm_version: str = "v0.1-choppy"
+    parameter_version: str = "2026-10-26.1"
+
+
+@dataclass(frozen=True, slots=True)
 class Swing:
     index: int
     timestamp: datetime
@@ -96,6 +183,51 @@ class Zone:
 
 
 @dataclass(frozen=True, slots=True)
+class LiquidityLevel:
+    level_id: str
+    instrument_id: str
+    timeframe: str
+    side: str
+    price: float
+    kind: str
+    formed_at: datetime
+    confirmed_at: datetime
+    state: str = "unswept"
+    swept_at: datetime | None = None
+    invalidated_at: datetime | None = None
+    unavailable_at: datetime | None = None
+    expired_at: datetime | None = None
+    pending_since: datetime | None = None
+    pending_candles: int = 0
+    source_timestamps: tuple[datetime, ...] = ()
+    unavailable_reason: str | None = None
+    algorithm_version: str = "v0.1-liquidity"
+    parameter_version: str = "2026-10-26.1"
+
+    def __post_init__(self) -> None:
+        if not self.level_id or not self.instrument_id:
+            raise ValueError("liquidity level identity is required")
+        if self.timeframe not in ("5m", "15m"):
+            raise ValueError("liquidity timeframe must be 5m or 15m")
+        if self.side not in ("above", "below"):
+            raise ValueError("liquidity side must be above or below")
+        if not isfinite(self.price) or self.price <= 0:
+            raise ValueError("liquidity price must be positive and finite")
+        if self.state not in ("unswept", "swept", "invalidated", "expired", "unavailable"):
+            raise ValueError("invalid liquidity lifecycle state")
+        if self.formed_at.tzinfo is None or self.confirmed_at.tzinfo is None:
+            raise ValueError("liquidity timestamps must be timezone-aware")
+        if self.confirmed_at < self.formed_at:
+            raise ValueError("liquidity cannot be confirmed before formation")
+        if self.state == "swept" and self.swept_at is None:
+            raise ValueError("swept liquidity requires swept_at")
+        if self.state == "expired" and self.expired_at is None:
+            raise ValueError("expired liquidity requires expired_at")
+        if self.state == "unavailable" and not self.unavailable_reason:
+            raise ValueError("unavailable liquidity requires a reason")
+
+
+@dataclass(frozen=True, slots=True)
 class ReplayBar:
     candle: Candle
     atr: float | None
@@ -108,6 +240,8 @@ class ReplayBar:
     price_above_vwap: bool | None = None
     price_above_ema20: bool | None = None
     sector_direction: str | None = None
+    adx14: float | None = None
+    indicator_unavailable_reasons: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         if self.timeframe not in ("5m", "15m"):
@@ -125,6 +259,7 @@ class ReplayEvent:
     zone_id: str | None = None
     state: str | None = None
     detail: str | None = None
+    liquidity_level_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -133,6 +268,8 @@ class ReplayScore:
     timestamp: datetime
     result: ScoreResult
     direction: str | None = None
+    choppy: ChoppyResult | None = None
+    filtered_strength: float | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -85,6 +85,10 @@ Use provider sandbox/replay data where allowed; use synthetic fixtures otherwise
 
 The implemented Python prototype in `services/api/src/zonescan/replay.py` accepts chronological `ReplayBar` records and returns timestamped swing/zone/lifecycle/data-gap events plus retained zones. It uses the same `confirmed_swings`, order-block detector, overlap resolver and lifecycle updater as other callers. It does not aggregate raw ticks into candles or calculate ATR/RVOL; callers must provide those values or leave them unavailable. Missing same-session candle intervals are reported, not filled. Unit coverage includes both directions, required-input and threshold failures, prior-opposing-candle selection, non-repainting recognition timing, lifecycle transitions, session-based expiry, overlap/cap rules, input ordering, and identical reruns. This fixture coverage does not validate signal performance or a live feed.
 
+`services/api/src/zonescan/indicators.py` provides deterministic one-minute to 5m/15m aggregation and point-in-time indicator frames. `tests/test_indicators.py` covers aggregate OHLCV and close timestamps, session isolation, missing/incomplete intervals, warm-up and known-value checks, daily sigma/RVOL history, separate contract OI and rollover availability, explicit zero-volume/missing-OI states, and invariance of earlier outputs when future candles change. These are mechanics tests on fixed fixtures, not historical performance validation.
+
+The replay liquidity prototype uses existing confirmed swings and an explicit session calendar for period/opening levels. `tests/test_liquidity.py` checks high/low and equal-level formation, ATR tolerance and outer-price convention, sweep timing within three completed candles, timeout invalidation, missing-history/gap availability, opening-range boundaries, deterministic replay, and confirmation-time causality. These tests establish implementation behavior only; they are not historical performance validation.
+
 ### Metrics
 
 - Hit rate by score band, with precise outcome definition and denominators.

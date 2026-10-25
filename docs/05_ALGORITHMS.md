@@ -28,6 +28,21 @@ For each eligible equity and each completed minute, calculate or update:
 
 Use decimal fractions in formulas: 5% is `0.05`, not `5`. OI calculations must retain contract identity so a rollover does not create a false change. Indicators are unavailable until enough history exists; never backfill missing history with future observations.
 
+### Indicator engine conventions (v0.1-indicators)
+
+`zonescan.indicators` consumes normalized `Candle`, `TradingSession`, `OpenInterestObservation`, and `FuturesContractMapping` models. Input minute timestamps denote interval starts; aggregate timestamps denote interval ends. Session windows are `[opens_at, closes_at)`, use Asia/Kolkata session dates, and never cross sessions. A window is emitted only when every 1-minute candle is present and complete; gaps/incomplete source bars are returned as `MissingCandleInterval` records. No missing candle is synthesized.
+
+- ATR(14) is Wilder-smoothed true range on completed aggregate bars, seeded by the arithmetic mean of 14 true ranges. The first true range is high-low. A missing aggregate resets ATR/EMA/ADX warm-up.
+- EMA(20) uses completed aggregate closes, alpha `2/(20+1)`, and an SMA of the first 20 consecutive closes as its seed.
+- ADX(14) uses Wilder +DM/-DM/TR smoothing, DX, and an arithmetic mean of 14 valid DX values as initial ADX. It is unavailable when directional movement has a zero denominator.
+- VWAP uses completed aggregate close times aggregate volume, accumulated from session open. Zero cumulative volume makes VWAP and its price-side flag unavailable.
+- Day return uses current completed close against the first completed aggregate candle's open. If that first candle is absent, the day's return remains unavailable.
+- Daily sigma uses sample standard deviation (`n-1`) over 20 simple close-to-close returns from 21 completed daily closes strictly before the current session. Supply the prior session calendar as `TradingSession` history; if any of those 21 sessions lacks a completed daily candle, sigma is unavailable rather than bridging the gap.
+- RVOL compares cumulative completed aggregate volume through the current elapsed slot with the arithmetic mean of cumulative volume through the same slot over the previous 20 supplied sessions. Any missing baseline slot/current-session interval, fewer than 20 baseline sessions, or zero baseline makes RVOL unavailable.
+- OI observations remain keyed by futures contract and timestamp; they are never sourced from the cash-equity candle. At an aggregate close, current OI is the last constituent 1-minute timestamp. The 30-minute reference is the exact observation 30 minutes earlier. Daily comparison uses the previous supplied session's last minute and is unavailable across contract-ID change. Missing timestamp/reference or invalid denominator remains unavailable; values are not carried forward.
+
+The result is one `IndicatorFrame` per expected aggregate slot, including explicit gaps. It can map available fields to existing `ReplayBar` values; unavailable values remain `None`. Sector classification stays upstream and Q-019 remains open. Calculations are prefix-causal: future candles, daily closes, or OI observations are not consulted for an earlier frame.
+
 ## 3. Confirmed swing points and structure
 
 A swing high is a candle whose high exceeds the highs of the three candles before and the three candles after. A swing low is the mirror. The point becomes confirmed only after the three later candles close. Therefore, the engine may record a swing's original timestamp, but must not use it before confirmation time.
@@ -95,6 +110,14 @@ Candidate levels:
 - Opening-range high/low for the first 15 minutes of the session; do not compute the final range before that period has completed.
 
 A sweep candidate occurs when price trades beyond a defined level and then closes back inside within three completed candles. Mark the level `Swept` and remove it from the list of unswept levels. A sweep beside a fresh order block can be recorded as a confluence feature for later validation; it must not be called a guaranteed liquidity trap.
+
+#### Replay conventions (provisional v0.1-liquidity)
+
+Replay emits `LiquidityLevel` records and timestamped liquidity events independently from `ReplayScore`. A swing level becomes available only at its existing confirmed swing's `confirmed_at`. Equal highs/lows are built from same-kind confirmed swing points no farther than `0.1 × current ATR14_5m`; the outer cluster extreme is used as the level price (maximum for highs, minimum for lows). ATR must be positive and available on a 5m replay bar or equal-level formation is reported unavailable; 15m-only replay emits an unavailable diagnostic for equal-level detection because it has no 5m ATR input. Levels above price are high-side references and those below price are low-side references.
+
+Previous-day levels use the immediately preceding supplied `TradingSession`; previous-week levels use all supplied sessions in the preceding ISO calendar week. Every expected candle in those periods must be present and complete. The first-15-minute range is emitted only when every expected 5m candle (three bars) or 15m candle (one bar) through the range close is complete. Missing calendar/history produces a `liquidity_unavailable` event rather than partial extrema. The caller must supply the exchange session calendar; special sessions require their actual bounds.
+
+For a high-side level, an excursion means `high > level`; return inside means `close <= level`. Low-side comparisons mirror this (`low < level`, `close >= level`). The excursion bar counts as candle one: a return in that bar sweeps immediately; otherwise a return by the third completed candle confirms the sweep. If the third completed candle still closes beyond, the level becomes `invalidated`. Day/opening levels expire at the next session and week levels at the next ISO week. A data gap or incomplete candle makes every currently unswept level for that stream `unavailable`, since an unseen high/low may have crossed it; an interrupted pending window is therefore not guessed. Swept, invalidated, expired, and unavailable records remain in replay output for audit and are excluded from unswept levels. These cluster-price, window-count, invalidation, and completeness conventions are provisional pending owner review.
 
 The word “liquidity” in the UI must refer to these price levels, not to an assertion that the application can see the exchange order book or all resting stops.
 

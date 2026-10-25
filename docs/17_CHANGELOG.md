@@ -1,5 +1,17 @@
 # Documentation Changelog
 
+## 2026-10-26 — Chart liquidity levels and sweeps
+
+- Added retained swing, equal-high/low, prior-day/week, and first-15-minute levels to chronological replay, with session-calendar/history requirements and explicit unavailable diagnostics.
+- Added high/low sweep confirmation within three completed candles, timeout invalidation, next-session/next-week expiry for period levels, and unavailable lifecycle state when candles are missing.
+- Kept chart liquidity records separate from scoring; documented provisional implementation conventions in D-024. Deterministic fixtures only; no historical performance claim.
+
+## 2026-10-26 — Deterministic indicator engine
+
+- Added provider-independent completed 5m/15m aggregation from normalized 1m candles with explicit missing/incomplete intervals and session boundaries.
+- Added point-in-time ATR(14), sample daily sigma(20), day return, elapsed-time RVOL, contract-specific OI changes, close-based VWAP, EMA(20), and ADX(14) with typed availability reasons.
+- Documented provisional smoothing, seeding, timestamp, volume, and OI alignment conventions in D-023; these fixture tests establish mechanics only and do not validate historical performance.
+
 ## 2026-10-26 — Optional Upstox historical candles
 
 - Added a read-only Upstox Historical Candle V3 adapter for explicitly configured one-minute instrument/date requests, with month-window chunking, validated parsing, chronological merge, duplicate handling, and separate optional futures OI observations.
