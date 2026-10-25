@@ -29,7 +29,7 @@ Use golden fixtures: fixed input session → expected outputs with versioned exp
 
 `services/api/tests/test_scoring.py` uses independently calculated expected values rather than values copied from the scorer. It tests each component, unavailable reasons, no early rounding, fixed-weight contribution, exact zero/100 results, and repeatability. Passing these tests does not validate provider data quality or out-of-sample value.
 
-`services/api/tests/test_replay_scoring.py` verifies that completed replay bars receive scores at their own timestamps; confirmed structure is unavailable before its right-side bars close; future bars and future sector classifications do not change earlier score outputs; missing required fields propagate component reasons; repeated replay is identical; and scoring records coexist with order-block lifecycle events. Inputs are hand-built synthetic observations, not historical market results.
+`services/api/tests/test_replay_scoring.py` verifies that completed replay bars receive scores at their own timestamps; confirmed structure is unavailable before its right-side bars close; future bars and future sector classifications do not change earlier score outputs; missing required fields propagate component reasons; repeated replay is identical; and scoring records coexist with order-block lifecycle events. `services/api/tests/test_boards.py` covers directional boundaries and unavailable states, smoothing and session resets, exact tie-breaks/top-20 behavior, Choppy/data-invalid exclusion, hysteresis entry/retention margins, deterministic snapshots, and prefix causality. Inputs are hand-built synthetic observations, not historical market results.
 
 ### Historical evaluation prototype
 

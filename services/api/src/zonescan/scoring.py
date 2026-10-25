@@ -138,22 +138,22 @@ def calculate_sector_component(direction: str | None,
 
 def classify_direction(day_return: float | None, structure: str | None,
                        price_above_vwap: bool | None) -> str | None:
-    """Apply the documented direction rule to current, already-available inputs."""
+    """Classify using signed return plus structure; neutral differs from unavailable."""
     if _finite(day_return, "day_return") is not None:
         return None
     if structure not in ("bullish", "bearish", "range"):
         return None
     if price_above_vwap is not None and type(price_above_vwap) is not bool:
         return None
-    if day_return > 0 and structure == "bullish":
+    if day_return > 0 and (structure == "bullish" or
+                           (structure == "range" and price_above_vwap is True)):
         return "bullish"
-    if day_return < 0 and structure == "bearish":
+    if day_return < 0 and (structure == "bearish" or
+                           (structure == "range" and price_above_vwap is False)):
         return "bearish"
-    if structure == "range" and price_above_vwap is True:
-        return "bullish"
-    if structure == "range" and price_above_vwap is False:
-        return "bearish"
-    return None
+    if structure == "range" and price_above_vwap is None:
+        return None
+    return "neutral"
 
 
 def calculate_zone_component(direction: str | None,

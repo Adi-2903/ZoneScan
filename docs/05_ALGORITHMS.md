@@ -212,24 +212,24 @@ Replay attaches `ChoppyResult` and `filtered_strength` to each `ReplayScore`. Wh
 
 ### Direction classification
 
-- Bullish if day return is positive and structure is bullish, or structure is range with price above VWAP.
-- Bearish is the mirror.
-- Otherwise Choppy/Neutral.
-- Apply the choppy filter before the final ranking.
+- Bullish requires a positive day return and either bullish structure or range structure with price above VWAP.
+- Bearish requires a negative day return and either bearish structure or range structure with price below VWAP.
+- A valid signed return/structure combination that satisfies neither direction is `neutral`. Missing day return or structure is unavailable; range structure also requires a known VWAP side. Zero day return is neutral.
+- The Choppy filter remains a separate classification. A Choppy result excludes the row from either directional board; it does not rewrite the directional label or raw score.
 
 ### Smoothing
 
-`smoothed_score = 0.6 × new_score + 0.4 × previous_smoothed_score`
+`smoothed_score = 0.6 * new_score + 0.4 * previous_smoothed_score`
 
-Reset the previous-score dependency for a new session according to a written rule. On first eligible score of a session, use the raw score; do not carry stale prior-session smoothing without an explicit rule.
+Replay smooths `filtered_strength` (the Choppy-adjusted score), independently per instrument and timeframe. The first available filtered score in a session is used unchanged. A missing filtered score clears the chain; the next available score starts again from its current filtered value. A new session always resets the chain. Choppy's valid zero is a score observation, although that row is excluded from the board. Incomplete candles are unavailable observations.
 
 ### Sorting and stability
 
-Sort by smoothed Strength Score descending, then RVOL descending, then traded value descending, then symbol ascending for deterministic tie-breaks.
+At each completed 5m timestamp, build both boards only from scores emitted at that timestamp. A candidate must have an available raw score, directional classification for that side, an available non-Choppy classification, filtered and smoothed scores, and valid RVOL/traded value. Missing or invalid values are excluded and hysteresis never retains them. The replay tie-break value `traded_value` is the current completed candle's close multiplied by its volume; cumulative session turnover is not available in `ReplayBar` and this choice is provisional. Sort by smoothed Strength Score descending, then RVOL descending, then this traded value descending, then symbol ascending. If a symbol mapping is absent in a fixture, instrument ID is used as the stable final key; production inputs should supply the mapped symbol.
 
-Use hysteresis to limit flicker: a new entrant must beat the current 20th score by at least 2 points; a current member may remain until it falls 3 points below the relevant cutoff. Implement the cutoff/side transition logic explicitly and test ties, removals, choppy status and missing data. Hysteresis must never retain an ineligible or data-invalid symbol.
+Hysteresis is evaluated independently per side and resets each session. The cutoff is the prior snapshot's 20th row score, measured using its smoothed Strength Score. A previously listed, still-eligible member is retained when its current smoothed score is at least `cutoff - 3`; a new entrant is admitted only at or above `cutoff + 2`. Eligible retained members and qualifying entrants are sorted by the normal keys and truncated to 20. An incomplete prior board has open slots and is filled by normal rank order without entry margin. A side change makes an instrument a new entrant on the other side. A cutoff is not carried when the prior board had fewer than 20 rows.
 
-Persist top-20 rows by side as a timestamped snapshot with raw components, smoothed score, zone/level references and the parameter version.
+Replay returns immutable timestamped `BoardSnapshot` values, with up to 20 rows per side and each row retaining its full `ReplayScore` (raw components, filtered/smoothed values, Choppy result, and versions). These are in-memory deterministic fixtures, not persisted board history. Snapshot production does not use later timestamp scores.
 
 ## 10. One-zone setup card
 

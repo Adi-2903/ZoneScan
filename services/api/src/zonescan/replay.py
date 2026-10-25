@@ -4,12 +4,13 @@ from dataclasses import dataclass, replace
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from .boards import build_board_snapshots, smooth_score
 from .choppy import (candle_overlap_ratio, classify_choppy,
                      unavailable_choppy)
 from .liquidity import (equal_level_for_swing, expected_candle_timestamps,
                         invalidate_levels_for_gap, level_from_extreme,
                         level_from_swing, session_complete, update_sweep)
-from .models import (ChoppyResult, LiquidityLevel, ReplayBar, ReplayEvent, ReplayScore,
+from .models import (BoardSnapshot, ChoppyResult, LiquidityLevel, ReplayBar, ReplayEvent, ReplayScore,
                      ScoreInputs, ScoreResult, Swing, TradingSession, Zone)
 from .order_blocks import (OrderBlockParameters, _session_day,
                            detect_order_blocks, resolve_zone_overlap,
@@ -27,6 +28,7 @@ class ReplayResult:
     zones: tuple[Zone, ...]
     scores: tuple[ReplayScore, ...]
     liquidity_levels: tuple[LiquidityLevel, ...] = ()
+    boards: tuple[BoardSnapshot, ...] = ()
 
 
 def _structure_if_warm(swings: tuple[Swing, ...]) -> str | None:
@@ -117,6 +119,8 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
     sessions: dict[tuple[str, str], list[date]] = {}
     zones: list[Zone] = []
     scores: list[ReplayScore] = []
+    previous_smoothed: dict[tuple[str, str, date], float] = {}
+    symbols: dict[str, str] = {}
     zone_formation_sessions: dict[str, int] = {}
     events: list[ReplayEvent] = []
     liquidity_levels: list[LiquidityLevel] = []
@@ -129,6 +133,10 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
 
     for bar in bars:
         candle = bar.candle
+        if bar.symbol is not None:
+            previous_symbol = symbols.setdefault(candle.instrument_id, bar.symbol)
+            if previous_symbol != bar.symbol:
+                raise ValueError("symbol mapping changed within replay")
         if last_timestamp is not None and candle.timestamp < last_timestamp:
             raise ValueError("replay bars must be ordered by timestamp")
         last_timestamp = candle.timestamp
@@ -423,8 +431,18 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
             filtered_strength = None
             if choppy.available:
                 filtered_strength = (0.0 if choppy.is_choppy else score.strength)
-            scores.append(ReplayScore(candle.instrument_id, candle.timestamp, score, direction,
-                                      choppy, filtered_strength))
+            smoothing_key = (candle.instrument_id, bar.timeframe, day)
+            prior = previous_smoothed.get(smoothing_key)
+            smoothed = smooth_score(filtered_strength, prior)
+            if smoothed is None:
+                previous_smoothed.pop(smoothing_key, None)
+            else:
+                previous_smoothed[smoothing_key] = smoothed
+            scores.append(ReplayScore(
+                candle.instrument_id, candle.timestamp, score, direction,
+                choppy, filtered_strength, smoothed, bar.rvol,
+                candle.close * candle.volume if candle.complete else None,
+                day, bar.timeframe))
         else:
             unavailable = ScoreResult(
                 available=False,
@@ -435,7 +453,9 @@ def replay(bars: tuple[ReplayBar, ...] | list[ReplayBar],
                                   for key in ("M", "V", "O", "T", "S", "Z")},
             )
             scores.append(ReplayScore(candle.instrument_id, candle.timestamp, unavailable,
-                                      choppy=unavailable_choppy("incomplete_candle")))
+                                      choppy=unavailable_choppy("incomplete_candle"),
+                                      session_date=day, timeframe=bar.timeframe))
 
+    boards = build_board_snapshots(scores, symbols)
     return ReplayResult(tuple(events), tuple(all_swings.values()), tuple(zones), tuple(scores),
-                        tuple(liquidity_levels))
+                        tuple(liquidity_levels), boards)

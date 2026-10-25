@@ -242,6 +242,7 @@ class ReplayBar:
     sector_direction: str | None = None
     adx14: float | None = None
     indicator_unavailable_reasons: tuple[tuple[str, str], ...] = ()
+    symbol: str | None = None
 
     def __post_init__(self) -> None:
         if self.timeframe not in ("5m", "15m"):
@@ -270,6 +271,30 @@ class ReplayScore:
     direction: str | None = None
     choppy: ChoppyResult | None = None
     filtered_strength: float | None = None
+    smoothed_strength: float | None = None
+    rvol: float | None = None
+    traded_value: float | None = None
+    session_date: date | None = None
+    timeframe: str = "5m"
+
+
+@dataclass(frozen=True, slots=True)
+class BoardRow:
+    rank: int
+    instrument_id: str
+    symbol: str
+    side: str
+    score: ReplayScore
+
+
+@dataclass(frozen=True, slots=True)
+class BoardSnapshot:
+    timestamp: datetime
+    session_date: date
+    bullish: tuple[BoardRow, ...]
+    bearish: tuple[BoardRow, ...]
+    algorithm_version: str = "v0.1-board"
+    parameter_version: str = "2026-10-26.1"
 
 
 @dataclass(frozen=True, slots=True)

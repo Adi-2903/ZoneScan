@@ -1,3 +1,9 @@
+## 2026-10-26 ? Direction classification and deterministic boards
+
+- Tightened directional classification to require signed day return with matching structure/VWAP context, distinguishing neutral from unavailable inputs.
+- Added per-instrument/session score smoothing, timestamp-local bullish/bearish 5m snapshots, deterministic sorting, top-20 caps, and explicit hysteresis.
+- Added model and replay coverage while retaining raw Strength components. Bar turnover/cutoff conventions are provisional; synthetic fixtures only, with no historical performance claim.
+
 # Documentation Changelog
 
 ## 2026-10-26 — Q-009 resolution and Choppy filter
