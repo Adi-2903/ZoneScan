@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { api, formatPercent, formatPrice, formatTimestamp } from "@/lib/api";
-import type { BoardResponse, BoardRow, CandleResponse, MarketStatus, StockResponse } from "@/lib/api";
+import type { BoardResponse, BoardRow, CandleResponse, MarketStatus, StockResponse, XRayResponse, XRayClassification } from "@/lib/api";
 import { ZoneChart } from "@/components/ZoneChart";
 
 type Side = "bull" | "bear";
-type View = "board" | "stock";
+type View = "board" | "stock" | "xray";
 
 const componentNames: Record<string, string> = {
   M: "Move", V: "Volume", O: "Open interest", T: "Trend", S: "Sector", Z: "Zone",
@@ -15,8 +15,10 @@ const componentNames: Record<string, string> = {
 export default function Dashboard() {
   const [side, setSide] = useState<Side>("bull");
   const [view, setView] = useState<View>("board");
+  const [detailOrigin, setDetailOrigin] = useState<"board" | "xray">("board");
   const [status, setStatus] = useState<MarketStatus | null>(null);
   const [board, setBoard] = useState<BoardResponse | null>(null);
+  const [xray, setXray] = useState<XRayResponse | null>(null);
   const [stock, setStock] = useState<StockResponse | null>(null);
   const [candles, setCandles] = useState<CandleResponse | null>(null);
   const [timeframe, setTimeframe] = useState("5m");
@@ -30,9 +32,10 @@ export default function Dashboard() {
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
     try {
-      const [nextStatus, nextBoard] = await Promise.all([api.status(signal), api.board(side, signal)]);
+      const [nextStatus, nextBoard, nextXray] = await Promise.all([api.status(signal), api.board(side, signal), api.xray(signal)]);
       setStatus(nextStatus);
       setBoard(nextBoard);
+      setXray(nextXray);
     } catch (cause) {
       if (!signal?.aborted) setError(cause instanceof Error ? cause.message : "Unable to load market data.");
     } finally {
@@ -47,13 +50,14 @@ export default function Dashboard() {
   }, [refresh]);
 
   const openStock = useCallback((symbol: string) => {
+    setDetailOrigin(view === "xray" ? "xray" : "board");
     setStock(null);
     setCandles(null);
     setDetailError(null);
     setDetailLoading(true);
     setSelectedSymbol(symbol);
     setView("stock");
-  }, []);
+  }, [view]);
 
   useEffect(() => {
     if (view !== "stock" || !selectedSymbol) return;
@@ -71,7 +75,7 @@ export default function Dashboard() {
 
   const rows = board?.side === side ? board.rows : [];
   const boardLoading = loading || (!error && board?.side !== side);
-  const meta = stock ?? board ?? status;
+  const meta = stock ?? (view === "xray" ? xray : board) ?? status;
 
   return <main className={lightTheme ? "app light" : "app"}>
     <div className="demo-ribbon"><span className="demo-dot" /> SYNTHETIC FIXTURE · NOT LIVE MARKET DATA</div>
@@ -81,10 +85,10 @@ export default function Dashboard() {
           <span className="brand-mark">Z</span><span>ZoneScan<small>MARKET INTELLIGENCE</small></span>
         </a>
         <div className="sidebar-label">WORKSPACE</div>
-        <button className={`nav-item ${view === "board" ? "active" : ""}`} onClick={() => setView("board")}>
+        <button aria-current={view === "board" || (view === "stock" && detailOrigin === "board") ? "page" : undefined} className={`nav-item ${view === "board" || (view === "stock" && detailOrigin === "board") ? "active" : ""}`} onClick={() => setView("board")}>
           <span>▦</span> Market board
         </button>
-        <button className="nav-item muted-nav" disabled title="Not part of this prototype"><span>⌕</span> Market X-Ray</button>
+        <button aria-current={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "page" : undefined} className={`nav-item ${view === "xray" || (view === "stock" && detailOrigin === "xray") ? "active" : ""}`} onClick={() => setView("xray")}><span>◉</span> Market X-Ray</button>
         <div className="sidebar-bottom">
           <div className="source-card"><span className="status-lamp" />Fixture engine
             <small>Fixed historical sample</small></div>
@@ -98,21 +102,30 @@ export default function Dashboard() {
       <section className="main-column">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">Z</span><strong>ZoneScan</strong></div>
-          <div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{view === "board" ? "Market board" : `${selectedSymbol ?? "Stock"} detail`}</strong></div>
+          <div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : `${selectedSymbol ?? "Stock"} detail`}</strong></div>
           <div className="topbar-actions">
-            <span className="market-unknown"><i /> {status?.market_state === "closed" ? "Market closed" : "Session status unavailable"}</span>
+            <span className="market-unknown"><i /> {status?.market_state === "closed" ? "Market closed" : status?.market_state === "open" ? "Market open" : "Market status unknown"}</span>
             <button className="icon-button" aria-label="Toggle theme" onClick={() => setLightTheme((value) => !value)}>{lightTheme ? "☾" : "☼"}</button>
           </div>
         </header>
+
+        <nav className="mobile-nav" aria-label="Main navigation">
+          <button aria-current={view === "board" || (view === "stock" && detailOrigin === "board") ? "page" : undefined} className={view === "board" || (view === "stock" && detailOrigin === "board") ? "active" : ""} onClick={() => setView("board")}>
+            <span aria-hidden="true">▦</span> Board
+          </button>
+          <button aria-current={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "page" : undefined} className={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "active" : ""} onClick={() => setView("xray")}>
+            <span aria-hidden="true">◉</span> X-Ray
+          </button>
+        </nav>
 
         <div className="page-content">
           <div className="mobile-synthetic">Synthetic fixture data · not live</div>
           <div className="page-heading">
             <div>
-              {view === "stock" && <button className="back-link" onClick={() => setView("board")}>← Back to board</button>}
-              <p className="eyebrow">{view === "board" ? "MARKET OVERVIEW" : "INSTRUMENT ANALYSIS"}</p>
-              <h1>{view === "board" ? "Market board" : stock?.symbol ?? selectedSymbol ?? "Stock detail"}</h1>
-              <p className="subheading">{view === "board" ? "Ranked synthetic examples from the deterministic replay fixture." : "Point-in-time analytics and completed candle context."}</p>
+              {view === "stock" && <button className="back-link" onClick={() => setView(detailOrigin)}>← Back to {detailOrigin === "xray" ? "X-Ray" : "board"}</button>}
+              <p className="eyebrow">{view === "board" ? "MARKET OVERVIEW" : view === "xray" ? "FIXTURE COVERAGE" : "INSTRUMENT ANALYSIS"}</p>
+              <h1>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : stock?.symbol ?? selectedSymbol ?? "Stock detail"}</h1>
+              <p className="subheading">{view === "board" ? "Ranked synthetic examples from the deterministic replay fixture." : view === "xray" ? "Point-in-time movement across the instruments included in this synthetic fixture." : "Point-in-time analytics and completed candle context."}</p>
             </div>
             <div className="heading-actions">
               {view === "board" ? <button className="refresh-button" onClick={() => { setError(null); setLoading(true); void refresh(); }} disabled={loading}>↻ <span>Refresh</span></button>
@@ -130,17 +143,17 @@ export default function Dashboard() {
           {view === "board" ? <>
             {error && <div className="error-state" role="alert"><div><strong>API unavailable</strong><p>{error}</p></div><button onClick={() => void refresh()}>Retry</button></div>}
             <div className="board-heading-row">
-              <div className="tabs" role="tablist" aria-label="Board direction">
-                <button role="tab" aria-selected={side === "bull"} className={side === "bull" ? "selected bull-tab" : ""}
+              <div className="tabs" role="group" aria-label="Board direction">
+                <button type="button" aria-pressed={side === "bull"} className={side === "bull" ? "selected bull-tab" : ""}
                   onClick={() => { setError(null); setLoading(true); setSide("bull"); }}>↗ Bullish <span>{side === "bull" ? rows.length : ""}</span></button>
-                <button role="tab" aria-selected={side === "bear"} className={side === "bear" ? "selected bear-tab" : ""}
+                <button type="button" aria-pressed={side === "bear"} className={side === "bear" ? "selected bear-tab" : ""}
                   onClick={() => { setError(null); setLoading(true); setSide("bear"); }}>↘ Bearish <span>{side === "bear" ? rows.length : ""}</span></button>
               </div>
               <div className="board-snapshot">{board ? `Snapshot · ${formatTimestamp(board.as_of)}` : "Snapshot · —"}</div>
             </div>
             <BoardTable rows={rows} loading={boardLoading} side={side} onSelect={openStock} />
             <div className="board-footnote"><span>ⓘ</span> Scores are deterministic heuristics from fixture inputs. They do not indicate certainty or profitability.</div>
-          </> : <StockDetail symbol={selectedSymbol} stock={stock} candles={candles}
+          </> : view === "xray" ? <MarketXRay data={xray} loading={loading} error={error} onRetry={() => { setError(null); setLoading(true); void refresh(); }} onSelect={openStock} /> : <StockDetail symbol={selectedSymbol} stock={stock} candles={candles}
             timeframe={timeframe} setTimeframe={(value) => { setCandles(null); setDetailLoading(true); setTimeframe(value); }} loading={detailLoading}
             error={detailError} retry={() => { setStock(null); setCandles(null); setDetailLoading(true); setDetailRefresh((value) => value + 1); }} />}
 
@@ -149,6 +162,34 @@ export default function Dashboard() {
       </section>
     </div>
   </main>;
+}
+
+function MarketXRay({ data, loading, error, onRetry, onSelect }: {
+  data: XRayResponse | null; loading: boolean; error: string | null;
+  onRetry: () => void; onSelect: (symbol: string) => void;
+}) {
+  if (loading && !data) return <div className="xray-state"><span className="spinner" /> Loading synthetic X-Ray…</div>;
+  if (error && !data) return <div className="error-state" role="alert"><div><strong>Market X-Ray unavailable</strong><p>{error}</p></div><button onClick={onRetry}>Retry</button></div>;
+  if (!data || data.instruments.length === 0) return <div className="xray-state"><strong>No covered instruments</strong><p>The API returned no X-Ray points for this fixture.</p></div>;
+
+  const states: XRayClassification[] = ["bullish", "bearish", "choppy", "neutral", "unavailable"];
+  return <div className="xray-layout">
+    <section className="xray-coverage"><div><span className="eyebrow">FIXTURE COVERAGE</span><strong>{data.coverage.label}</strong></div>
+      <span>{data.coverage.universe_complete ? "Complete" : "Partial fixture"}</span></section>
+    <section className="xray-counts" aria-label="Classification counts">{states.map((state) => <div className={`xray-count ${state}`} key={state}><span className="state-glyph">{state === "bullish" ? "↑" : state === "bearish" ? "↓" : state === "choppy" ? "≈" : state === "neutral" ? "↔" : "?"}</span><span>{data.counts[state]}</span><small>{state}</small></div>)}</section>
+    <section className="xray-card">
+      <div className="xray-card-title"><div><p className="eyebrow">MARKET X-RAY · SYNTHETIC</p><h2>Instrument movement map</h2></div><span>As of {formatTimestamp(data.as_of)}</span></div>
+      <div className="xray-map" role="group" aria-label="Synthetic instrument dot map">{data.instruments.map((item) => <button key={item.symbol} title={`${item.symbol} · ${item.classification} · ${formatPercent(item.change_pct)} · ${item.timestamp ? formatTimestamp(item.timestamp) : item.unavailable_reason ?? "Timestamp unavailable"}`} className={`xray-point ${item.classification}`} onClick={() => onSelect(item.symbol)} aria-label={`${item.symbol}, ${item.classification}, ${formatPercent(item.change_pct)}`}>
+        <span className="xray-dot" style={{ "--dot-size": `${Math.min(46, 22 + Math.min(24, Math.abs(item.change_pct ?? 0) * 2))}px` } as React.CSSProperties}>{item.classification === "bullish" ? "↑" : item.classification === "bearish" ? "↓" : item.classification === "choppy" ? "≈" : item.classification === "neutral" ? "↔" : "?"}</span>
+        <strong>{item.symbol}</strong><small>{formatPercent(item.change_pct)}</small><em>{item.classification}</em>
+      </button>)}</div>
+      <div className="xray-legend">{states.map((state) => <span key={state}><i className={state}>{state === "bullish" ? "↑" : state === "bearish" ? "↓" : state === "choppy" ? "≈" : state === "neutral" ? "↔" : "?"}</i>{state}</span>)}</div>
+      <details className="xray-table-access"><summary>View instrument data as a table</summary><div className="xray-table-scroll"><table><thead><tr><th>Instrument</th><th>Change</th><th>Direction</th><th>Classification</th><th>Timestamp</th></tr></thead><tbody>{data.instruments.map((item) => <tr key={item.symbol}><th scope="row">{item.symbol}</th><td>{formatPercent(item.change_pct)}</td><td>{item.direction ?? "Unavailable"}</td><td>{item.classification}</td><td>{item.timestamp ? formatTimestamp(item.timestamp) : item.unavailable_reason ?? "Unavailable"}</td></tr>)}</tbody></table></div></details>
+      <p className="xray-note">Each dot is one fixture instrument. Position is only a layout; size reflects the absolute fixture percentage change. Missing values remain unavailable. This is not a market-wide NSE view.</p>
+    </section>
+    <div className="xray-lists">{([["Leading examples", data.leaders], ["Lagging examples", data.laggards]] as const).map(([title, items]) => <section className="xray-card xray-list" key={title}><h2>{title}</h2>{items.length ? items.map((item) => <button key={item.symbol} onClick={() => onSelect(item.symbol)}><strong>{item.symbol}</strong><span className={item.change_pct !== null && item.change_pct >= 0 ? "up-text" : "down-text"}>{formatPercent(item.change_pct)}</span><small>{item.classification}</small></button>) : <p className="muted">No values available.</p>}</section>)}</div>
+    <p className="xray-disclaimer">Synthetic examples only · no sector aggregation · real market status remains unknown for this fixed fixture.</p>
+  </div>;
 }
 
 function BoardTable({ rows, loading, side, onSelect }: {
@@ -191,6 +232,8 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
   if (error) return <div className="error-state" role="alert"><div><strong>Could not load {symbol ?? "stock"}</strong><p>{error}</p></div><button onClick={retry}>Retry</button></div>;
   if (!stock) return <div className="empty-state"><h2>Detail unavailable</h2><p>No stock response was returned.</p></div>;
   const early = stock.strength.early_move;
+  const strengthDirectionClass = stock.strength.direction === "bullish" ? "positive"
+    : stock.strength.direction === "bearish" ? "negative" : "neutral";
   const activeZones = stock.zones.filter((zone) => zone.active && ["fresh", "tested"].includes(zone.state));
   const openLevels = stock.liquidity_levels.filter((level) => level.state === "unswept");
 
@@ -198,7 +241,7 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
     <section className="detail-card chart-card">
       <div className="detail-card-heading chart-heading"><div><p className="eyebrow">PRICE ACTION</p><h2>{stock.symbol} <span className="exchange-tag">NSE · SYNTHETIC</span></h2>
         <div className="detail-price">{formatPrice(stock.price)} <span className="neutral-caption">Snapshot close · {formatTimestamp(stock.as_of)}</span></div></div>
-        <div className="timeframe-tabs" aria-label="Chart timeframe">{["1m", "5m", "15m", "1d"].map((tf) => <button key={tf} className={timeframe === tf ? "active" : ""} onClick={() => setTimeframe(tf)}>{tf}</button>)}</div>
+        <div className="timeframe-tabs" role="group" aria-label="Chart timeframe">{["1m", "5m", "15m", "1d"].map((tf) => <button key={tf} type="button" aria-pressed={timeframe === tf} className={timeframe === tf ? "active" : ""} onClick={() => setTimeframe(tf)}>{tf}</button>)}</div>
       </div>
       {error && <div className="inline-error">{error}</div>}
       {loading && !candles ? <div className="empty-chart"><span className="spinner" /> Loading candle data…</div>
@@ -210,7 +253,7 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
       <section className="detail-card score-card">
         <div className="detail-card-heading"><div><p className="eyebrow">CORE ANALYTICS</p><h2>Strength Score</h2></div><span className="version-mini">{stock.strength.available ? "AVAILABLE" : "UNAVAILABLE"}</span></div>
         {stock.strength.available && stock.strength.strength !== null
-          ? <div className="score-hero"><strong>{stock.strength.strength.toFixed(1)}</strong><span>/ 100</span><span className={`direction-pill ${stock.strength.direction === "bullish" ? "positive" : "negative"}`}>{stock.strength.direction ?? "Direction unavailable"}</span></div>
+          ? <div className="score-hero"><strong>{stock.strength.strength.toFixed(1)}</strong><span>/ 100</span><span className={`direction-pill ${strengthDirectionClass}`}>{stock.strength.direction === "bullish" ? "↑ Bullish" : stock.strength.direction === "bearish" ? "↓ Bearish" : stock.strength.direction === "neutral" ? "↔ Neutral" : "Direction unavailable"}</span></div>
           : <div className="unavailable-panel">Strength unavailable · {stock.strength.unavailable_reason ?? "Required inputs missing"}</div>}
         <div className="component-list">{Object.entries(stock.strength.components).map(([key, value]) => <div className="component-row" key={key}>
           <span><b>{key}</b>{componentNames[key] ?? key}</span><strong>{value === null ? "Unavailable" : value.toFixed(3)}</strong>

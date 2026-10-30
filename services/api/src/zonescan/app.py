@@ -1,6 +1,7 @@
 """Optional read-only FastAPI boundary over the deterministic synthetic engine."""
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from functools import lru_cache
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -13,18 +14,26 @@ from fastapi.responses import JSONResponse
 from .analytics_service import AnalyticsService, versions
 from .fixtures import SyntheticFixtureProvider
 
-app = FastAPI(title="ZoneScan API", version="0.1.0")
-app.add_middleware(CORSMiddleware, allow_origins=[
-    "http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_credentials=False, allow_methods=["GET"], allow_headers=["*"])
-provider = SyntheticFixtureProvider()
-IST = ZoneInfo("Asia/Kolkata")
-
 
 @lru_cache(maxsize=1)
 def get_analytics_service() -> AnalyticsService:
     """Construct the chronological fixture replay once per process."""
     return AnalyticsService()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Pre-warm the deterministic fixture replay on startup so requests serve instantly."""
+    get_analytics_service()
+    yield
+
+
+app = FastAPI(title="ZoneScan API", version="0.1.0", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=[
+    "http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=False, allow_methods=["GET"], allow_headers=["*"])
+provider = SyntheticFixtureProvider()
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -118,6 +127,33 @@ def market_status(service: AnalyticsService = Depends(get_analytics_service)):
             "universe_eligible": snap.universe_eligible,
             "symbols_excluded": snap.symbols_excluded,
             "exclusion_summary": snap.exclusion_summary}
+
+
+@app.get("/api/v1/xray")
+def market_xray(service: AnalyticsService = Depends(get_analytics_service)):
+    """Return the fixture's covered instruments, not a claimed market universe."""
+    instruments = list(service.xray_instruments())
+    counts = {state: sum(row["classification"] == state for row in instruments)
+              for state in ("bullish", "bearish", "choppy", "neutral", "unavailable")}
+    with_change = [row for row in instruments if row["change_pct"] is not None]
+    leaders = sorted(with_change, key=lambda row: (-row["change_pct"], row["symbol"]))[:3]
+    laggards = sorted(with_change, key=lambda row: (row["change_pct"], row["symbol"]))[:3]
+    snap = service.snapshot
+    return {
+        **_metadata(service),
+        "instruments": instruments,
+        "counts": counts,
+        "leaders": leaders,
+        "laggards": laggards,
+        "coverage": {
+            "covered_instruments": len(instruments),
+            "universe_complete": False,
+            "scope": "synthetic_fixture_examples_only",
+            "label": (f"{len(instruments)} deterministic synthetic examples; "
+                      "not the complete NSE F&O universe"),
+            "unavailable_values": counts["unavailable"],
+        },
+    }
 
 
 @app.get("/api/v1/board")

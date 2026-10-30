@@ -136,6 +136,39 @@ class AnalyticsService:
         return tuple(candle for candle in candles
                      if candle.timestamp.date() == latest_session)
 
+    def xray_instruments(self) -> tuple[dict[str, object], ...]:
+        """Build X-Ray points from replay outputs at the fixed snapshot only."""
+        rows: list[dict[str, object]] = []
+        for instrument in sorted(self.dataset.instruments, key=lambda item: item.symbol):
+            score = self.latest_score(instrument.instrument_id)
+            bar = self.latest_bar(instrument.instrument_id)
+            choppy = score.choppy if score is not None else None
+            if bar is None or score is None or score.direction is None:
+                classification = "unavailable"
+                reason = ("no_completed_5m_bar_at_snapshot" if bar is None
+                          else "direction_classification_unavailable")
+            elif choppy is None or not choppy.available:
+                classification = "unavailable"
+                reason = (choppy.reason if choppy is not None and choppy.reason
+                          else "choppy_classification_unavailable")
+            elif choppy is not None and choppy.available and choppy.is_choppy:
+                classification, reason = "choppy", None
+            elif score.direction in ("bullish", "bearish", "neutral"):
+                classification, reason = score.direction, None
+            else:
+                classification, reason = "unavailable", "direction_classification_unavailable"
+            rows.append({
+                "symbol": instrument.symbol,
+                "instrument_id": instrument.instrument_id,
+                "direction": score.direction if score is not None else None,
+                "change_pct": bar.day_return * 100 if bar is not None and bar.day_return is not None else None,
+                "classification": classification,
+                "classification_available": classification != "unavailable",
+                "unavailable_reason": reason,
+                "timestamp": bar.candle.timestamp.isoformat() if bar is not None else None,
+            })
+        return tuple(rows)
+
 
 def versions() -> dict[str, str]:
     return {"algorithm_version": ALGORITHM_VERSION,

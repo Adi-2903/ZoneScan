@@ -119,6 +119,25 @@ export type CandleResponse = ApiMeta & {
   candles: Candle[];
 };
 
+export type XRayClassification = "bullish" | "bearish" | "choppy" | "neutral" | "unavailable";
+export type XRayInstrument = {
+  symbol: string;
+  instrument_id: string;
+  direction: string | null;
+  change_pct: number | null;
+  classification: XRayClassification;
+  classification_available: boolean;
+  unavailable_reason: string | null;
+  timestamp: string | null;
+};
+export type XRayResponse = ApiMeta & {
+  instruments: XRayInstrument[];
+  counts: Record<XRayClassification, number>;
+  leaders: XRayInstrument[];
+  laggards: XRayInstrument[];
+  coverage: { covered_instruments: number; universe_complete: false; scope: string; label: string; unavailable_values: number };
+};
+
 type ErrorEnvelope = { error?: { code?: string; message?: string; request_id?: string } };
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
@@ -147,6 +166,7 @@ export const api = {
   stock: (symbol: string, signal?: AbortSignal) => getJson<StockResponse>(`/api/v1/stocks/${encodeURIComponent(symbol)}`, signal),
   candles: (symbol: string, timeframe: string, signal?: AbortSignal) => getJson<CandleResponse>(
     `/api/v1/stocks/${encodeURIComponent(symbol)}/candles?tf=${encodeURIComponent(timeframe)}`, signal),
+  xray: (signal?: AbortSignal) => getJson<XRayResponse>("/api/v1/xray", signal),
 };
 
 export function formatTimestamp(value: string): string {

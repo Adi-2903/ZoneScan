@@ -77,6 +77,33 @@ class AnalyticalApiTests(unittest.TestCase):
         invalid = self.client.get("/api/v1/stocks/SYNBULL/candles", params={"tf": "2m"})
         self.assertEqual(invalid.status_code, 400)
 
+    def test_xray_is_deterministic_fixture_scoped_and_keeps_unavailable_values(self):
+        first = self.client.get("/api/v1/xray")
+        second = self.client.get("/api/v1/xray")
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(first.json(), second.json())
+        body = first.json()
+        self.assertEqual(body["data_mode"], "synthetic")
+        self.assertEqual(body["data_status"], "synthetic")
+        self.assertEqual(body["data_source"], "deterministic_synthetic_fixture")
+        self.assertEqual(body["market_state"], "unknown")
+        self.assertTrue(body["as_of"].endswith("+05:30"))
+        self.assertFalse(body["coverage"]["universe_complete"])
+        self.assertEqual(body["coverage"]["scope"], "synthetic_fixture_examples_only")
+        self.assertIn("not the complete NSE F&O universe", body["coverage"]["label"])
+        self.assertEqual(body["coverage"]["covered_instruments"], len(body["instruments"]))
+        self.assertEqual(sum(body["counts"].values()), len(body["instruments"]))
+        self.assertEqual({"bullish", "bearish", "choppy", "neutral", "unavailable"},
+                         {row["classification"] for row in body["instruments"]})
+        missing = next(row for row in body["instruments"] if row["classification"] == "unavailable")
+        choppy = next(row for row in body["instruments"] if row["classification"] == "choppy")
+        self.assertIsNotNone(choppy["direction"])
+        self.assertIsNone(missing["change_pct"])
+        self.assertIsNone(missing["direction"])
+        self.assertIsNone(missing["timestamp"])
+        self.assertTrue(missing["unavailable_reason"])
+        self.assertTrue(body["leaders"] and body["laggards"])
+
     def test_missing_analytical_inputs_stay_unavailable(self):
         from dataclasses import replace
         from zonescan.analytics_service import AnalyticsService

@@ -46,6 +46,9 @@ def build_synthetic_analytics_dataset() -> SyntheticAnalyticsDataset:
     instruments = (
         Instrument("SYN-BULL", "SYNBULL", "Synthetic Fixture Sector"),
         Instrument("SYN-BEAR", "SYNBEAR", "Synthetic Fixture Sector"),
+        Instrument("SYN-CHOP", "SYNCHOP", "Synthetic Fixture Sector"),
+        Instrument("SYN-NEUTRAL", "SYNNEUTRAL", "Synthetic Fixture Sector"),
+        Instrument("SYN-UNAVAILABLE", "SYNUNAV", None),
     )
     dates = _fixture_dates()
     minute_candles: list[Candle] = []
@@ -55,8 +58,14 @@ def build_synthetic_analytics_dataset() -> SyntheticAnalyticsDataset:
     mappings: list[FuturesContractMapping] = []
     sectors: dict[tuple[str, datetime], str] = {}
 
+    # Additional examples exercise X-Ray states. They remain hand-authored
+    # synthetic paths; this small list is never represented as the F&O universe.
     for instrument, direction, initial_price in (
-            (instruments[0], 1.0, 100.0), (instruments[1], -1.0, 200.0)):
+            (instruments[0], 1.0, 100.0),
+            (instruments[1], -1.0, 200.0),
+            (instruments[2], 0.025, 150.0),
+            (instruments[3], 0.0, 250.0),
+            (instruments[4], 0.7, 300.0)):
         previous_close = initial_price
         previous_oi_close = 100_000.0
         contract_id = f"{instrument.instrument_id}-FUT"
@@ -76,17 +85,26 @@ def build_synthetic_analytics_dataset() -> SyntheticAnalyticsDataset:
             final_close = previous_close
             last_center = previous_close
             for minute_index in range(375):
+                # Leave the final five-minute slot absent for one demo instrument
+                # so consumers can see explicit unavailable coverage.
+                if (instrument.instrument_id == "SYN-UNAVAILABLE"
+                        and session_index == len(dates) - 1 and minute_index >= 370):
+                    continue
                 timestamp = opens_at + timedelta(minutes=minute_index)
                 progress = (minute_index + 1) / 375
                 trend_fraction = daily_fraction * progress
                 wave_fraction = 0.00065 * sin(2 * pi * minute_index / 24)
+                if instrument.instrument_id == "SYN-NEUTRAL":
+                    wave_fraction -= 0.00065 * sin(2 * pi * 374 / 24)
                 center = previous_close * (1 + trend_fraction + wave_fraction)
                 candle_open = last_center
                 candle_close = center
                 wick = previous_close * 0.00018
                 high = max(candle_open, candle_close) + wick
                 low = min(candle_open, candle_close) - wick
-                volume = 140.0 if session_index == len(dates) - 1 else 100.0
+                volume = (80.0 if instrument.instrument_id == "SYN-CHOP"
+                          and session_index == len(dates) - 1
+                          else 140.0 if session_index == len(dates) - 1 else 100.0)
                 minute_candles.append(Candle(
                     instrument.instrument_id, timestamp, candle_open, high, low,
                     candle_close, volume, quality_flags=("synthetic",)))
@@ -109,7 +127,8 @@ def build_synthetic_analytics_dataset() -> SyntheticAnalyticsDataset:
         # implement sector aggregation or resolve the outstanding sector decision.
         for minute in range(5, 376, 5):
             stamp = session.opens_at + timedelta(minutes=minute)
-            sectors[(session.instrument_id, stamp)] = "neutral"
+            if session.instrument_id != "SYN-UNAVAILABLE":
+                sectors[(session.instrument_id, stamp)] = "neutral"
 
     return SyntheticAnalyticsDataset(
         instruments=instruments,
