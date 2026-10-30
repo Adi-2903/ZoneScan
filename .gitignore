@@ -1,0 +1,103 @@
+# ==============================================================================
+# ZoneScan Monorepo — Git Ignore
+# ==============================================================================
+
+# OS & System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# Environment & Secrets (AGENTS.md: Never commit keys/credentials)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.cert
+credentials.json
+token.json
+session.json
+
+# Node & Web Frontend (apps/web)
+node_modules/
+.npm/
+.npm-cache/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts.tmp
+.turbo/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python & Backend (services/api)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+.hypothesis/
+
+# Local SQLite databases (scratch/testing runs)
+*.sqlite3
+*.sqlite3-journal
+*.db-journal
+*.db-wal
+*.db-shm
+
+# IDE & Editor files
+.idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json

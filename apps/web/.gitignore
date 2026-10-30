@@ -1,6 +1,18 @@
+# Dependencies & Caches
 node_modules/
+.npm-cache/
+.turbo/
+
+# Next.js Build Outputs
 .next/
 out/
 build/
-.env*.local
+dist/
+
+# TypeScript & Temp declarations
+*.tsbuildinfo
 next-env.d.ts.tmp
+
+# Local environment & secrets
+.env*.local
+*.log

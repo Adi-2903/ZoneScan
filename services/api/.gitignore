@@ -1,2 +1,24 @@
+# Python bytecode & cache
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Virtual Environments & Build
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Local databases & logs
+*.db
+*.sqlite3
+*.log
