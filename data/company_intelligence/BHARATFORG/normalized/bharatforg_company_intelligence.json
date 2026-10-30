@@ -1,0 +1,989 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "generated_at": "2026-10-30T15:03:09.294147+05:30",
+    "extraction_engine": "ZoneScan-ARX-Docling-Arelle",
+    "is_synthetic": false,
+    "origin": "official_corporate_filings"
+  },
+  "company_profile": {
+    "company_id": "L25209PN1961PLC012046",
+    "company_name": "Bharat Forge Limited",
+    "symbol": "BHARATFORG",
+    "bse_code": "500493",
+    "isin": "INE465A01025",
+    "cin": "L25209PN1961PLC012046",
+    "sector": "Capital Goods",
+    "industry": "Forgings & Precision Components",
+    "incorporation_year": 1961,
+    "registered_office": "Mundhwa, Pune Cantonment, Pune - 411036, Maharashtra, India",
+    "evidence_status": "disclosed"
+  },
+  "financial_statements": {
+    "consolidated": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "note": "Note 23",
+          "values": {
+            "FY2023-24": 15682.07,
+            "FY2022-23": 12910.26,
+            "FY2021-22": 10461.08
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "note": "Note 24",
+          "values": {
+            "FY2023-24": 222.14,
+            "FY2022-23": 178.5,
+            "FY2021-22": 159.2
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "note": null,
+          "values": {
+            "FY2023-24": 15904.21,
+            "FY2022-23": 13088.76,
+            "FY2021-22": 10620.28
+          }
+        },
+        {
+          "metric": "cost_of_materials",
+          "label": "Cost of Raw Materials Consumed",
+          "note": "Note 25",
+          "values": {
+            "FY2023-24": 6684.32,
+            "FY2022-23": 5698.4,
+            "FY2021-22": 4512.1
+          }
+        },
+        {
+          "metric": "purchases_stock_in_trade",
+          "label": "Purchases of Stock-in-Trade",
+          "note": null,
+          "values": {
+            "FY2023-24": 310.45,
+            "FY2022-23": 284.1,
+            "FY2021-22": 215.3
+          }
+        },
+        {
+          "metric": "changes_in_inventories",
+          "label": "Changes in Inventories",
+          "note": null,
+          "values": {
+            "FY2023-24": -142.1,
+            "FY2022-23": -95.6,
+            "FY2021-22": -180.4
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses",
+          "note": "Note 26",
+          "values": {
+            "FY2023-24": 1845.2,
+            "FY2022-23": 1580.3,
+            "FY2021-22": 1315.6
+          }
+        },
+        {
+          "metric": "finance_costs",
+          "label": "Finance Costs",
+          "note": "Note 27",
+          "values": {
+            "FY2023-24": 568.4,
+            "FY2022-23": 380.2,
+            "FY2021-22": 260.4
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation and Amortisation",
+          "note": "Note 4",
+          "values": {
+            "FY2023-24": 820.5,
+            "FY2022-23": 725.1,
+            "FY2021-22": 612.8
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Expenses",
+          "note": "Note 28",
+          "values": {
+            "FY2023-24": 4385.6,
+            "FY2022-23": 3560.8,
+            "FY2021-22": 2680.5
+          }
+        },
+        {
+          "metric": "total_expenses",
+          "label": "Total Expenses",
+          "note": null,
+          "values": {
+            "FY2023-24": 14472.37,
+            "FY2022-23": 12133.3,
+            "FY2021-22": 9416.3
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax",
+          "note": null,
+          "values": {
+            "FY2023-24": 1431.84,
+            "FY2022-23": 955.46,
+            "FY2021-22": 1203.98
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "note": "Note 29",
+          "values": {
+            "FY2023-24": 520.61,
+            "FY2022-23": 447.23,
+            "FY2021-22": 218.42
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "note": null,
+          "values": {
+            "FY2023-24": 911.23,
+            "FY2022-23": 508.23,
+            "FY2021-22": 985.56
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment",
+          "note": "Note 4",
+          "values": {
+            "FY2023-24": 6540.2,
+            "FY2022-23": 5820.1,
+            "FY2021-22": 4980.5
+          }
+        },
+        {
+          "metric": "cwip",
+          "label": "Capital Work-in-Progress",
+          "note": null,
+          "values": {
+            "FY2023-24": 845.6,
+            "FY2022-23": 910.4,
+            "FY2021-22": 720.1
+          }
+        },
+        {
+          "metric": "goodwill",
+          "label": "Goodwill",
+          "note": "Note 5",
+          "values": {
+            "FY2023-24": 412.3,
+            "FY2022-23": 395.2,
+            "FY2021-22": 380.0
+          }
+        },
+        {
+          "metric": "investments_noncurrent",
+          "label": "Investments (Non-Current)",
+          "note": "Note 7",
+          "values": {
+            "FY2023-24": 1240.5,
+            "FY2022-23": 1150.2,
+            "FY2021-22": 950.4
+          }
+        },
+        {
+          "metric": "other_noncurrent_assets",
+          "label": "Other Non-Current Assets",
+          "note": null,
+          "values": {
+            "FY2023-24": 780.4,
+            "FY2022-23": 690.3,
+            "FY2021-22": 590.2
+          }
+        },
+        {
+          "metric": "total_noncurrent_assets",
+          "label": "Total Non-Current Assets",
+          "note": null,
+          "values": {
+            "FY2023-24": 9819.0,
+            "FY2022-23": 8966.2,
+            "FY2021-22": 7621.2
+          }
+        },
+        {
+          "metric": "inventories",
+          "label": "Inventories",
+          "note": "Note 11",
+          "values": {
+            "FY2023-24": 3485.4,
+            "FY2022-23": 3120.5,
+            "FY2021-22": 2680.1
+          }
+        },
+        {
+          "metric": "trade_receivables",
+          "label": "Trade Receivables",
+          "note": "Note 12",
+          "values": {
+            "FY2023-24": 3125.1,
+            "FY2022-23": 2740.2,
+            "FY2021-22": 2210.4
+          }
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "label": "Cash and Cash Equivalents",
+          "note": "Note 13",
+          "values": {
+            "FY2023-24": 1485.6,
+            "FY2022-23": 1210.4,
+            "FY2021-22": 980.5
+          }
+        },
+        {
+          "metric": "other_current_assets",
+          "label": "Other Current Assets",
+          "note": null,
+          "values": {
+            "FY2023-24": 1150.3,
+            "FY2022-23": 980.5,
+            "FY2021-22": 820.1
+          }
+        },
+        {
+          "metric": "total_current_assets",
+          "label": "Total Current Assets",
+          "note": null,
+          "values": {
+            "FY2023-24": 9246.4,
+            "FY2022-23": 8051.6,
+            "FY2021-22": 6691.1
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "note": null,
+          "values": {
+            "FY2023-24": 19065.4,
+            "FY2022-23": 17017.8,
+            "FY2021-22": 14312.3
+          }
+        },
+        {
+          "metric": "equity_share_capital",
+          "label": "Equity Share Capital",
+          "note": "Note 16",
+          "values": {
+            "FY2023-24": 93.12,
+            "FY2022-23": 93.12,
+            "FY2021-22": 93.12
+          }
+        },
+        {
+          "metric": "other_equity",
+          "label": "Other Equity",
+          "note": "Note 17",
+          "values": {
+            "FY2023-24": 7027.38,
+            "FY2022-23": 6428.18,
+            "FY2021-22": 6215.48
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "note": null,
+          "values": {
+            "FY2023-24": 7120.5,
+            "FY2022-23": 6521.3,
+            "FY2021-22": 6308.6
+          }
+        },
+        {
+          "metric": "borrowings_noncurrent",
+          "label": "Borrowings (Non-Current)",
+          "note": "Note 18",
+          "values": {
+            "FY2023-24": 4120.45,
+            "FY2022-23": 3840.1,
+            "FY2021-22": 3210.5
+          }
+        },
+        {
+          "metric": "total_noncurrent_liabilities",
+          "label": "Total Non-Current Liabilities",
+          "note": null,
+          "values": {
+            "FY2023-24": 4810.2,
+            "FY2022-23": 4410.5,
+            "FY2021-22": 3690.4
+          }
+        },
+        {
+          "metric": "borrowings_current",
+          "label": "Borrowings (Current)",
+          "note": "Note 21",
+          "values": {
+            "FY2023-24": 2221.7,
+            "FY2022-23": 1950.4,
+            "FY2021-22": 1540.2
+          }
+        },
+        {
+          "metric": "trade_payables",
+          "label": "Trade Payables",
+          "note": "Note 22",
+          "values": {
+            "FY2023-24": 2980.4,
+            "FY2022-23": 2520.1,
+            "FY2021-22": 1890.3
+          }
+        },
+        {
+          "metric": "total_current_liabilities",
+          "label": "Total Current Liabilities",
+          "note": null,
+          "values": {
+            "FY2023-24": 7134.7,
+            "FY2022-23": 6086.0,
+            "FY2021-22": 4313.3
+          }
+        },
+        {
+          "metric": "total_equity_and_liabilities",
+          "label": "Total Equity and Liabilities",
+          "note": null,
+          "values": {
+            "FY2023-24": 19065.4,
+            "FY2022-23": 17017.8,
+            "FY2021-22": 14312.3
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "operating_cash_flow",
+          "label": "Cash Flow from Operating Activities",
+          "note": null,
+          "values": {
+            "FY2023-24": 2180.45,
+            "FY2022-23": 1750.3,
+            "FY2021-22": 1410.2
+          }
+        },
+        {
+          "metric": "investing_cash_flow",
+          "label": "Cash Flow from Investing Activities",
+          "note": null,
+          "values": {
+            "FY2023-24": -1250.3,
+            "FY2022-23": -1180.2,
+            "FY2021-22": -940.5
+          }
+        },
+        {
+          "metric": "financing_cash_flow",
+          "label": "Cash Flow from Financing Activities",
+          "note": null,
+          "values": {
+            "FY2023-24": -654.95,
+            "FY2022-23": -340.2,
+            "FY2021-22": -280.4
+          }
+        },
+        {
+          "metric": "net_change_in_cash",
+          "label": "Net Increase / (Decrease) in Cash",
+          "note": null,
+          "values": {
+            "FY2023-24": 275.2,
+            "FY2022-23": 229.9,
+            "FY2021-22": 189.3
+          }
+        },
+        {
+          "metric": "opening_cash",
+          "label": "Cash and Cash Equivalents at Beginning of Year",
+          "note": null,
+          "values": {
+            "FY2023-24": 1210.4,
+            "FY2022-23": 980.5,
+            "FY2021-22": 791.2
+          }
+        },
+        {
+          "metric": "closing_cash",
+          "label": "Cash and Cash Equivalents at End of Year",
+          "note": null,
+          "values": {
+            "FY2023-24": 1485.6,
+            "FY2022-23": 1210.4,
+            "FY2021-22": 980.5
+          }
+        }
+      ]
+    },
+    "standalone": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "values": {
+            "FY2023-24": 8959.5,
+            "FY2022-23": 7572.7,
+            "FY2021-22": 6046.2
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "values": {
+            "FY2023-24": 254.2,
+            "FY2022-23": 210.1,
+            "FY2021-22": 182.4
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "values": {
+            "FY2023-24": 9213.7,
+            "FY2022-23": 7782.8,
+            "FY2021-22": 6228.6
+          }
+        },
+        {
+          "metric": "cost_of_materials",
+          "label": "Cost of Raw Materials Consumed",
+          "values": {
+            "FY2023-24": 3840.1,
+            "FY2022-23": 3310.2,
+            "FY2021-22": 2680.4
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses",
+          "values": {
+            "FY2023-24": 620.4,
+            "FY2022-23": 540.2,
+            "FY2021-22": 480.1
+          }
+        },
+        {
+          "metric": "finance_costs",
+          "label": "Finance Costs",
+          "values": {
+            "FY2023-24": 280.1,
+            "FY2022-23": 195.4,
+            "FY2021-22": 140.2
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation and Amortisation",
+          "values": {
+            "FY2023-24": 460.2,
+            "FY2022-23": 412.3,
+            "FY2021-22": 375.1
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Expenses",
+          "values": {
+            "FY2023-24": 2420.5,
+            "FY2022-23": 2040.1,
+            "FY2021-22": 1580.4
+          }
+        },
+        {
+          "metric": "total_expenses",
+          "label": "Total Expenses",
+          "values": {
+            "FY2023-24": 7621.3,
+            "FY2022-23": 6498.2,
+            "FY2021-22": 5256.2
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax",
+          "values": {
+            "FY2023-24": 1592.4,
+            "FY2022-23": 1284.6,
+            "FY2021-22": 972.4
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "values": {
+            "FY2023-24": 380.2,
+            "FY2022-23": 310.1,
+            "FY2021-22": 240.3
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "values": {
+            "FY2023-24": 1212.2,
+            "FY2022-23": 974.5,
+            "FY2021-22": 732.1
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment",
+          "values": {
+            "FY2023-24": 3850.4,
+            "FY2022-23": 3490.2,
+            "FY2021-22": 3120.1
+          }
+        },
+        {
+          "metric": "total_noncurrent_assets",
+          "label": "Total Non-Current Assets",
+          "values": {
+            "FY2023-24": 7240.5,
+            "FY2022-23": 6510.4,
+            "FY2021-22": 5890.2
+          }
+        },
+        {
+          "metric": "total_current_assets",
+          "label": "Total Current Assets",
+          "values": {
+            "FY2023-24": 4980.2,
+            "FY2022-23": 4210.1,
+            "FY2021-22": 3520.4
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "values": {
+            "FY2023-24": 12220.7,
+            "FY2022-23": 10720.5,
+            "FY2021-22": 9410.6
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "values": {
+            "FY2023-24": 6840.3,
+            "FY2022-23": 6010.5,
+            "FY2021-22": 5420.1
+          }
+        },
+        {
+          "metric": "total_noncurrent_liabilities",
+          "label": "Total Non-Current Liabilities",
+          "values": {
+            "FY2023-24": 2410.2,
+            "FY2022-23": 2180.1,
+            "FY2021-22": 1980.3
+          }
+        },
+        {
+          "metric": "total_current_liabilities",
+          "label": "Total Current Liabilities",
+          "values": {
+            "FY2023-24": 2970.2,
+            "FY2022-23": 2529.9,
+            "FY2021-22": 2010.2
+          }
+        },
+        {
+          "metric": "total_equity_and_liabilities",
+          "label": "Total Equity and Liabilities",
+          "values": {
+            "FY2023-24": 12220.7,
+            "FY2022-23": 10720.5,
+            "FY2021-22": 9410.6
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "operating_cash_flow",
+          "label": "Cash Flow from Operating Activities",
+          "values": {
+            "FY2023-24": 1640.2,
+            "FY2022-23": 1320.1,
+            "FY2021-22": 1080.4
+          }
+        },
+        {
+          "metric": "investing_cash_flow",
+          "label": "Cash Flow from Investing Activities",
+          "values": {
+            "FY2023-24": -890.1,
+            "FY2022-23": -750.4,
+            "FY2021-22": -620.1
+          }
+        },
+        {
+          "metric": "financing_cash_flow",
+          "label": "Cash Flow from Financing Activities",
+          "values": {
+            "FY2023-24": -520.3,
+            "FY2022-23": -380.1,
+            "FY2021-22": -290.5
+          }
+        },
+        {
+          "metric": "net_change_in_cash",
+          "label": "Net Increase / (Decrease) in Cash",
+          "values": {
+            "FY2023-24": 229.8,
+            "FY2022-23": 189.6,
+            "FY2021-22": 169.8
+          }
+        }
+      ]
+    }
+  },
+  "segments": [
+    {
+      "segment_name": "Commercial Vehicles (CV)",
+      "revenue_cr": 6115.8,
+      "revenue_share_pct": 39.0,
+      "operating_profit_cr": 1080.2,
+      "assets_cr": 6840.5,
+      "liabilities_cr": 2410.2,
+      "description": "Front axle beams, steering knuckles, crankshafts, and driveline assemblies supplied to global Class 8 and medium/heavy truck OEMs.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 34 (Operating Segment Disclosures), Page 246"
+    },
+    {
+      "segment_name": "Industrial & Energy",
+      "revenue_cr": 4234.15,
+      "revenue_share_pct": 27.0,
+      "operating_profit_cr": 780.4,
+      "assets_cr": 4980.2,
+      "liabilities_cr": 1650.3,
+      "description": "Turbine rotor shafts, oil & gas subsea valve blocks, marine engine forgings, rail components, and wind turbine forged rings.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 34 (Operating Segment Disclosures), Page 246"
+    },
+    {
+      "segment_name": "Passenger Vehicles (PV)",
+      "revenue_cr": 3450.05,
+      "revenue_share_pct": 22.0,
+      "operating_profit_cr": 510.6,
+      "assets_cr": 4120.1,
+      "liabilities_cr": 1340.5,
+      "description": "Aluminum lightweight chassis knuckles, transmission forged gears, and structural sub-assemblies for global passenger car and EV OEMs.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 34 (Operating Segment Disclosures), Page 246"
+    },
+    {
+      "segment_name": "Defence & Aerospace",
+      "revenue_cr": 1882.07,
+      "revenue_share_pct": 12.0,
+      "operating_profit_cr": 390.8,
+      "assets_cr": 2340.4,
+      "liabilities_cr": 780.2,
+      "description": "Advanced Towed Artillery Gun Systems (ATAGS), mounted gun systems, armored vehicle drivelines, aero-engine high-nickel compressor disks.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 34 (Operating Segment Disclosures), Page 246"
+    }
+  ],
+  "shareholding": [
+    {
+      "category": "Promoter & Promoter Group",
+      "holding_pct": 45.25,
+      "shares_count": 210724195,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.0,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "BSE Shareholding Filing under Reg 31, Scrip 500493 (Filing Date: 2024-04-16)"
+    },
+    {
+      "category": "Mutual Funds & Domestic Financial Institutions (DII)",
+      "holding_pct": 27.42,
+      "shares_count": 127698540,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.45,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "BSE Shareholding Filing under Reg 31, Scrip 500493 (Filing Date: 2024-04-16)"
+    },
+    {
+      "category": "Foreign Portfolio Investors (FPI / FII)",
+      "holding_pct": 16.85,
+      "shares_count": 78468210,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.32,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "BSE Shareholding Filing under Reg 31, Scrip 500493 (Filing Date: 2024-04-16)"
+    },
+    {
+      "category": "Public, Retail & Corporate Bodies",
+      "holding_pct": 10.48,
+      "shares_count": 48798425,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.13,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "BSE Shareholding Filing under Reg 31, Scrip 500493 (Filing Date: 2024-04-16)"
+    }
+  ],
+  "corporate_relationships": [
+    {
+      "entity_name": "Bharat Forge Global Holding GmbH",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "Germany",
+      "nature_of_transaction": "Holding company for European forging and machining manufacturing operations",
+      "transaction_amount_cr": 450.2,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 39 (Subsidiary and Associate Details), Page 256"
+    },
+    {
+      "entity_name": "Bharat Forge America Inc.",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "USA",
+      "nature_of_transaction": "North American aluminum forging facility and commercial vehicle components sales",
+      "transaction_amount_cr": 380.5,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 39, Page 256"
+    },
+    {
+      "entity_name": "Kalyani Strategic Systems Limited",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "India",
+      "nature_of_transaction": "Design, manufacturing, and export of artillery systems, armored vehicles, and defense ammunition",
+      "transaction_amount_cr": 620.1,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 39, Page 256"
+    },
+    {
+      "entity_name": "BF Industrial Solutions GmbH",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "Germany",
+      "nature_of_transaction": "Industrial and non-automotive forging operations in Germany and Scandinavia",
+      "transaction_amount_cr": 210.4,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 39, Page 256"
+    },
+    {
+      "entity_name": "Kalyani Powertrain Limited",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "India",
+      "nature_of_transaction": "Electric powertrain solutions, e-drives, battery systems, and power electronics for commercial EVs",
+      "transaction_amount_cr": 95.3,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 39, Page 257"
+    },
+    {
+      "entity_name": "Tata Motors Limited",
+      "relationship_type": "customer",
+      "ownership_pct": null,
+      "country": "India",
+      "nature_of_transaction": "OEM supply of heavy commercial vehicle front axle beams and steering assemblies",
+      "transaction_amount_cr": 1250.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, MD&A Commercial Vehicles Review, Page 54"
+    },
+    {
+      "entity_name": "Daimler Truck AG",
+      "relationship_type": "customer",
+      "ownership_pct": null,
+      "country": "Germany",
+      "nature_of_transaction": "Global Tier-1 long-term export contracts for commercial vehicle chassis and forged axle components",
+      "transaction_amount_cr": 1420.5,
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Global Market Footprint, Page 58"
+    },
+    {
+      "entity_name": "Boeing Commercial Airplanes",
+      "relationship_type": "customer",
+      "ownership_pct": null,
+      "country": "USA",
+      "nature_of_transaction": "Supply of aerospace titanium flap tracks and structural components",
+      "transaction_amount_cr": 215.3,
+      "evidence_status": "disclosed",
+      "source_ref": "BSE/NSE Corporate Announcement dated 2023-09-12"
+    },
+    {
+      "entity_name": "Jindal Steel & Power Ltd / Kalyani Steels",
+      "relationship_type": "supplier",
+      "ownership_pct": null,
+      "country": "India",
+      "nature_of_transaction": "Forging quality carbon and alloy steel billets, bloom, and bar sourcing",
+      "transaction_amount_cr": 2850.4,
+      "evidence_status": "inferred",
+      "source_ref": "Annual Report FY24, Note 25 (Raw Materials Consumed) & Industry Billet Sourcing"
+    }
+  ],
+  "commodity_exposure": [
+    {
+      "material_name": "Carbon & Alloy Forging Steel (Billets / Rounds)",
+      "share_of_cogs_pct": 62.4,
+      "annual_expenditure_cr": 4171.02,
+      "benchmark_index": "Domestic Alloy Billet Index (\u20b9/Tonne)",
+      "domestic_import_mix": "78% Domestic / 22% Import",
+      "hedging_policy": "Quarterly raw material index formula pricing pass-through clauses with automotive OEM customers.",
+      "risk_summary": "High exposure to domestic steel price revisions; cushioned by 1-quarter lagging indexing clauses in OEM supply contracts.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 25.1 (Details of Raw Materials Consumed), Page 232"
+    },
+    {
+      "material_name": "Aluminum Ingots & Extrusions",
+      "share_of_cogs_pct": 18.2,
+      "annual_expenditure_cr": 1216.55,
+      "benchmark_index": "MCX / LME Primary Aluminum (Cash)",
+      "domestic_import_mix": "45% Domestic / 55% Import",
+      "hedging_policy": "Forward physical procurement contracts and financial hedge instruments for overseas aluminum supplies.",
+      "risk_summary": "Key input for European and US lightweight chassis knuckles; exposure to LME cash aluminum spreads and energy tariffs.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 25.1, Page 232"
+    },
+    {
+      "material_name": "Titanium & High-Nickel Superalloys",
+      "share_of_cogs_pct": 8.5,
+      "annual_expenditure_cr": 568.17,
+      "benchmark_index": "LME Cash Nickel / Aerospace Titanium Spreads",
+      "domestic_import_mix": "10% Domestic / 90% Import",
+      "hedging_policy": "Back-to-back fixed-price customer contracting for aerospace and defense orders.",
+      "risk_summary": "Critical input for defense artillery shells and aero-engine disks; import dependent with specialized qualification lead times.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 25.1, Page 232"
+    },
+    {
+      "material_name": "Consumable Alloys, Tooling & Die Steel",
+      "share_of_cogs_pct": 10.9,
+      "annual_expenditure_cr": 728.58,
+      "benchmark_index": "Industrial Tooling Indices",
+      "domestic_import_mix": "60% Domestic / 40% Import",
+      "hedging_policy": "Strategic vendor stocking and multi-supplier procurement.",
+      "risk_summary": "Essential for heavy forging press dies; subject to specialty tool steel price fluctuations.",
+      "evidence_status": "disclosed",
+      "source_ref": "Annual Report FY24, Note 25.1, Page 232"
+    }
+  ],
+  "business_intelligence": [
+    {
+      "category": "division",
+      "title": "Precision Forging and Advanced Machining",
+      "details": "World's largest single-location forging facility at Mundhwa, Pune, equipped with closed-die forging presses up to 16,000 Tonne capacity, offering end-to-end component manufacturing.",
+      "source_ref": "Annual Report FY24, Business Overview, Page 16"
+    },
+    {
+      "category": "division",
+      "title": "Defense and Aerospace Systems",
+      "details": "Indigenous development of 155mm/52 caliber Advanced Towed Artillery Gun Systems (ATAGS), mounted gun systems, armored protected vehicles, and critical aero-engine titanium forgings.",
+      "source_ref": "Annual Report FY24, Strategic Growth Vectors, Page 28"
+    },
+    {
+      "category": "division",
+      "title": "E-Mobility and Lightweighting",
+      "details": "Aluminum forging and high-pressure casting facilities in North Carolina (USA) and Germany targeting passenger vehicle lightweighting; proprietary electric powertrains via Kalyani Powertrain.",
+      "source_ref": "Annual Report FY24, Page 34"
+    },
+    {
+      "category": "location",
+      "title": "Global Manufacturing Footprint",
+      "details": "Primary plants: Mundhwa, Baramati, Chakan, Jalgaon (Maharashtra, India); overseas plants in Daun and Neckarsulm (Germany); Karlskoga (Sweden); Sanford, North Carolina (USA).",
+      "source_ref": "Annual Report FY24, Operations Directory, Page 14"
+    },
+    {
+      "category": "capex",
+      "title": "Capital Expenditure & Modernization Programs",
+      "details": "Annual capital expenditure of ~\u20b91,250 Cr across FY24 focused on defense artillery gun assembly facilities in Pune and ramp-up of the North American aluminum forging press lines.",
+      "source_ref": "Annual Report FY24, MD&A Capex Review, Page 48"
+    },
+    {
+      "category": "risk_factor",
+      "title": "Automotive Cyclicality and Global Class 8 Truck Build",
+      "details": "Significant revenue exposure to North American and European heavy commercial vehicle replacement and production cycles.",
+      "source_ref": "Annual Report FY24, Risk Management Framework, Page 62"
+    },
+    {
+      "category": "risk_factor",
+      "title": "Raw Material Price and Energy Cost Volatility",
+      "details": "Fluctuations in steel scrap, alloy billet pricing, and European industrial natural gas / electricity rates directly influence gross margins before contract reset windows.",
+      "source_ref": "Annual Report FY24, Page 63"
+    },
+    {
+      "category": "commentary",
+      "title": "Management Outlook & Defense Export Ramp",
+      "details": "Management highlighted sustained order book expansion in defense exports and non-automotive industrial segments, projecting international aerospace and artillery deliveries to anchor margin stability.",
+      "source_ref": "Annual Report FY24, Chairman's Statement, Page 8"
+    }
+  ],
+  "data_conflicts": [
+    {
+      "metric": "Revenue from Operations",
+      "reporting_period": "FY2023-24",
+      "statement_scope": "Scope Variance (Consolidated vs Standalone)",
+      "source_primary": "Audited Consolidated P&L (Page 218)",
+      "value_primary": 15682.07,
+      "source_secondary": "Audited Standalone P&L (Page 134)",
+      "value_secondary": 8959.5,
+      "discrepancy_pct": 42.87,
+      "reason": "Consolidated statement includes global European and US manufacturing subsidiaries (\u20b96,722.57 Cr net contribution). Both figures are correct within their respective disclosed statutory reporting scopes."
+    },
+    {
+      "metric": "Profit After Tax (PAT)",
+      "reporting_period": "FY2023-24",
+      "statement_scope": "Scope Variance (Consolidated vs Standalone)",
+      "source_primary": "Audited Consolidated P&L (Page 218)",
+      "value_primary": 911.23,
+      "source_secondary": "Audited Standalone P&L (Page 134)",
+      "value_secondary": 1212.2,
+      "discrepancy_pct": -24.83,
+      "reason": "Standalone India operations generated higher net margin (\u20b91,212.20 Cr); overseas European subsidiaries bore energy inflation and aluminum ramp-up costs, reducing consolidated PAT to \u20b9911.23 Cr."
+    },
+    {
+      "metric": "Total Borrowings (Debt)",
+      "reporting_period": "FY2023-24",
+      "statement_scope": "Scope Variance (Consolidated vs Standalone)",
+      "source_primary": "Audited Consolidated Balance Sheet (Page 216)",
+      "value_primary": 6342.15,
+      "source_secondary": "Audited Standalone Balance Sheet (Page 132)",
+      "value_secondary": 3410.2,
+      "discrepancy_pct": 46.23,
+      "reason": "Overseas subsidiaries hold \u20b92,931.95 Cr of non-recourse project and working capital debt."
+    }
+  ]
+}

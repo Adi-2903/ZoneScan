@@ -101,3 +101,9 @@ htmlcov/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+
+# Corporate Data Acquisition Raw Binary Documents (Keep manifests, normalized JSON, and reports)
+data/**/raw/*.pdf
+data/**/raw/*.zip
+data/**/raw/*.bin
+
