@@ -1,3 +1,26 @@
+## 2026-10-30 — Company Intelligence UI Prototype
+
+**Frontend-only prototype; synthetic demo fixtures only; no production database or backend changes.**
+
+- Built complete Company Intelligence experience adhering to the `ui-ux-pro-max` skill and the ZoneScan terminal design system (`design-system/zonescan/MASTER.md`).
+- Added typed synthetic fixtures (`apps/web/src/lib/fixtures/company-intelligence.ts`) with two detailed fictional Indian manufacturing companies (`ZENITHFAB` and `APEXALLOY`), complete 3-year audited and quarterly financial statements, segment breakdowns, shareholding profiles, 13 mapped relationships with evidence statuses, raw material cost structures, and statutory filings.
+- Created reusable Financial Intelligence components:
+  - `EvidenceBadge`: accessible color, text, and glyph tags for Disclosed, Verified, Inferred, Unconfirmed, and Unavailable data with source inspection triggers.
+  - `SourcePanel`: accessible slide-out drawer providing Level 3 progressive disclosure of exact calculation formulas (e.g. Gross Margin, EBITDA) and statutory filing excerpts on demand.
+  - `FinancialTable`: multi-period statement table featuring frozen sticky row headers, Consolidated/Standalone and Annual/Quarterly toggle modes, accounting parentheses for negative values, and line-item source inspection.
+  - `KPICard`: high-density terminal cards with tabular numerals, units (₹ Cr, %, ×), YoY delta arrows, and evidence badges.
+  - `MetricSparkline`: bespoke pure-SVG trend visualizer with gradient area fills, hoverable tooltip pills, and accessible data table summaries.
+  - `ShareholdingBar`: segmented promoter/DII/FII/retail distribution bar with QoQ change badges and promoter pledge tracking.
+  - `SegmentChart`: division revenue/profit share visualizer with spotlight cards and accessible table alternative.
+  - `RelationshipMap`: interactive Cytoscape.js network graph featuring concentric layout, typed node and edge styling, pan/zoom/reset controls, interactive node inspector drawer, category filters, and accessible adjacency table alternative.
+  - `SupplyChainSimulator`: raw material dependency cards, interactive commodity price shock slider (-20% to +30%), real-time gross margin compression and EBITDA impact calculator with transparent mathematical formulas and synthetic disclaimers.
+  - `FilingList`: reverse-chronological statutory filing feed with category badges (Quarterly Results, Material Contract, Shareholding, Expansion) and excerpt inspection.
+  - `CompanyIntelligence`: master workspace orchestrator with company selector dropdown and seamless cross-tab navigation.
+- Integrated Company Intelligence into main application (`apps/web/src/app/page.tsx`), adding primary navigation, breadcrumbs, back-to-board links, and quick jump buttons from Market Board and X-Ray.
+- Installed `cytoscape` and `@types/cytoscape`.
+- Updated `docs/02_UX_FLOWS.md` and `docs/14_DESIGN_SYSTEM.md`.
+- Verified type safety (`tsc --noEmit`), linting (`eslint .`), production build (`next build`), formatting (`git diff --check`), and visual appearance across desktop, mobile, dark, and light themes.
+
 ## 2026-10-30 — Product vision expansion: Financial Intelligence Terminal
 
 **Documentation and planning only; no application code changed.**

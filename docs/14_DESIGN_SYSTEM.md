@@ -124,29 +124,33 @@ Implementation rule: the "Source" action must always be reachable within two int
 - `PaywallGate`
 - `AccessibleXRayTable`
 
-### Financial Intelligence (planned — build when implementation phase begins)
+### Financial Intelligence Components
 
-- `EvidenceBadge` — renders Disclosed / Inferred / Unconfirmed / Unavailable label with accessible styling
-- `SourcePanel` — slide-out or inline panel showing source document reference, formula, or filing link
-- `FinancialTable` — multi-period financial statement table with freeze column, horizontal scroll, tabular numerals, restatement indicators
-- `KPICard` — headline metric card with value, unit, period, source badge, and trend indicator
-- `MetricSparkline` — compact 3-year trend line for profitability and margin KPIs
-- `ShareholdingBar` — horizontal bar showing promoter/FII/DII/retail breakdown
-- `SegmentPieChart` — segment revenue/profit split (accessible: must have table alternative)
-- `RelationshipNode` — keyboard-focusable node for relationship map with evidence badge
-- `RelationshipMap` — wrapper for the corporate ownership / supplier-customer map
-- `FilingCard` — filing event card with type label, date, plain-language summary, and original document link
-- `ImpactScenarioPanel` — commodity scenario calculator with formula shown, illustrative label
-- `ResearchPanelContainer` — drag-and-drop panel wrapper with keyboard reorder fallback
-- `CompanyComparisonTable` — side-by-side metric table for up to 4 companies with availability status per cell
-- `DataRightsGate` — screen/section placeholder shown when a workspace is not yet enabled due to unresolved data licensing
+#### Implemented in Prototype (Synthetic Fixtures)
 
-### Candidate third-party components (evaluation only; not yet adopted)
+- `EvidenceBadge` — renders Disclosed / Verified / Inferred / Unconfirmed / Unavailable label with accessible styling, glyphs, and source inspection triggers
+- `SourcePanel` — accessible slide-out drawer disclosing mathematical formulas, statutory excerpt citations, and synthetic disclaimer on demand
+- `FinancialTable` — multi-period financial statement table with frozen sticky row headers, consolidated/standalone and annual/quarterly toggles, accounting parentheses for negatives, and line-item source inspection
+- `KPICard` — headline metric card with value, unit, reporting period, evidence badge, YoY delta arrow, and source inspection trigger
+- `MetricSparkline` — pure SVG multi-period sparkline with hoverable tooltip pill, gradient area fill, and accessible table summary
+- `ShareholdingBar` — segmented horizontal bar showing promoter/FII/DII/retail breakdown with QoQ change badges and pledge indicator
+- `SegmentChart` — interactive business segment proportion bar with division spotlight cards and accessible table alternative
+- `RelationshipMap` — interactive Cytoscape.js network graph with concentric layout, typed node styles, edge evidence indicators, pan/zoom/reset controls, node inspector panel, and accessible adjacency table alternative
+- `SupplyChainSimulator` — raw material profiles, interactive commodity shock slider (-20% to +30%), real-time gross margin impact and bps compression calculator, transparent formula, and disruption signal alerts
+- `FilingList` — reverse-chronological statutory filing feed with category pills (Quarterly Results, Material Contract, Shareholding, Expansion) and excerpt inspection
 
+#### Planned (Future Phases)
+
+- `ResearchPanelContainer` — drag-and-drop panel wrapper with keyboard reorder fallback (Workspace 6)
+- `CompanyComparisonTable` — side-by-side metric table for up to 4 companies with availability status per cell (Workspace 2 expansion)
+- `DataRightsGate` — screen/section placeholder shown when a workspace is not yet enabled due to unresolved data licensing (Production Gate 3)
+
+### Third-party components and evaluation
+
+- **Cytoscape.js** (`cytoscape`, `@types/cytoscape`): **Adopted for Prototype**. Used for interactive Company Intelligence relationship network graphs with concentric layout, typed styling, and accessible fallback.
 - `shadcn/ui`: accessible Radix-based dialog, sheet, tabs, select, data table — candidate for Workspaces 2–6 modals and forms.
 - `@tanstack/react-table`: headless table for `FinancialTable` implementation — candidate.
 - `dnd-kit`: accessible drag-and-drop for Research Workspace panels — candidate.
-- `Recharts`: accessible chart library for KPI sparklines and segment charts — candidate.
-- `React Flow`: node-edge graph for relationship maps — candidate; accessibility support must be verified.
+- `Recharts`: candidate for advanced financial time-series charts; prototype uses lightweight bespoke SVG sparklines.
 
 Build only components needed for the phase currently under development. Evaluate candidates at the start of each phase, not preemptively.

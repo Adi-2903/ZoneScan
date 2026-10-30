@@ -98,28 +98,28 @@ Do not add a complicated navigation system before real user testing. The Financi
 | Account | User profile, entitlement/plan, renewal date, invoices, devices/sessions, theme, logout | Manage account, sign out, request deletion |
 | Admin | Feed health, instruments, users, entitlements, payments, alerts, parameters, content, audit | Role-protected operational actions |
 
-### Financial Intelligence screens (P3 — planning only; no implementation started)
+### Financial Intelligence screens (Prototype implemented for Company Intelligence; production data/backend P3 pending Gate 3)
 
-| Screen | Required content | Key actions |
-|---|---|---|
-| Company Overview | Company name, identifiers, one-line description, headline financial KPIs, source badges, evidence status | Navigate to sub-views, navigate to filing |
-| Financial Statements | Income statement, balance sheet, cash flow; period selector; toggle consolidated/standalone | Expand row, view filing source, switch period |
-| Profitability & Margins | Margin trends (3-year), ROE, ROCE, ROIC sparklines with plain-language summary | Hover for formula, compare to sector peers |
-| Segment Breakdown | Revenue/profit by segment/geography; source reference | View underlying filing section |
-| Valuation | P/E, P/B, EV/EBITDA, Market Cap, Dividend Yield; analyst estimate disclaimer | Switch TTM/forward, compare peer |
-| Shareholding | Promoter/FII/DII/Retail breakdown; QoQ change; source | View historical pattern |
-| Suppliers & Customers | Disclosed relationships with concentration %; evidence status per row | View source document, filter by type |
-| Competitors | Peer table with comparative metrics; source of peer definition | Sort column, navigate to competitor profile |
-| Corporate Ownership | Ownership tree: holding companies, subsidiaries; depth limit with source link | Expand node, view MCA filing |
-| Subsidiary Map | Subsidiary list with jurisdiction, holding%, activity; source reference | Link to annual report subsidiary note |
-| Raw Material Profile | Key raw materials, share of COGS, source filing | View annual report section |
-| Commodity Prices | Current and 30-day chart for relevant commodities; source and data status | Run impact scenario |
-| Impact Scenario | Commodity price change slider, computed margin impact, formula and assumptions | Change assumption, save to workspace |
-| Regulatory Filings | Reverse-chronological BSE/NSE announcements with type labels and plain-language summary | Open original PDF, filter by type |
-| Annual Reports | Filing list; PDF link; extracted highlights with verbatim quotes and references | Open PDF section, navigate to excerpt |
-| Earnings Commentary | Verbatim transcript excerpts (if available); source and date | Navigate to full transcript |
-| News Feed | News items with source/date/unconfirmed badge | Open original article |
-| Research Workspace | Draggable panels, saved layout list, company comparison table, notes editor | Add/remove panel, save layout, export notes |
+| Screen | Required content | Key actions | Prototype Status |
+|---|---|---|---|
+| Company Overview | Company name, identifiers, one-line description, headline financial KPIs, source badges, evidence status | Navigate to sub-views, navigate to filing | Implemented (Synthetic) |
+| Financial Statements | Income statement, balance sheet, cash flow; period selector; toggle consolidated/standalone | Expand row, view filing source, switch period | Implemented (Synthetic) |
+| Profitability & Margins | Margin trends (3-year), ROE, ROCE, ROIC sparklines with plain-language summary | Hover for formula, compare to sector peers | Implemented (Synthetic) |
+| Segment Breakdown | Revenue/profit by segment/geography; source reference | View underlying filing section | Implemented (Synthetic) |
+| Valuation | P/E, P/B, EV/EBITDA, Market Cap, Dividend Yield; analyst estimate disclaimer | Switch TTM/forward, compare peer | Implemented (Synthetic) |
+| Shareholding | Promoter/FII/DII/Retail breakdown; QoQ change; source | View historical pattern | Implemented (Synthetic) |
+| Suppliers & Customers | Disclosed relationships with concentration %; evidence status per row | View source document, filter by type | Implemented (Cytoscape.js) |
+| Competitors | Peer table with comparative metrics; source of peer definition | Sort column, navigate to competitor profile | Implemented (Cytoscape.js) |
+| Corporate Ownership | Ownership tree: holding companies, subsidiaries; depth limit with source link | Expand node, view MCA filing | Planned (Phase 4) |
+| Subsidiary Map | Subsidiary list with jurisdiction, holding%, activity; source reference | Link to annual report subsidiary note | Planned (Phase 4) |
+| Raw Material Profile | Key raw materials, share of COGS, source filing | View annual report section | Implemented (Synthetic) |
+| Commodity Prices | Current and 30-day chart for relevant commodities; source and data status | Run impact scenario | Implemented (Synthetic) |
+| Impact Scenario | Commodity price change slider, computed margin impact, formula and assumptions | Change assumption, save to workspace | Implemented (Interactive Heuristic) |
+| Regulatory Filings | Reverse-chronological BSE/NSE announcements with type labels and plain-language summary | Open original PDF, filter by type | Implemented (Synthetic) |
+| Annual Reports | Filing list; PDF link; extracted highlights with verbatim quotes and references | Open PDF section, navigate to excerpt | Planned (Phase 4) |
+| Earnings Commentary | Verbatim transcript excerpts (if available); source and date | Navigate to full transcript | Planned (Phase 4) |
+| News Feed | News items with source/date/unconfirmed badge | Open original article | Implemented (Disruption Signals) |
+| Research Workspace | Draggable panels, saved layout list, company comparison table, notes editor | Add/remove panel, save layout, export notes | Planned (Phase 5) |
 
 ---
 

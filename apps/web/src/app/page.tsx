@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { api, formatPercent, formatPrice, formatTimestamp } from "@/lib/api";
 import type { BoardResponse, BoardRow, CandleResponse, MarketStatus, StockResponse, XRayResponse, XRayClassification } from "@/lib/api";
 import { ZoneChart } from "@/components/ZoneChart";
+import { CompanyIntelligence } from "@/components/company/CompanyIntelligence";
 
 type Side = "bull" | "bear";
-type View = "board" | "stock" | "xray";
+type View = "board" | "stock" | "xray" | "company";
 
 const componentNames: Record<string, string> = {
   M: "Move", V: "Volume", O: "Open interest", T: "Trend", S: "Sector", Z: "Zone",
@@ -84,11 +85,12 @@ export default function Dashboard() {
         <a className="brand" href="#board" onClick={(event) => { event.preventDefault(); setView("board"); }}>
           <span className="brand-mark">Z</span><span>ZoneScan<small>MARKET INTELLIGENCE</small></span>
         </a>
-        <div className="sidebar-label">WORKSPACE</div>
+        <div className="sidebar-label">WORKSPACES</div>
         <button aria-current={view === "board" || (view === "stock" && detailOrigin === "board") ? "page" : undefined} className={`nav-item ${view === "board" || (view === "stock" && detailOrigin === "board") ? "active" : ""}`} onClick={() => setView("board")}>
           <span>▦</span> Market board
         </button>
         <button aria-current={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "page" : undefined} className={`nav-item ${view === "xray" || (view === "stock" && detailOrigin === "xray") ? "active" : ""}`} onClick={() => setView("xray")}><span>◉</span> Market X-Ray</button>
+        <button aria-current={view === "company" ? "page" : undefined} className={`nav-item ${view === "company" ? "active" : ""}`} onClick={() => setView("company")}><span>☊</span> Company Intelligence</button>
         <div className="sidebar-bottom">
           <div className="source-card"><span className="status-lamp" />Fixture engine
             <small>Fixed historical sample</small></div>
@@ -102,7 +104,7 @@ export default function Dashboard() {
       <section className="main-column">
         <header className="topbar">
           <div className="mobile-brand"><span className="brand-mark">Z</span><strong>ZoneScan</strong></div>
-          <div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : `${selectedSymbol ?? "Stock"} detail`}</strong></div>
+          <div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : view === "company" ? "Company Intelligence" : `${selectedSymbol ?? "Stock"} detail`}</strong></div>
           <div className="topbar-actions">
             <span className="market-unknown"><i /> {status?.market_state === "closed" ? "Market closed" : status?.market_state === "open" ? "Market open" : "Market status unknown"}</span>
             <button className="icon-button" aria-label="Toggle theme" onClick={() => setLightTheme((value) => !value)}>{lightTheme ? "☾" : "☼"}</button>
@@ -116,6 +118,9 @@ export default function Dashboard() {
           <button aria-current={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "page" : undefined} className={view === "xray" || (view === "stock" && detailOrigin === "xray") ? "active" : ""} onClick={() => setView("xray")}>
             <span aria-hidden="true">◉</span> X-Ray
           </button>
+          <button aria-current={view === "company" ? "page" : undefined} className={view === "company" ? "active" : ""} onClick={() => setView("company")}>
+            <span aria-hidden="true">☊</span> Company
+          </button>
         </nav>
 
         <div className="page-content">
@@ -123,9 +128,9 @@ export default function Dashboard() {
           <div className="page-heading">
             <div>
               {view === "stock" && <button className="back-link" onClick={() => setView(detailOrigin)}>← Back to {detailOrigin === "xray" ? "X-Ray" : "board"}</button>}
-              <p className="eyebrow">{view === "board" ? "MARKET OVERVIEW" : view === "xray" ? "FIXTURE COVERAGE" : "INSTRUMENT ANALYSIS"}</p>
-              <h1>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : stock?.symbol ?? selectedSymbol ?? "Stock detail"}</h1>
-              <p className="subheading">{view === "board" ? "Ranked synthetic examples from the deterministic replay fixture." : view === "xray" ? "Point-in-time movement across the instruments included in this synthetic fixture." : "Point-in-time analytics and completed candle context."}</p>
+              <p className="eyebrow">{view === "board" ? "MARKET OVERVIEW" : view === "xray" ? "FIXTURE COVERAGE" : view === "company" ? "FINANCIAL INTELLIGENCE" : "INSTRUMENT ANALYSIS"}</p>
+              <h1>{view === "board" ? "Market board" : view === "xray" ? "Market X-Ray" : view === "company" ? "Company Research" : stock?.symbol ?? selectedSymbol ?? "Stock detail"}</h1>
+              <p className="subheading">{view === "board" ? "Ranked synthetic examples from the deterministic replay fixture." : view === "xray" ? "Point-in-time movement across the instruments included in this synthetic fixture." : view === "company" ? "Fundamental company profile, interactive relationship graph, and supply chain scenario testing." : "Point-in-time analytics and completed candle context."}</p>
             </div>
             <div className="heading-actions">
               {view === "board" ? <button className="refresh-button" onClick={() => { setError(null); setLoading(true); void refresh(); }} disabled={loading}>↻ <span>Refresh</span></button>
@@ -151,11 +156,11 @@ export default function Dashboard() {
               </div>
               <div className="board-snapshot">{board ? `Snapshot · ${formatTimestamp(board.as_of)}` : "Snapshot · —"}</div>
             </div>
-            <BoardTable rows={rows} loading={boardLoading} side={side} onSelect={openStock} />
+            <BoardTable rows={rows} loading={boardLoading} side={side} onSelect={openStock} onOpenCompany={() => setView("company")} />
             <div className="board-footnote"><span>ⓘ</span> Scores are deterministic heuristics from fixture inputs. They do not indicate certainty or profitability.</div>
-          </> : view === "xray" ? <MarketXRay data={xray} loading={loading} error={error} onRetry={() => { setError(null); setLoading(true); void refresh(); }} onSelect={openStock} /> : <StockDetail symbol={selectedSymbol} stock={stock} candles={candles}
+          </> : view === "xray" ? <MarketXRay data={xray} loading={loading} error={error} onRetry={() => { setError(null); setLoading(true); void refresh(); }} onSelect={openStock} /> : view === "company" ? <CompanyIntelligence onNavigateToBoard={() => setView("board")} /> : <StockDetail symbol={selectedSymbol} stock={stock} candles={candles}
             timeframe={timeframe} setTimeframe={(value) => { setCandles(null); setDetailLoading(true); setTimeframe(value); }} loading={detailLoading}
-            error={detailError} retry={() => { setStock(null); setCandles(null); setDetailLoading(true); setDetailRefresh((value) => value + 1); }} />}
+            error={detailError} retry={() => { setStock(null); setCandles(null); setDetailLoading(true); setDetailRefresh((value) => value + 1); }} onOpenCompany={() => setView("company")} />}
 
           <footer className="footer"><span>ZoneScan · local prototype</span><span>Algorithm {meta?.algorithm_version ?? "—"} · Parameters {meta?.parameter_version ?? "—"}</span></footer>
         </div>
@@ -192,15 +197,16 @@ function MarketXRay({ data, loading, error, onRetry, onSelect }: {
   </div>;
 }
 
-function BoardTable({ rows, loading, side, onSelect }: {
+function BoardTable({ rows, loading, side, onSelect, onOpenCompany }: {
   rows: BoardRow[]; loading: boolean; side: Side; onSelect: (symbol: string) => void;
+  onOpenCompany?: () => void;
 }) {
   if (loading && !rows.length) return <div className="table-card"><div className="loading-state"><span className="spinner" /> Loading fixture-backed board…</div>
     <div className="skeleton-rows">{[0, 1].map((item) => <div className="skeleton-row" key={item} />)}</div></div>;
   if (!loading && !rows.length) return <div className="table-card empty-state"><span className="empty-icon">⌁</span>
     <h2>No {side === "bull" ? "bullish" : "bearish"} rows available</h2><p>The API returned an empty board for this side.</p></div>;
   return <div className="table-card">
-    <div className="table-title"><div><strong>{side === "bull" ? "Bullish" : "Bearish"} watchlist</strong><span>{rows.length} synthetic instrument{rows.length === 1 ? "" : "s"}</span></div>
+    <div className="table-title"><div><strong>{side === "bull" ? "Bullish" : "Bearish"} watchlist</strong><span>{rows.length} synthetic instrument{rows.length === 1 ? "" : "s"}</span>{onOpenCompany && <button type="button" className="btn-inspect-link" style={{ marginLeft: "14px" }} onClick={onOpenCompany}>Company Intelligence Prototype →</button>}</div>
       <span className="table-columns-note">Sorted by backend rank</span></div>
     <div className="desktop-table-wrap"><table className="board-table">
       <thead><tr><th>RANK</th><th>INSTRUMENT</th><th className="numeric">LAST PRICE</th><th className="numeric">CHANGE</th><th className="numeric">STRENGTH</th><th>SECTOR</th><th>DIRECTION</th></tr></thead>
@@ -223,10 +229,10 @@ function BoardTable({ rows, loading, side, onSelect }: {
   </div>;
 }
 
-function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading, error, retry }: {
+function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading, error, retry, onOpenCompany }: {
   symbol: string | null; stock: StockResponse | null; candles: CandleResponse | null;
   timeframe: string; setTimeframe: (value: string) => void; loading: boolean;
-  error: string | null; retry: () => void;
+  error: string | null; retry: () => void; onOpenCompany?: () => void;
 }) {
   if (loading && !stock) return <div className="detail-card loading-state"><span className="spinner" /> Loading analytical detail…</div>;
   if (error) return <div className="error-state" role="alert"><div><strong>Could not load {symbol ?? "stock"}</strong><p>{error}</p></div><button onClick={retry}>Retry</button></div>;
@@ -240,7 +246,7 @@ function StockDetail({ symbol, stock, candles, timeframe, setTimeframe, loading,
   return <div className="detail-layout">
     <section className="detail-card chart-card">
       <div className="detail-card-heading chart-heading"><div><p className="eyebrow">PRICE ACTION</p><h2>{stock.symbol} <span className="exchange-tag">NSE · SYNTHETIC</span></h2>
-        <div className="detail-price">{formatPrice(stock.price)} <span className="neutral-caption">Snapshot close · {formatTimestamp(stock.as_of)}</span></div></div>
+        <div className="detail-price">{formatPrice(stock.price)} <span className="neutral-caption">Snapshot close · {formatTimestamp(stock.as_of)}</span>{onOpenCompany && <button type="button" className="btn-inspect-link" style={{ marginLeft: "12px", fontSize: "11px" }} onClick={onOpenCompany}>Company Intelligence ↗</button>}</div></div>
         <div className="timeframe-tabs" role="group" aria-label="Chart timeframe">{["1m", "5m", "15m", "1d"].map((tf) => <button key={tf} type="button" aria-pressed={timeframe === tf} className={timeframe === tf ? "active" : ""} onClick={() => setTimeframe(tf)}>{tf}</button>)}</div>
       </div>
       {error && <div className="inline-error">{error}</div>}
