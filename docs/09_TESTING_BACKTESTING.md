@@ -93,6 +93,8 @@ The replay liquidity prototype uses existing confirmed swings and an explicit se
 
 `tests/test_api.py` exercises the optional FastAPI boundary using only deterministic synthetic fixtures: both board directions, timestamps and source labels, stock detail, invalid parameters, unknown symbols, unavailable OI/sector propagation, and repeated-read determinism. The API service performs one chronological replay per process and serves cached results. These tests verify response wiring and mechanics only; they are not historical performance validation and require no provider credentials or network access.
 
+The Market X-Ray API test checks its five classification states, stable repeated response, `+05:30` snapshot metadata, explicit synthetic source, partial-fixture coverage wording, leaders/laggards, and `null` change/timestamp for an instrument with no completed snapshot candle. The UI uses typed API data and touch-friendly fixture dots; verify at narrow and desktop widths when browser tooling is available. These examples do not represent market-wide distributions or historical evidence.
+
 ### Metrics
 
 - Hit rate by score band, with precise outcome definition and denominators.

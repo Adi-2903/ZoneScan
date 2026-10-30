@@ -1,3 +1,23 @@
+## 2026-10-30 — Product vision expansion: Financial Intelligence Terminal
+
+**Documentation and planning only; no application code changed.**
+
+- Evolved product positioning from Indian stock scanner to Bloomberg-inspired **Financial Intelligence Terminal** with six connected workspaces: Market Intelligence (existing), Company Intelligence, Relationship Intelligence, Supply Chain & Commodities, News & Filings, and Research Workspace.
+- Added guiding design principle: "Bloomberg-level information depth, understandable through progressive disclosure."
+- Defined four-level evidence quality framework: Disclosed / Inferred / Unconfirmed / Unavailable.
+- Updated `docs/00_PROJECT_BRIEF.md`: six-workspace product summary, principles, out-of-scope, and gate list.
+- Created `docs/19_FINANCIAL_INTELLIGENCE.md`: full specification for Workspaces 2–6, data pipeline architecture, evidence framework, GitHub component evaluation table, and 12 open questions.
+- Updated `docs/01_PRODUCT_REQUIREMENTS.md`: added P3 requirements (PR-FI-001 through PR-FI-005) for each Financial Intelligence workspace; preserved all existing P0–P2 requirements.
+- Updated `docs/02_UX_FLOWS.md`: six-workspace navigation, company research user flow, Financial Intelligence screen inventory, data rights gate state, and progressive disclosure pattern.
+- Updated `docs/03_ARCHITECTURE.md`: Financial Intelligence ingestion pipeline (scheduled, not real-time), planned `ingestion-worker` service boundary, and per-workspace API grouping.
+- Updated `docs/07_DATA_MODEL.md`: Part B with Financial Intelligence schema (companies, financials, shareholding, relationships, filings, commodities, research workspace tables); Part A market model preserved unchanged.
+- Updated `docs/11_ROADMAP.md`: added Gate 3 (Financial Intelligence data/legal feasibility), Phases 4–5 (Financial Intelligence alpha and expansion), Phase 6 (P2 and AI-assisted research); marked Market Intelligence prototype milestones as complete.
+- Updated `docs/13_OPEN_QUESTIONS.md`: added 12 FI-series blockers (FI-001 through FI-012); all 21 existing market intelligence questions preserved.
+- Updated `docs/14_DESIGN_SYSTEM.md`: evidence status color semantics, progressive disclosure pattern, financial table guidelines, new accessibility requirements, planned FI component inventory, candidate third-party component evaluation.
+- Updated `README.md`: six-workspace framing, current status table per module, simplified docs map.
+- Updated `AGENTS.md`: document-lookup table for selective context loading, P3 priority definition, Financial Intelligence guardrails, evidence status rule, Gate 3 implementation guard.
+- `git diff --check` passed (exit 0). No application code modified.
+
 ## 2026-10-26 ? Early-Move Score replay prototype
 
 - Added an independent Early-Move score with OI30, 15m momentum, 15m volume burst, run-penalty breakdown, and explicit unavailable reasons.
@@ -11,6 +31,19 @@
 - Added model and replay coverage while retaining raw Strength components. Bar turnover/cutoff conventions are provisional; synthetic fixtures only, with no historical performance claim.
 
 # Documentation Changelog
+
+## 2026-10-27 — Frontend Polish V1
+
+- Added persistent mobile Board/X-Ray navigation and return-to-origin behavior from stock details; made the unknown market state explicit in the header.
+- Improved terminal spacing/contrast tokens, minimum touch targets, keyboard focus and active states; kept score values neutral unless a direction is explicitly labeled.
+- Added an accessible table alternative and data tooltip to the synthetic X-Ray map; refined its 360px and tablet layouts without changing the API contract.
+
+## 2026-10-26 — Synthetic Market X-Ray MVP
+
+- Added `GET /api/v1/xray`, deriving five-state counts and leading/lagging covered stocks from the cached point-in-time replay, with deterministic metadata and explicit partial-fixture coverage.
+- Extended the deterministic fixture with bullish, bearish, Choppy, neutral, and unavailable examples; the unavailable example has no final completed candle, and values remain `null`.
+- Added a responsive dashboard dot map with state glyphs/labels, counts, leading/lagging examples, stock-detail navigation, loading/error/empty states, and persistent synthetic/coverage limits. Sector aggregation and index bias remain omitted; market status stays unknown.
+- Added offline response determinism/shape/coverage tests. Fixture behavior only; no market-wide or performance claim.
 
 ## 2026-10-26 — Responsive synthetic dashboard prototype
 

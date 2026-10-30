@@ -4,7 +4,7 @@
 **Transport:** HTTPS JSON for REST; SSE for one-way live updates.  
 **Time:** ISO 8601 with explicit `+05:30` offset for all market timestamps.
 
-This document describes the proposed product contract. The local API prototype below implements only read-only synthetic status, board, and stock detail; it does not implement authentication, subscriber access, or public/live service.
+This document describes the proposed product contract. The local API prototype implements read-only synthetic status, board, stock detail, candles, and a fixture-scoped Market X-Ray; it does not implement authentication, subscriber access, or public/live service.
 
 ## Endpoint inventory
 
@@ -16,7 +16,7 @@ This document describes the proposed product contract. The local API prototype b
 | GET | `/api/v1/stocks/{symbol}` | Subscriber | Score, breakdown, active zone, levels, sector context |
 | GET | `/api/v1/stocks/{symbol}/candles?tf=5m&from=&to=` | Subscriber | Chart candle series |
 | GET | `/api/v1/stocks/{symbol}/zones` | Subscriber | Current/history zones and liquidity levels |
-| GET | `/api/v1/xray` | Subscriber/allowed preview | Dot map, counts, sector ranking, index context |
+| GET | `/api/v1/xray` | Subscriber/allowed preview | Covered-instrument dot map, classifications, counts, and fixture coverage |
 | GET | `/api/v1/sectors` | Subscriber | Sector strength/context |
 | GET/POST | `/api/v1/watchlist` | Subscriber (P1) | List/add watchlist items |
 | DELETE | `/api/v1/watchlist/{symbol}` | Subscriber (P1) | Remove item |
@@ -35,7 +35,9 @@ An endpoint not implemented in the current phase should be omitted or return a d
 
 ### Local analytical prototype
 
-`GET /api/v1/market/status`, `GET /api/v1/board?side=bull|bear`, and `GET /api/v1/stocks/{symbol}` are implemented for local development. They use a process-cached, fixed synthetic dataset, a chronological indicator/replay pass, and the production scoring and board functions. Every response reports `data_mode: synthetic`, `data_status: synthetic`, and `data_source: deterministic_synthetic_fixture`; `market_state` is `unknown`. The fixture's fixed `as_of` time is not a current market timestamp. Sector labels are explicit fixture inputs, not sector aggregation.
+`GET /api/v1/market/status`, `GET /api/v1/board?side=bull|bear`, `GET /api/v1/stocks/{symbol}`, and `GET /api/v1/xray` are implemented for local development. They use a process-cached, fixed synthetic dataset, a chronological indicator/replay pass, and the production scoring and board functions. Every response reports `data_mode: synthetic`, `data_status: synthetic`, and `data_source: deterministic_synthetic_fixture`; `market_state` is `unknown`. The fixture's fixed `as_of` time is not a current market timestamp. Sector labels are explicit fixture inputs, not sector aggregation.
+
+The X-Ray response reuses each instrument's replay direction, Choppy result, and day return at the fixed snapshot. `instruments` carries symbol/id, underlying direction, percentage change, one of `bullish`, `bearish`, `choppy`, `neutral`, or `unavailable`, availability reason, and timestamp. If either direction or Choppy classification is unavailable, the display classification is unavailable. `counts` covers all five states; `leaders` and `laggards` sort covered instruments with an available change. `coverage.universe_complete` is always `false` for this fixture and the label explicitly calls the instruments synthetic examples. The fixture currently includes five examples, including an intentionally missing latest candle to exercise unavailable values. This endpoint does not calculate sectors or index context; Q-019 remains open, and no market-wide completeness is implied.
 
 `GET /api/v1/stocks/{symbol}/candles?tf=5m` serves the corresponding cash-equity synthetic fixture candles for `1m`, `5m`, `15m`, or `1d`. Intraday requests return the fixed fixture's final session; daily requests return supplied fixture history. 5m and 15m candles use the shared session-bounded aggregation function. The endpoint returns source/quality metadata and does not synthesize missing candles.
 

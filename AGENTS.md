@@ -4,24 +4,39 @@ These instructions apply to every coding agent and contributor. Follow them befo
 
 ## 1. Mandatory context load
 
-At the start of a task, read:
+**Always read first (every task):**
+1. `README.md` — project status and entry point
+2. `docs/00_PROJECT_BRIEF.md` — product scope and six workspaces
+3. `docs/12_DECISIONS.md` — accepted decisions agents must not reopen
+4. `docs/13_OPEN_QUESTIONS.md` — active blockers and open items
 
-1. `README.md`
-2. `docs/00_PROJECT_BRIEF.md`
-3. `docs/12_DECISIONS.md`
-4. `docs/13_OPEN_QUESTIONS.md`
-5. The specific documents relevant to the assigned task
+**Then read only the documents relevant to your assigned task:**
 
-Do not dump every document into context for a small task. Use this index to load only the relevant detail. If instructions conflict, `AGENTS.md` controls execution policy; `12_DECISIONS.md` controls accepted product decisions; feature-specific docs control their feature details. Flag a real conflict rather than silently choosing whichever is convenient.
+| Task area | Read these additional docs |
+|---|---|
+| Market scoring algorithm | `05_ALGORITHMS.md`, `09_TESTING_BACKTESTING.md` |
+| API endpoints or response shape | `06_API_CONTRACTS.md`, `03_ARCHITECTURE.md` |
+| Data model or DB schema | `07_DATA_MODEL.md` |
+| Market data / provider | `04_MARKET_DATA.md`, `18_DATA_PROVIDER_EVALUATION.md` |
+| Frontend / UI / design | `02_UX_FLOWS.md`, `14_DESIGN_SYSTEM.md` |
+| Deployment / operations | `10_DEPLOYMENT_OPERATIONS.md` |
+| Security / compliance / legal | `08_SECURITY_PRIVACY_COMPLIANCE.md` |
+| Roadmap / prioritization | `11_ROADMAP.md` |
+| Financial Intelligence workspaces | `19_FINANCIAL_INTELLIGENCE.md`, `07_DATA_MODEL.md` |
+| Testing / backtest methodology | `09_TESTING_BACKTESTING.md` |
+
+Do not load every document for a small task. If instructions conflict, `AGENTS.md` controls execution policy; `12_DECISIONS.md` controls accepted product decisions; feature-specific docs control their feature details. Flag a real conflict rather than silently choosing whichever is convenient.
 
 ## 2. Product guardrails
 
 - Build **ZoneScan**, an original analytics product. The name is a working codename, not a cleared trademark or approved public brand.
-- Do not copy OrderBlock's brand, logos, copy, screenshots, testimonials, proprietary implementation, or claim of performance. It is a category/reference source only.
+- Do not copy any competitor's brand, logos, copy, screenshots, testimonials, proprietary implementation, or claim of performance. Reference sources are for category understanding only.
 - The product is analytics-only. Do not add order placement, automated execution, broker-account trading access, personalized recommendations, buy/sell calls, targets, or stop-loss instructions unless the owner explicitly changes scope after legal review.
 - A score or zone is a heuristic derived from market data; it is not proof of institutional orders, certainty, or a profitable trade.
-- Never invent market data, backtest outcomes, testimonials, licenses, regulatory approvals, pricing, or provider capabilities.
+- Never invent market data, backtest outcomes, company financial figures, supplier relationships, testimonials, licences, regulatory approvals, pricing, or provider capabilities.
 - Sample/demo data must be clearly identified in the UI and API as synthetic. Never make sample values look like real-time market data.
+- Financial Intelligence data must carry explicit evidence status (Disclosed / Inferred / Unconfirmed / Unavailable) on every displayed value. Never display Inferred or Unconfirmed data without its label.
+- Do not build or enable any Financial Intelligence workspace until Gate 3 in `docs/11_ROADMAP.md` passes. Planning and documentation may proceed.
 - Use `Asia/Kolkata` for exchange-session logic and ISO 8601 timestamps with `+05:30` in API examples.
 
 ## 3. Data licensing and legal release gates
@@ -47,10 +62,11 @@ Do not dump every document into context for a small task. Use this index to load
 ## 5. Scope discipline
 
 - Implement only the assigned task and features marked in-scope in `docs/01_PRODUCT_REQUIREMENTS.md` and `docs/11_ROADMAP.md`.
-- Priority definitions: **P0** = core proof/MVP; **P1** = first expansion; **P2** = later. A priority does not override a legal/data gate.
+- Priority definitions: **P0** = core proof/MVP; **P1** = first expansion; **P2** = later; **P3** = Financial Intelligence workspaces (planning only until Gate 3 passes). A priority does not override a legal/data gate.
 - Prefer a modular monolith and small, testable modules over premature microservices.
 - Do not introduce new infrastructure, services, state libraries, or dependencies without a clear need and a short explanation in the PR/task summary.
 - Do not add AI/ML merely to make the product sound advanced. The first engine is deterministic and explainable.
+- Do not scaffold the `ingestion-worker` service or any Financial Intelligence database tables until Gate 3 in `docs/11_ROADMAP.md` passes.
 
 ## 6. Required workflow for every task
 
@@ -69,9 +85,10 @@ Do not dump every document into context for a small task. Use this index to load
 - Keep money values in integer minor units or a documented decimal type; never use binary floating point for payment amounts.
 - Verify payment-provider webhook signatures on the server and make webhook processing idempotent.
 - Use secure, HTTP-only cookies for web sessions; apply CSRF protection to state-changing cookie-authenticated endpoints.
-- Use accessible labels and icons as well as color. Bullish/bearish/choppy states must remain understandable without color perception.
-- Handle loading, market closed, settling, delayed feed, unavailable data, subscription expiry, offline, and API error states.
+- Use accessible labels and icons as well as color. Bullish/bearish/choppy states must remain understandable without color perception. Evidence status badges (Disclosed/Inferred/Unconfirmed/Unavailable) must be text-labeled, not color-only.
+- Handle loading, market closed, settling, delayed feed, unavailable data, subscription expiry, offline, and API error states. For Financial Intelligence: also handle data rights gate, evidence unavailable, and filing lag states.
 - Never deploy during NSE market hours except for a documented emergency procedure.
+- Financial data stored in the database must carry `evidence_status` and a `source` reference. Reject rows that lack provenance at the ingestion boundary.
 
 ## 8. When a spec is incomplete
 
