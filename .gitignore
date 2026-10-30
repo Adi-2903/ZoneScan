@@ -107,3 +107,7 @@ data/**/raw/*.pdf
 data/**/raw/*.zip
 data/**/raw/*.bin
 
+# Security Master Downloaded CSV Cache
+**/security_master/*.csv
+services/api/data/
+

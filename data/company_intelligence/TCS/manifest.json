@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-10-30T18:44:04.491887+05:30",
+  "company_info": {
+    "company_name": "Tata Consultancy Services Limited",
+    "symbol": "TCS",
+    "bse_code": "532540",
+    "isin": "INE467B01029",
+    "cin": "L22210MH1995PLC084781",
+    "sector": "Information Technology",
+    "industry": "IT Consulting & Software Services",
+    "incorporation_year": 1980,
+    "registered_office": ""
+  },
+  "documents_count": 3,
+  "documents": [
+    {
+      "doc_id": "doc_nse_TCS_annual_report_index",
+      "title": "NSE India Annual Reports API",
+      "document_type": "annual_report_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/annual-reports?index=equities&symbol=TCS",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:44:02.887579+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\TCS\\raw\\nse_annual_reports.json",
+      "sha256_hash": "36e23a4ff400ce2071fd10b2b335ab16a7a46058ecee2c489594d9d0b1242ad6",
+      "file_size_bytes": 6964,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_TCS_financial_results_index",
+      "title": "NSE India Corporate Results API",
+      "document_type": "financial_results_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol=TCS",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:44:03.087774+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\TCS\\raw\\nse_financial_results.json",
+      "sha256_hash": "d1e1bd3c2c14a57fd1ee546847affc8c97bf318d930f34f87bcdc13e709bd497",
+      "file_size_bytes": 15046,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_TCS_announcements_index",
+      "title": "NSE India Corporate Announcements API",
+      "document_type": "announcements_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=TCS",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:44:04.483961+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\TCS\\raw\\nse_announcements.json",
+      "sha256_hash": "d5a254dc0681963053d59389a53ab2b120d4cb7b72e0e94751e875e9dbeb83a1",
+      "file_size_bytes": 3008809,
+      "extraction_status": "downloaded",
+      "error_message": null
+    }
+  ],
+  "extraction_issues_count": 0,
+  "extraction_issues": []
+}

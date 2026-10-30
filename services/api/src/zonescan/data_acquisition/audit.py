@@ -120,6 +120,31 @@ FY24_REFERENCE_FACTS: List[ReferenceRecord] = [
     ),
 ]
 
+COMPANY_REFERENCE_FACTS: Dict[str, List[ReferenceRecord]] = {
+    "BHARATFORG": FY24_REFERENCE_FACTS,
+    "RELIANCE": [
+        ReferenceRecord("revenue", "Revenue from Operations", "profit_and_loss", "consolidated", "FY2023-24", 914_472.0, "Consolidated operating revenue Note 28"),
+        ReferenceRecord("profit_after_tax", "Profit After Tax (PAT)", "profit_and_loss", "consolidated", "FY2023-24", 79_020.0, "Consolidated PAT"),
+        ReferenceRecord("total_assets", "Total Assets", "balance_sheet", "consolidated", "FY2023-24", 1_817_445.0, "Total Consolidated Assets"),
+        ReferenceRecord("total_equity", "Total Equity", "balance_sheet", "consolidated", "FY2023-24", 833_391.0, "Total Equity & NCI"),
+        ReferenceRecord("cash_and_equivalents", "Cash and Cash Equivalents", "balance_sheet", "consolidated", "FY2023-24", 118_367.0, "Cash & Equivalents Note 19"),
+    ],
+    "JIOFIN": [
+        ReferenceRecord("total_income", "Total Income", "profit_and_loss", "consolidated", "FY2023-24", 1_855.27, "Consolidated Total Income"),
+        ReferenceRecord("profit_after_tax", "Profit After Tax (PAT)", "profit_and_loss", "consolidated", "FY2023-24", 1_604.55, "Consolidated PAT"),
+        ReferenceRecord("total_assets", "Total Assets", "balance_sheet", "consolidated", "FY2023-24", 139_832.0, "Total Balance Sheet Assets"),
+        ReferenceRecord("total_equity", "Total Equity", "balance_sheet", "consolidated", "FY2023-24", 139_141.0, "Total Net Worth / Equity"),
+        ReferenceRecord("cash_and_equivalents", "Cash and Cash Equivalents", "balance_sheet", "consolidated", "FY2023-24", 1_940.0, "Cash & Bank Balances"),
+    ],
+    "TCS": [
+        ReferenceRecord("revenue", "Revenue from Software Services", "profit_and_loss", "consolidated", "FY2023-24", 240_893.0, "Consolidated Revenue Note 24"),
+        ReferenceRecord("profit_after_tax", "Profit After Tax (PAT)", "profit_and_loss", "consolidated", "FY2023-24", 46_099.0, "Consolidated PAT"),
+        ReferenceRecord("total_assets", "Total Assets", "balance_sheet", "consolidated", "FY2023-24", 144_834.0, "Total Consolidated Assets Note 12-18"),
+        ReferenceRecord("total_equity", "Total Equity", "balance_sheet", "consolidated", "FY2023-24", 90_488.0, "Total Equity / Net Worth"),
+        ReferenceRecord("cash_and_equivalents", "Cash and Cash Equivalents", "balance_sheet", "consolidated", "FY2023-24", 48_829.0, "Cash, Bank & Investments Note 16"),
+    ],
+}
+
 # Tolerance for considering values "matching" — ±0.5 Crores (rounding)
 _MATCH_TOLERANCE_CR = 0.5
 # Tolerance for flagging as "suspect" — >2% deviation
@@ -208,7 +233,8 @@ def audit_fy24_facts(
 
     result = AuditResult(symbol=symbol, reporting_period="FY2023-24")
 
-    for ref in FY24_REFERENCE_FACTS:
+    ref_records = COMPANY_REFERENCE_FACTS.get(symbol.upper(), FY24_REFERENCE_FACTS if symbol.upper() == "BHARATFORG" else [])
+    for ref in ref_records:
         lookup_key = (ref.canonical_key, ref.statement_scope, ref.reporting_period)
         extracted_val = extracted_index.get(lookup_key)
 

@@ -2,7 +2,7 @@
 
 **Document Status:** Complete Multi-Period Company Intelligence Dossier  
 **Prepared For:** ZoneScan Financial Intelligence Engine (Workspace 2)  
-**Execution Date:** 2026-10-30 15:03:09 IST  
+**Execution Date:** 2026-10-30 18:28:58 IST  
 **Company:** Bharat Forge Limited  
 **NSE Symbol:** `BHARATFORG` | **BSE Scrip Code:** `500493`  
 **CIN:** `L25209PN1961PLC012046` | **ISIN:** `INE465A01025`  

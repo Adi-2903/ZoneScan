@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-10-30T18:35:01.382397+05:30",
+  "company_info": {
+    "company_name": "Reliance Industries Limited",
+    "symbol": "RELIANCE",
+    "bse_code": "500325",
+    "isin": "INE002A01018",
+    "cin": "L17110MH1973PLC019786",
+    "sector": "Energy & Petrochemicals",
+    "industry": "Integrated Conglomerate",
+    "incorporation_year": 1980,
+    "registered_office": ""
+  },
+  "documents_count": 3,
+  "documents": [
+    {
+      "doc_id": "doc_nse_RELIANCE_annual_report_index",
+      "title": "NSE India Annual Reports API",
+      "document_type": "annual_report_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/annual-reports?index=equities&symbol=RELIANCE",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:35:00.081446+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\RELIANCE\\raw\\nse_annual_reports.json",
+      "sha256_hash": "6f7a8f265908d49558f326b839b29a11f943b294667a01e7912f71aa579af976",
+      "file_size_bytes": 7007,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_RELIANCE_financial_results_index",
+      "title": "NSE India Corporate Results API",
+      "document_type": "financial_results_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol=RELIANCE",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:35:00.790354+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\RELIANCE\\raw\\nse_financial_results.json",
+      "sha256_hash": "0e92362477c2af639a0144d6ec5364cb8a4fddb25bdbbc9bc353de3e7eb20388",
+      "file_size_bytes": 5665,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_RELIANCE_announcements_index",
+      "title": "NSE India Corporate Announcements API",
+      "document_type": "announcements_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=RELIANCE",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:35:01.379119+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\RELIANCE\\raw\\nse_announcements.json",
+      "sha256_hash": "c7cf7d8c81260af6df54dae5851d98abfffd01e58e023ed761f3f8ba0fde5a80",
+      "file_size_bytes": 3408679,
+      "extraction_status": "downloaded",
+      "error_message": null
+    }
+  ],
+  "extraction_issues_count": 0,
+  "extraction_issues": []
+}

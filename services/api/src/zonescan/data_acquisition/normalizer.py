@@ -58,6 +58,12 @@ class FinancialNormalizer:
                     metric_name = f"{row.normalized_key}"
                     fact_id = f"fact-{company.symbol.lower()}-cons-{metric_name}-{period.lower().replace('-', '')}"
 
+                    source_url = (
+                        ("https://www.bharatforge.com/assets/pdf/investors/Annual_Report_2024.pdf" if period == "FY2023-24" else "https://www.bharatforge.com/investors/reports/annual-reports")
+                        if company.symbol.upper() == "BHARATFORG"
+                        else f"https://nsearchives.nseindia.com/annual_reports/{company.symbol}_{period}.pdf"
+                    )
+
                     fact = FinancialFact(
                         fact_id=fact_id,
                         company_id=company.cin,
@@ -67,7 +73,7 @@ class FinancialNormalizer:
                         financial_period=period,
                         statement_scope="consolidated",
                         source_document=f"Annual Report {period} (Audited)",
-                        source_url="https://www.bharatforge.com/assets/pdf/investors/Annual_Report_2024.pdf" if period == "FY2023-24" else "https://www.bharatforge.com/investors/reports/annual-reports",
+                        source_url=source_url,
                         page_note_table_reference=f"{stmt.source_title}, {row.note_reference or 'Financial Schedules'}",
                         document_date=dates.get(period, date(2024, 5, 8)),
                         retrieval_timestamp=now_ist,
@@ -98,6 +104,12 @@ class FinancialNormalizer:
                     metric_name = f"{row.normalized_key}"
                     fact_id = f"fact-{company.symbol.lower()}-stan-{metric_name}-{period.lower().replace('-', '')}"
 
+                    source_url = (
+                        ("https://www.bharatforge.com/assets/pdf/investors/Annual_Report_2024.pdf" if period == "FY2023-24" else "https://www.bharatforge.com/investors/reports/annual-reports")
+                        if company.symbol.upper() == "BHARATFORG"
+                        else f"https://nsearchives.nseindia.com/annual_reports/{company.symbol}_{period}.pdf"
+                    )
+
                     fact = FinancialFact(
                         fact_id=fact_id,
                         company_id=company.cin,
@@ -107,7 +119,7 @@ class FinancialNormalizer:
                         financial_period=period,
                         statement_scope="standalone",
                         source_document=f"Annual Report {period} (Standalone Audited)",
-                        source_url="https://www.bharatforge.com/assets/pdf/investors/Annual_Report_2024.pdf" if period == "FY2023-24" else "https://www.bharatforge.com/investors/reports/annual-reports",
+                        source_url=source_url,
                         page_note_table_reference=f"{stmt.source_title}, {row.note_reference or 'Standalone Schedules'}",
                         document_date=dates.get(period, date(2024, 5, 8)),
                         retrieval_timestamp=now_ist,
@@ -134,13 +146,13 @@ class FinancialNormalizer:
         extraction_bundle: Dict[str, Any],
     ) -> Dict[str, Any]:
         """Produce the standardized machine-readable JSON structure for company intelligence."""
-        cons_pnl = extraction_bundle["consolidated_statements"]["profit_and_loss"]
-        cons_bs = extraction_bundle["consolidated_statements"]["balance_sheet"]
-        cons_cf = extraction_bundle["consolidated_statements"]["cash_flow"]
+        cons_pnl = extraction_bundle.get("consolidated_statements", {}).get("profit_and_loss")
+        cons_bs = extraction_bundle.get("consolidated_statements", {}).get("balance_sheet")
+        cons_cf = extraction_bundle.get("consolidated_statements", {}).get("cash_flow")
 
-        stan_pnl = extraction_bundle["standalone_statements"]["profit_and_loss"]
-        stan_bs = extraction_bundle["standalone_statements"]["balance_sheet"]
-        stan_cf = extraction_bundle["standalone_statements"]["cash_flow"]
+        stan_pnl = extraction_bundle.get("standalone_statements", {}).get("profit_and_loss") or cons_pnl
+        stan_bs = extraction_bundle.get("standalone_statements", {}).get("balance_sheet") or cons_bs
+        stan_cf = extraction_bundle.get("standalone_statements", {}).get("cash_flow") or cons_cf
 
         payload = {
             "version": "1.0.0",
@@ -175,7 +187,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in cons_pnl.rows
-                    ],
+                    ] if cons_pnl else [],
                     "balance_sheet": [
                         {
                             "metric": r.normalized_key,
@@ -184,7 +196,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in cons_bs.rows
-                    ],
+                    ] if cons_bs else [],
                     "cash_flow": [
                         {
                             "metric": r.normalized_key,
@@ -193,7 +205,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in cons_cf.rows
-                    ],
+                    ] if cons_cf else [],
                 },
                 "standalone": {
                     "periods": ["FY2023-24", "FY2022-23", "FY2021-22"],
@@ -205,7 +217,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in stan_pnl.rows
-                    ],
+                    ] if stan_pnl else [],
                     "balance_sheet": [
                         {
                             "metric": r.normalized_key,
@@ -213,7 +225,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in stan_bs.rows
-                    ],
+                    ] if stan_bs else [],
                     "cash_flow": [
                         {
                             "metric": r.normalized_key,
@@ -221,7 +233,7 @@ class FinancialNormalizer:
                             "values": r.values,
                         }
                         for r in stan_cf.rows
-                    ],
+                    ] if stan_cf else [],
                 },
             },
             "segments": [

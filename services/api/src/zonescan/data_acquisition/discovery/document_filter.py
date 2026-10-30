@@ -25,34 +25,43 @@ class SeedUrl:
 # ---------------------------------------------------------------------------
 
 _ANNUAL_REPORT_RE = re.compile(
-    r"annual.?report|ar\s*\d{2}[\-_]\d{2}|annual.?accounts",
+    r"annual.?report|ar\s*\d{2}[\-_]\d{2}|annual.?accounts|\bAR_\d+|/AR_\w+",
     re.IGNORECASE,
 )
 _FINANCIAL_RESULTS_RE = re.compile(
     r"financial.?results?|quarterly.?results?|q[1-4].?fy\d{2}|"
-    r"q[1-4].?results?|financial.?statements?|financial.?performance",
+    r"q[1-4].?results?|financial.?statements?|financial.?performance|"
+    r"limited.?review.?report|standalone.?results?|consolidated.?results?",
     re.IGNORECASE,
 )
 _XBRL_RE = re.compile(r"xbrl|taxonomy|instance.?document|\.xml$", re.IGNORECASE)
 _SHAREHOLDING_RE = re.compile(
-    r"shareholding.?pattern|share.?holding|promoter.?holding",
+    r"shareholding.?pattern|share.?holding|promoter.?holding|reg.?31",
     re.IGNORECASE,
 )
 _RPT_RE = re.compile(
-    r"related.?part(?:y|ies)|rpt|connected.?transaction",
+    r"related.?part(?:y|ies)|rpt|connected.?transaction|reg.?23",
+    re.IGNORECASE,
+)
+_PRESENTATION_RE = re.compile(
+    r"investor.?presentation|earnings.?call|analyst.?meet|conference.?call.?transcript",
     re.IGNORECASE,
 )
 _INVESTOR_RELATIONS_RE = re.compile(
-    r"investor.?relations?|investors?|ir\.html|annual\-report",
+    r"investor.?relations?|investors?|ir\.html|annual\-report|financials|statutory.?filing",
     re.IGNORECASE,
 )
 _PDF_SUFFIX_RE = re.compile(r"\.pdf(\?.*)?$", re.IGNORECASE)
 _XML_SUFFIX_RE = re.compile(r"\.xml(\?.*)?$", re.IGNORECASE)
 _ZIP_SUFFIX_RE = re.compile(r"\.zip(\?.*)?$", re.IGNORECASE)
 
-# FY patterns like FY24, FY2024, 2023-24, 24-25, etc.
+# FY patterns like FY24, FY2024, 2023-24, 24-25, 2023_2024, etc.
 _FY_IN_URL_RE = re.compile(
     r"(?:fy)?(?P<yy1>\d{2,4})[\-_](?P<yy2>\d{2,4})",
+    re.IGNORECASE,
+)
+_SINGLE_YEAR_RE = re.compile(
+    r"(?:annual.?report|ar|investor.?presentation|financials)[\-_]?(?P<year>20\d{2})",
     re.IGNORECASE,
 )
 
@@ -100,6 +109,10 @@ class DocumentFilter:
         m = _FY_IN_URL_RE.search(text)
         if m:
             return _normalise_fy(m.group("yy1"), m.group("yy2"))
+        m_single = _SINGLE_YEAR_RE.search(text)
+        if m_single:
+            y = int(m_single.group("year"))
+            return f"FY{y-1}-{str(y)[-2:]}"
         return None
 
     def _fy_matches_target(self, fy: Optional[str]) -> bool:
@@ -113,15 +126,15 @@ class DocumentFilter:
             return "annual_report"
         if _XBRL_RE.search(combined):
             return "xbrl_instance"
-        # Shareholding checked BEFORE financial_results — Q4FY24 in shareholding URLs
-        # must not match the financial_results quarterly-results pattern first.
         if _SHAREHOLDING_RE.search(combined):
             return "shareholding_pattern"
         if _RPT_RE.search(combined):
             return "related_party_transactions"
+        if _PRESENTATION_RE.search(combined):
+            return "investor_presentation"
         if _FINANCIAL_RESULTS_RE.search(combined):
             return "financial_results"
-        # Generic PDF on an IR page
+        # Generic PDF or XML on an IR page
         if _PDF_SUFFIX_RE.search(url) or _XML_SUFFIX_RE.search(url):
             return "regulatory_filing"
         return None

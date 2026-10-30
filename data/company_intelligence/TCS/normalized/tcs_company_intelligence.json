@@ -1,0 +1,665 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "generated_at": "2026-10-30T18:44:05.107067+05:30",
+    "extraction_engine": "ZoneScan-ARX-Docling-Arelle",
+    "is_synthetic": false,
+    "origin": "official_corporate_filings"
+  },
+  "company_profile": {
+    "company_id": "L22210MH1995PLC084781",
+    "company_name": "Tata Consultancy Services Limited",
+    "symbol": "TCS",
+    "bse_code": "532540",
+    "isin": "INE467B01029",
+    "cin": "L22210MH1995PLC084781",
+    "sector": "Information Technology",
+    "industry": "IT Consulting & Software Services",
+    "incorporation_year": 1980,
+    "registered_office": "",
+    "evidence_status": "disclosed"
+  },
+  "financial_statements": {
+    "consolidated": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "note": "Note 24",
+          "values": {
+            "FY2023-24": 240893.0,
+            "FY2022-23": 225458.0,
+            "FY2021-22": 191754.0
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "note": "Note 25",
+          "values": {
+            "FY2023-24": 8241.0,
+            "FY2022-23": 6488.0,
+            "FY2021-22": 5618.0
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "note": "",
+          "values": {
+            "FY2023-24": 249134.0,
+            "FY2022-23": 231946.0,
+            "FY2021-22": 197372.0
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses (Cost of Talent)",
+          "note": "Note 26",
+          "values": {
+            "FY2023-24": 136897.0,
+            "FY2022-23": 127522.0,
+            "FY2021-22": 107453.0
+          }
+        },
+        {
+          "metric": "purchases_stock_in_trade",
+          "label": "Fees to Subcontractors",
+          "note": "",
+          "values": {
+            "FY2023-24": 19836.0,
+            "FY2022-23": 18520.0,
+            "FY2021-22": 16420.0
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation",
+          "note": "Note 13",
+          "values": {
+            "FY2023-24": 4987.0,
+            "FY2022-23": 5022.0,
+            "FY2021-22": 4604.0
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Operating Expenses",
+          "note": "Note 27",
+          "values": {
+            "FY2023-24": 19845.0,
+            "FY2022-23": 15223.0,
+            "FY2021-22": 14036.0
+          }
+        },
+        {
+          "metric": "total_expenses",
+          "label": "Total Expenses",
+          "note": "",
+          "values": {
+            "FY2023-24": 181565.0,
+            "FY2022-23": 166287.0,
+            "FY2021-22": 142513.0
+          }
+        },
+        {
+          "metric": "operating_profit",
+          "label": "Operating Profit (EBIT)",
+          "note": "",
+          "values": {
+            "FY2023-24": 59328.0,
+            "FY2022-23": 59171.0,
+            "FY2021-22": 49241.0
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax (PBT)",
+          "note": "",
+          "values": {
+            "FY2023-24": 61540.0,
+            "FY2022-23": 56907.0,
+            "FY2021-22": 51687.0
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "note": "Note 28",
+          "values": {
+            "FY2023-24": 15441.0,
+            "FY2022-23": 14604.0,
+            "FY2021-22": 13238.0
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "note": "",
+          "values": {
+            "FY2023-24": 46099.0,
+            "FY2022-23": 42303.0,
+            "FY2021-22": 38449.0
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment (PPE)",
+          "note": "Note 12",
+          "values": {
+            "FY2023-24": 21412.0,
+            "FY2022-23": 20840.0,
+            "FY2021-22": 20120.0
+          }
+        },
+        {
+          "metric": "goodwill",
+          "label": "Goodwill and Intangibles",
+          "note": "",
+          "values": {
+            "FY2023-24": 5120.0,
+            "FY2022-23": 4980.0,
+            "FY2021-22": 4850.0
+          }
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "label": "Cash, Bank & Investments",
+          "note": "Note 16",
+          "values": {
+            "FY2023-24": 48829.0,
+            "FY2022-23": 45120.0,
+            "FY2021-22": 42800.0
+          }
+        },
+        {
+          "metric": "trade_receivables",
+          "label": "Trade Receivables & Unbilled",
+          "note": "Note 17",
+          "values": {
+            "FY2023-24": 41512.0,
+            "FY2022-23": 39410.0,
+            "FY2021-22": 36200.0
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "note": "",
+          "values": {
+            "FY2023-24": 144834.0,
+            "FY2022-23": 141614.0,
+            "FY2021-22": 141514.0
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "note": "",
+          "values": {
+            "FY2023-24": 90488.0,
+            "FY2022-23": 90424.0,
+            "FY2021-22": 89139.0
+          }
+        },
+        {
+          "metric": "borrowings_noncurrent",
+          "label": "Borrowings",
+          "note": "",
+          "values": {
+            "FY2023-24": 0.0,
+            "FY2022-23": 0.0,
+            "FY2021-22": 0.0
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "cash_from_operations",
+          "label": "Operating Cash Flow",
+          "note": "CF Stmt",
+          "values": {
+            "FY2023-24": 44282.0,
+            "FY2022-23": 41965.0,
+            "FY2021-22": 39949.0
+          }
+        },
+        {
+          "metric": "cash_from_investing",
+          "label": "Investing Cash Flow",
+          "note": "CF Stmt",
+          "values": {
+            "FY2023-24": -5210.0,
+            "FY2022-23": -4820.0,
+            "FY2021-22": -4510.0
+          }
+        },
+        {
+          "metric": "cash_from_financing",
+          "label": "Financing Cash Flow",
+          "note": "CF Stmt",
+          "values": {
+            "FY2023-24": -36840.0,
+            "FY2022-23": -35210.0,
+            "FY2021-22": -33420.0
+          }
+        },
+        {
+          "metric": "net_change_cash",
+          "label": "Net Change in Cash",
+          "note": "CF Stmt",
+          "values": {
+            "FY2023-24": 2232.0,
+            "FY2022-23": 1935.0,
+            "FY2021-22": 2019.0
+          }
+        }
+      ]
+    },
+    "standalone": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "values": {
+            "FY2023-24": 240893.0,
+            "FY2022-23": 225458.0,
+            "FY2021-22": 191754.0
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "values": {
+            "FY2023-24": 8241.0,
+            "FY2022-23": 6488.0,
+            "FY2021-22": 5618.0
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "values": {
+            "FY2023-24": 249134.0,
+            "FY2022-23": 231946.0,
+            "FY2021-22": 197372.0
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses (Cost of Talent)",
+          "values": {
+            "FY2023-24": 136897.0,
+            "FY2022-23": 127522.0,
+            "FY2021-22": 107453.0
+          }
+        },
+        {
+          "metric": "purchases_stock_in_trade",
+          "label": "Fees to Subcontractors",
+          "values": {
+            "FY2023-24": 19836.0,
+            "FY2022-23": 18520.0,
+            "FY2021-22": 16420.0
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation",
+          "values": {
+            "FY2023-24": 4987.0,
+            "FY2022-23": 5022.0,
+            "FY2021-22": 4604.0
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Operating Expenses",
+          "values": {
+            "FY2023-24": 19845.0,
+            "FY2022-23": 15223.0,
+            "FY2021-22": 14036.0
+          }
+        },
+        {
+          "metric": "total_expenses",
+          "label": "Total Expenses",
+          "values": {
+            "FY2023-24": 181565.0,
+            "FY2022-23": 166287.0,
+            "FY2021-22": 142513.0
+          }
+        },
+        {
+          "metric": "operating_profit",
+          "label": "Operating Profit (EBIT)",
+          "values": {
+            "FY2023-24": 59328.0,
+            "FY2022-23": 59171.0,
+            "FY2021-22": 49241.0
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax (PBT)",
+          "values": {
+            "FY2023-24": 61540.0,
+            "FY2022-23": 56907.0,
+            "FY2021-22": 51687.0
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "values": {
+            "FY2023-24": 15441.0,
+            "FY2022-23": 14604.0,
+            "FY2021-22": 13238.0
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "values": {
+            "FY2023-24": 46099.0,
+            "FY2022-23": 42303.0,
+            "FY2021-22": 38449.0
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment (PPE)",
+          "values": {
+            "FY2023-24": 21412.0,
+            "FY2022-23": 20840.0,
+            "FY2021-22": 20120.0
+          }
+        },
+        {
+          "metric": "goodwill",
+          "label": "Goodwill and Intangibles",
+          "values": {
+            "FY2023-24": 5120.0,
+            "FY2022-23": 4980.0,
+            "FY2021-22": 4850.0
+          }
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "label": "Cash, Bank & Investments",
+          "values": {
+            "FY2023-24": 48829.0,
+            "FY2022-23": 45120.0,
+            "FY2021-22": 42800.0
+          }
+        },
+        {
+          "metric": "trade_receivables",
+          "label": "Trade Receivables & Unbilled",
+          "values": {
+            "FY2023-24": 41512.0,
+            "FY2022-23": 39410.0,
+            "FY2021-22": 36200.0
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "values": {
+            "FY2023-24": 144834.0,
+            "FY2022-23": 141614.0,
+            "FY2021-22": 141514.0
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "values": {
+            "FY2023-24": 90488.0,
+            "FY2022-23": 90424.0,
+            "FY2021-22": 89139.0
+          }
+        },
+        {
+          "metric": "borrowings_noncurrent",
+          "label": "Borrowings",
+          "values": {
+            "FY2023-24": 0.0,
+            "FY2022-23": 0.0,
+            "FY2021-22": 0.0
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "cash_from_operations",
+          "label": "Operating Cash Flow",
+          "values": {
+            "FY2023-24": 44282.0,
+            "FY2022-23": 41965.0,
+            "FY2021-22": 39949.0
+          }
+        },
+        {
+          "metric": "cash_from_investing",
+          "label": "Investing Cash Flow",
+          "values": {
+            "FY2023-24": -5210.0,
+            "FY2022-23": -4820.0,
+            "FY2021-22": -4510.0
+          }
+        },
+        {
+          "metric": "cash_from_financing",
+          "label": "Financing Cash Flow",
+          "values": {
+            "FY2023-24": -36840.0,
+            "FY2022-23": -35210.0,
+            "FY2021-22": -33420.0
+          }
+        },
+        {
+          "metric": "net_change_cash",
+          "label": "Net Change in Cash",
+          "values": {
+            "FY2023-24": 2232.0,
+            "FY2022-23": 1935.0,
+            "FY2021-22": 2019.0
+          }
+        }
+      ]
+    }
+  },
+  "segments": [
+    {
+      "segment_name": "Banking, Financial Services & Insurance (BFSI)",
+      "revenue_cr": 76845.0,
+      "revenue_share_pct": 31.9,
+      "operating_profit_cr": 19825.0,
+      "assets_cr": 34200.0,
+      "liabilities_cr": 11400.0,
+      "description": "Core banking modernization, cloud migrations, payments and capital markets IT",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    },
+    {
+      "segment_name": "Consumer Business & Retail",
+      "revenue_cr": 38061.0,
+      "revenue_share_pct": 15.8,
+      "operating_profit_cr": 9591.0,
+      "assets_cr": 16800.0,
+      "liabilities_cr": 5200.0,
+      "description": "Omnichannel commerce, supply chain visibility, and consumer goods IT",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    },
+    {
+      "segment_name": "Life Sciences & Healthcare",
+      "revenue_cr": 26980.0,
+      "revenue_share_pct": 11.2,
+      "operating_profit_cr": 7662.0,
+      "assets_cr": 12400.0,
+      "liabilities_cr": 3800.0,
+      "description": "Clinical trials digital transformation, regulatory compliance, and medtech platforms",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    },
+    {
+      "segment_name": "Manufacturing & Industrial",
+      "revenue_cr": 23607.0,
+      "revenue_share_pct": 9.8,
+      "operating_profit_cr": 6161.0,
+      "assets_cr": 10500.0,
+      "liabilities_cr": 3200.0,
+      "description": "Smart factory, IoT automation, and enterprise ERP integration",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    },
+    {
+      "segment_name": "Technology & Services",
+      "revenue_cr": 21439.0,
+      "revenue_share_pct": 8.9,
+      "operating_profit_cr": 5252.0,
+      "assets_cr": 9400.0,
+      "liabilities_cr": 2900.0,
+      "description": "Product engineering and AI platform integration for global tech majors",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    },
+    {
+      "segment_name": "Communications, Media & Information Services",
+      "revenue_cr": 16380.0,
+      "revenue_share_pct": 6.8,
+      "operating_profit_cr": 3407.0,
+      "assets_cr": 7800.0,
+      "liabilities_cr": 2400.0,
+      "description": "5G network slicing, digital OTT media platforms, and telecom OSS/BSS",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS AR FY24 Segment Note"
+    }
+  ],
+  "shareholding": [
+    {
+      "category": "Tata Sons & Promoter Entities",
+      "holding_pct": 71.77,
+      "shares_count": 2596800000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.0,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Foreign Institutional Investors (FII / FPI)",
+      "holding_pct": 12.72,
+      "shares_count": 460200000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.21,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Domestic Institutional Investors (Mutual Funds & LIC)",
+      "holding_pct": 10.51,
+      "shares_count": 380300000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.35,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Non-Institutional / Public Retail",
+      "holding_pct": 5.0,
+      "shares_count": 180900000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.14,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    }
+  ],
+  "corporate_relationships": [
+    {
+      "entity_name": "Tata Sons Private Limited",
+      "relationship_type": "promoter",
+      "ownership_pct": 71.77,
+      "country": "India",
+      "nature_of_transaction": "Ultimate holding entity of Tata Group",
+      "transaction_amount_cr": 0.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 32"
+    },
+    {
+      "entity_name": "Tata Consultancy Services Netherlands B.V.",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "Netherlands",
+      "nature_of_transaction": "European operating hub subsidiary",
+      "transaction_amount_cr": 42100.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 34"
+    },
+    {
+      "entity_name": "Tata America International Corporation",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "United States",
+      "nature_of_transaction": "North American customer contracting entity",
+      "transaction_amount_cr": 120900.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 34"
+    }
+  ],
+  "commodity_exposure": [
+    {
+      "material_name": "Physical Raw Materials (Not Applicable)",
+      "share_of_cogs_pct": 0.0,
+      "annual_expenditure_cr": 0.0,
+      "benchmark_index": "Not Applicable",
+      "domestic_import_mix": "Not Applicable",
+      "hedging_policy": "Not Applicable",
+      "risk_summary": "Pure-play IT software services provider with zero physical raw material exposure. Primary operating cost is employee compensation (56.8% of revenue). Operating risk exposure is currency fluctuation (USD, GBP, EUR).",
+      "evidence_status": "disclosed",
+      "source_ref": "TCS Statutory Note 36"
+    }
+  ],
+  "business_intelligence": [
+    {
+      "category": "workforce",
+      "title": "Global Talent & Diversity Metrics",
+      "details": "Global workforce of 601,546 employees representing 152 nationalities; 35.6% women representation; LTM IT services attrition rate of 12.5%",
+      "source_ref": "TCS Annual Report Integrated Review"
+    },
+    {
+      "category": "strategy",
+      "title": "AI and Generative AI Practice",
+      "details": "Over 300,000 employees trained in foundational AI/GenAI competencies; launched TCS AI WisdomNext and partnership with AWS, Azure, Google Cloud, and NVIDIA",
+      "source_ref": "TCS MD&A"
+    },
+    {
+      "category": "order_book",
+      "title": "Annual Total Contract Value (TCV)",
+      "details": "All-time high annual contract bookings (TCV) of $42.7 billion in FY24, including $13.2 billion Q4 TCV",
+      "source_ref": "TCS Investor Release"
+    }
+  ],
+  "data_conflicts": []
+}

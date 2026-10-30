@@ -83,29 +83,44 @@ _FY26_SEED_URLS: List[dict] = [
 ]
 
 
-def _resolve_company(symbol: str) -> CompanyIdentifiers:
-    if symbol.upper() == "BHARATFORG":
-        return DEFAULT_BHARAT_FORGE
-    return CompanyIdentifiers(
-        company_name=f"{symbol.upper()} Limited",
-        symbol=symbol.upper(),
-        bse_code="500000",
-        isin=f"INE{symbol.upper()[:5]}01010",
-        cin="L00000MH2000PLC000000",
-        sector="General Manufacturing",
-        industry="Diversified",
-    )
+def _resolve_company(symbol_or_query: str) -> Optional[CompanyIdentifiers]:
+    """Resolve symbol or query using CompanyResolver."""
+    from .company_resolver import CompanyResolver  # noqa: PLC0415
+    resolver = CompanyResolver()
+    res = resolver.resolve(symbol_or_query)
+    if res.is_resolved and res.company:
+        return res.company
+    return None
 
 
 def _parse_years(years_str: Optional[str]) -> List[str]:
-    """Parse comma-separated FY periods."""
+    """Parse comma-separated FY periods or integer count of years.
+
+    Examples:
+      - '5' -> ['FY2023-24', 'FY2022-23', 'FY2021-22', 'FY2020-21', 'FY2019-20']
+      - 'FY2023-24,FY2022-23' -> ['FY2023-24', 'FY2022-23']
+      - None -> ['FY2023-24', 'FY2022-23', 'FY2021-22']
+    """
     if not years_str:
         return ["FY2023-24", "FY2022-23", "FY2021-22"]
-    return [y.strip() for y in years_str.split(",") if y.strip()]
+
+    clean = str(years_str).strip()
+    if clean.isdigit():
+        n = int(clean)
+        res = []
+        end_year = 2024
+        for i in range(n):
+            y2 = end_year - i
+            y1 = y2 - 1
+            res.append(f"FY{y1}-{str(y2)[2:]}")
+        return res
+
+    return [y.strip() for y in clean.split(",") if y.strip()]
 
 
 def run_pipeline(
-    symbol: str = "BHARATFORG",
+    symbol: Optional[str] = None,
+    query: Optional[str] = None,
     base_dir: Optional[Path] = None,
     db_path: Optional[Path] = None,
     target_years: Optional[List[str]] = None,
@@ -118,7 +133,8 @@ def run_pipeline(
     """Execute the end-to-end autonomous data acquisition pipeline.
 
     Args:
-        symbol: NSE stock symbol.
+        symbol: NSE stock symbol (optional if query is given).
+        query: Company search query, symbol, ISIN, CIN, or legal name.
         base_dir: Override output directory.
         db_path: Override SQLite database path.
         target_years: FY periods to process.
@@ -126,18 +142,48 @@ def run_pipeline(
         do_download: Download documents.
         do_extract: Run extraction engine.
         do_report: Generate deliverable reports.
-        do_audit: Run FY24 reference audit.
+        do_audit: Run reference audit.
     """
     start_time = time.time()
+    lookup = query or symbol or "BHARATFORG"
 
-    company = _resolve_company(symbol)
+    from .company_resolver import CompanyResolver  # noqa: PLC0415
+    resolver = CompanyResolver()
+    res = resolver.resolve(lookup)
+
+    if res.status == "ambiguous":
+        print("\n" + "!" * 80)
+        print(f" [AMBIGUITY DETECTED] Query '{lookup}' matched multiple entities:")
+        print("!" * 80)
+        print(f" {'Symbol':<15} {'Exchange':<10} {'BSE Scrip':<10} {'Company Name':<35} {'ISIN':<15}")
+        print(" " + "-" * 78)
+        for c in res.candidates:
+            print(f" {c.symbol:<15} {c.exchange:<10} {c.bse_code or '-':<10} {c.company_name[:34]:<35} {c.isin:<15}")
+        print(" " + "-" * 78)
+        print(f" Suggestion: {res.message}\n")
+        return {"error": "ambiguous", "candidates": res.candidates}
+
+    if res.status == "non_equity":
+        print("\n" + "!" * 80)
+        print(f" [NON-EQUITY SECURITY] Query '{lookup}' resolved to a non-equity instrument:")
+        print(f" -> {res.message}")
+        print("!" * 80 + "\n")
+        return {"error": "non_equity", "message": res.message}
+
+    if not res.is_resolved or not res.company:
+        print(f"\n[ERROR] Unable to resolve company for query '{lookup}': {res.message}\n")
+        return {"error": "not_found", "message": res.message}
+
+    company = res.company
     years = target_years or ["FY2023-24", "FY2022-23", "FY2021-22"]
 
     workspace_root = Path(__file__).resolve().parents[5]
     data_dir = base_dir or (workspace_root / "data" / "company_intelligence" / company.symbol)
 
     print("=" * 80)
-    print(f" ZONESCAN AUTONOMOUS DATA ACQUISITION: {company.company_name} ({company.symbol})")
+    print(f" ZONESCAN UNIVERSAL DATA ACQUISITION ENGINE: {company.company_name} ({company.symbol})")
+    print(f" Identifiers: ISIN={company.isin} | BSE={company.bse_code} | CIN={company.cin}")
+    print(f" Industry/Sector: {company.industry} / {company.sector}")
     print(f" Target FY periods: {', '.join(years)}")
     print(f" Mode: discover={do_discover} | download={do_download} | extract={do_extract} | report={do_report}")
     print("=" * 80)
@@ -150,11 +196,12 @@ def run_pipeline(
     # -----------------------------------------------------------------------
     discovered_urls: List[dict] = []
     if do_discover:
-        print(f"\n[Stage 0/5] Running autonomous discovery spiders (Scrapy) ...")
+        print(f"\n[Stage 0/5] Running autonomous discovery (Scrapy + Exchange Archives) ...")
         from .discovery import run_discovery  # noqa: PLC0415
         discovered_urls = run_discovery(
-            symbol=symbol,
+            symbol=company.symbol,
             bse_code=company.bse_code,
+            company=company,
             target_years=years,
             timeout_seconds=240,
         )
@@ -190,8 +237,9 @@ def run_pipeline(
                     source_website=item.get("source_domain", ""),
                 )
 
-        # Always attempt known static seeds (IR archives)
-        _seed_static_documents(collector, years)
+        # For BHARATFORG, seed static documents (IR archives baseline)
+        if company.symbol == "BHARATFORG":
+            _seed_static_documents(collector, years)
 
         # Query NSE metadata
         collector.collect_nse_metadata()
@@ -204,7 +252,6 @@ def run_pipeline(
         print(f" -> {len(collector.issues)} access/extraction issues recorded")
     else:
         print("\n[Stage 1/5] Skipping download (use --download to enable)")
-        # Still collect manifest for extraction stage
         collector.write_manifest()
         documents = collector.documents
 
@@ -213,10 +260,11 @@ def run_pipeline(
     # -----------------------------------------------------------------------
     extraction_bundle: dict = {}
     if do_extract:
-        print(f"\n[Stage 2/5] Extracting financial statements and disclosures ...")
+        print(f"\n[Stage 2/5] Extracting financial statements and disclosures (Industry-Aware) ...")
         extractor = CompanyReportExtractor(
             raw_dir=collector.raw_dir,
             extracted_dir=collector.extracted_dir,
+            company=company,
         )
         extraction_bundle = extractor.extract_all()
         _print_extraction_summary(extraction_bundle)
@@ -600,11 +648,12 @@ def _write_milestone_report(
         "_This report is auto-generated by ZoneScan data acquisition pipeline. Status: `implemented`._",
     ]
 
-    doc_path = workspace_root / "docs" / "23_AUTONOMOUS_SCRAPING_MILESTONE_REPORT.md"
-    with open(doc_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines))
-    logger.info("Milestone report written to %s", doc_path)
-    print(f"\n[Stage 5/5] Milestone report written to {doc_path}")
+    if company.symbol.upper() == "BHARATFORG":
+        doc_path = workspace_root / "docs" / "23_AUTONOMOUS_SCRAPING_MILESTONE_REPORT.md"
+        with open(doc_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines))
+        logger.info("Milestone report written to %s", doc_path)
+        print(f"\n[Stage 5/5] Milestone report written to {doc_path}")
 
 
 def main() -> None:
@@ -632,11 +681,20 @@ Examples:
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     collect_p = subparsers.add_parser("collect", help="Collect and extract company data")
-    collect_p.add_argument("--symbol", default="BHARATFORG", help="NSE stock symbol")
+    collect_p.add_argument(
+        "--query", "-q",
+        default=None,
+        help="Company search query, full legal name, trading symbol, ISIN, or CIN",
+    )
+    collect_p.add_argument(
+        "--symbol", "-s",
+        default=None,
+        help="NSE stock symbol (e.g. RELIANCE, TCS, JIOFIN, BHARATFORG)",
+    )
     collect_p.add_argument(
         "--years",
         default=None,
-        help="Comma-separated FY periods (e.g. FY2023-24,FY2024-25,FY2025-26)",
+        help="Count of FY years (e.g. 5) or comma-separated periods (e.g. FY2023-24,FY2022-23)",
     )
     collect_p.add_argument("--output-dir", default=None, help="Custom output directory")
     collect_p.add_argument("--db-path", default=None, help="Custom SQLite database path")
@@ -644,7 +702,7 @@ Examples:
         "--discover",
         action="store_true",
         default=False,
-        help="Run Scrapy autonomous discovery spiders",
+        help="Run autonomous discovery (Scrapy spiders + official exchange archives)",
     )
     collect_p.add_argument(
         "--download",
@@ -656,7 +714,7 @@ Examples:
         "--extract",
         action="store_true",
         default=False,
-        help="Run financial extraction engine",
+        help="Run financial extraction engine (industry-aware)",
     )
     collect_p.add_argument(
         "--report",
@@ -668,7 +726,7 @@ Examples:
         "--audit",
         action="store_true",
         default=False,
-        help="Run FY24 reference-check audit against verified values",
+        help="Run reference-check audit against verified values",
     )
     collect_p.add_argument(
         "--all",
@@ -681,7 +739,7 @@ Examples:
 
     if args.command == "collect" or len(sys.argv) == 1:
         a = args if args.command == "collect" else argparse.Namespace(
-            symbol="BHARATFORG", years=None, output_dir=None, db_path=None,
+            query=None, symbol="BHARATFORG", years=None, output_dir=None, db_path=None,
             discover=False, download=True, extract=True, report=True, audit=True, all=False,
         )
 
@@ -692,8 +750,14 @@ Examples:
         do_report = a.report or a.all or (not a.discover and not a.download and not a.extract and not a.report)
         do_audit = a.audit or a.all or (not a.discover and not a.download and not a.extract and not a.report)
 
+        query_arg = getattr(a, "query", None)
+        symbol_arg = getattr(a, "symbol", None)
+        if not query_arg and not symbol_arg:
+            symbol_arg = "BHARATFORG"
+
         run_pipeline(
-            symbol=getattr(a, "symbol", "BHARATFORG") or "BHARATFORG",
+            symbol=symbol_arg,
+            query=query_arg,
             base_dir=Path(a.output_dir) if getattr(a, "output_dir", None) else None,
             db_path=Path(a.db_path) if getattr(a, "db_path", None) else None,
             target_years=_parse_years(getattr(a, "years", None)),

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "metadata": {
-    "generated_at": "2026-10-30T15:03:09.294147+05:30",
+    "generated_at": "2026-10-30T18:28:57.838395+05:30",
     "extraction_engine": "ZoneScan-ARX-Docling-Arelle",
     "is_synthetic": false,
     "origin": "official_corporate_filings"
@@ -13,10 +13,10 @@
     "bse_code": "500493",
     "isin": "INE465A01025",
     "cin": "L25209PN1961PLC012046",
-    "sector": "Capital Goods",
+    "sector": "Capital Goods & Automotive",
     "industry": "Forgings & Precision Components",
-    "incorporation_year": 1961,
-    "registered_office": "Mundhwa, Pune Cantonment, Pune - 411036, Maharashtra, India",
+    "incorporation_year": 1980,
+    "registered_office": "",
     "evidence_status": "disclosed"
   },
   "financial_statements": {

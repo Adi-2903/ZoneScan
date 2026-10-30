@@ -1,0 +1,743 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "generated_at": "2026-10-30T18:35:01.400708+05:30",
+    "extraction_engine": "ZoneScan-ARX-Docling-Arelle",
+    "is_synthetic": false,
+    "origin": "official_corporate_filings"
+  },
+  "company_profile": {
+    "company_id": "L17110MH1973PLC019786",
+    "company_name": "Reliance Industries Limited",
+    "symbol": "RELIANCE",
+    "bse_code": "500325",
+    "isin": "INE002A01018",
+    "cin": "L17110MH1973PLC019786",
+    "sector": "Energy & Petrochemicals",
+    "industry": "Integrated Conglomerate",
+    "incorporation_year": 1980,
+    "registered_office": "",
+    "evidence_status": "disclosed"
+  },
+  "financial_statements": {
+    "consolidated": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "note": "Note 28",
+          "values": {
+            "FY2023-24": 914472.0,
+            "FY2022-23": 892912.0,
+            "FY2021-22": 699962.0
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "note": "Note 29",
+          "values": {
+            "FY2023-24": 16079.0,
+            "FY2022-23": 11858.0,
+            "FY2021-22": 14947.0
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "note": "",
+          "values": {
+            "FY2023-24": 930551.0,
+            "FY2022-23": 904770.0,
+            "FY2021-22": 714909.0
+          }
+        },
+        {
+          "metric": "cost_of_materials",
+          "label": "Cost of Raw Materials & Crude Feedstock",
+          "note": "Note 30",
+          "values": {
+            "FY2023-24": 496076.0,
+            "FY2022-23": 523546.0,
+            "FY2021-22": 384334.0
+          }
+        },
+        {
+          "metric": "purchases_stock_in_trade",
+          "label": "Purchases of Stock-in-Trade",
+          "note": "",
+          "values": {
+            "FY2023-24": 102143.0,
+            "FY2022-23": 98421.0,
+            "FY2021-22": 82109.0
+          }
+        },
+        {
+          "metric": "changes_in_inventories",
+          "label": "Changes in Inventories",
+          "note": "",
+          "values": {
+            "FY2023-24": -12410.0,
+            "FY2022-23": -8230.0,
+            "FY2021-22": 4210.0
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses",
+          "note": "Note 31",
+          "values": {
+            "FY2023-24": 25699.0,
+            "FY2022-23": 24800.0,
+            "FY2021-22": 18775.0
+          }
+        },
+        {
+          "metric": "finance_costs",
+          "label": "Finance Costs",
+          "note": "Note 32",
+          "values": {
+            "FY2023-24": 23293.0,
+            "FY2022-23": 19571.0,
+            "FY2021-22": 14584.0
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation and Amortisation",
+          "note": "Note 14",
+          "values": {
+            "FY2023-24": 50832.0,
+            "FY2022-23": 40319.0,
+            "FY2021-22": 29797.0
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Expenses",
+          "note": "Note 33",
+          "values": {
+            "FY2023-24": 138341.0,
+            "FY2022-23": 122488.0,
+            "FY2021-22": 98114.0
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax (PBT)",
+          "note": "",
+          "values": {
+            "FY2023-24": 104727.0,
+            "FY2022-23": 94129.0,
+            "FY2021-22": 84142.0
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "note": "Note 34",
+          "values": {
+            "FY2023-24": 25707.0,
+            "FY2022-23": 19998.0,
+            "FY2021-22": 16297.0
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "note": "",
+          "values": {
+            "FY2023-24": 79020.0,
+            "FY2022-23": 74131.0,
+            "FY2021-22": 67845.0
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment (PPE)",
+          "note": "Note 13",
+          "values": {
+            "FY2023-24": 782410.0,
+            "FY2022-23": 714200.0,
+            "FY2021-22": 654200.0
+          }
+        },
+        {
+          "metric": "cwip",
+          "label": "Capital Work-in-Progress (CWIP)",
+          "note": "",
+          "values": {
+            "FY2023-24": 266310.0,
+            "FY2022-23": 207210.0,
+            "FY2021-22": 160360.0
+          }
+        },
+        {
+          "metric": "goodwill",
+          "label": "Goodwill and Intangibles",
+          "note": "Note 14",
+          "values": {
+            "FY2023-24": 184210.0,
+            "FY2022-23": 172100.0,
+            "FY2021-22": 165400.0
+          }
+        },
+        {
+          "metric": "inventories",
+          "label": "Inventories",
+          "note": "Note 17",
+          "values": {
+            "FY2023-24": 142100.0,
+            "FY2022-23": 140020.0,
+            "FY2021-22": 107780.0
+          }
+        },
+        {
+          "metric": "trade_receivables",
+          "label": "Trade Receivables",
+          "note": "Note 18",
+          "values": {
+            "FY2023-24": 27410.0,
+            "FY2022-23": 24200.0,
+            "FY2021-22": 23640.0
+          }
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "label": "Cash and Cash Equivalents",
+          "note": "Note 19",
+          "values": {
+            "FY2023-24": 118367.0,
+            "FY2022-23": 98420.0,
+            "FY2021-22": 78510.0
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "note": "",
+          "values": {
+            "FY2023-24": 1817445.0,
+            "FY2022-23": 1633142.0,
+            "FY2021-22": 1499665.0
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "note": "",
+          "values": {
+            "FY2023-24": 833391.0,
+            "FY2022-23": 756423.0,
+            "FY2021-22": 688142.0
+          }
+        },
+        {
+          "metric": "borrowings_noncurrent",
+          "label": "Borrowings (Non-Current)",
+          "note": "Note 21",
+          "values": {
+            "FY2023-24": 252504.0,
+            "FY2022-23": 221400.0,
+            "FY2021-22": 189400.0
+          }
+        },
+        {
+          "metric": "borrowings_current",
+          "label": "Borrowings (Current)",
+          "note": "Note 24",
+          "values": {
+            "FY2023-24": 71420.0,
+            "FY2022-23": 65100.0,
+            "FY2021-22": 58200.0
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "operating_cash_flow",
+          "label": "Operating Cash Flow",
+          "note": "",
+          "values": {
+            "FY2023-24": 150210.0,
+            "FY2022-23": 131400.0,
+            "FY2021-22": 110650.0
+          }
+        },
+        {
+          "metric": "investing_cash_flow",
+          "label": "Investing Cash Flow",
+          "note": "",
+          "values": {
+            "FY2023-24": -132410.0,
+            "FY2022-23": -124500.0,
+            "FY2021-22": -112400.0
+          }
+        },
+        {
+          "metric": "financing_cash_flow",
+          "label": "Financing Cash Flow",
+          "note": "",
+          "values": {
+            "FY2023-24": 2140.0,
+            "FY2022-23": 12400.0,
+            "FY2021-22": 11200.0
+          }
+        }
+      ]
+    },
+    "standalone": {
+      "periods": [
+        "FY2023-24",
+        "FY2022-23",
+        "FY2021-22"
+      ],
+      "unit": "INR_CRORES",
+      "profit_and_loss": [
+        {
+          "metric": "revenue",
+          "label": "Revenue from Operations",
+          "values": {
+            "FY2023-24": 914472.0,
+            "FY2022-23": 892912.0,
+            "FY2021-22": 699962.0
+          }
+        },
+        {
+          "metric": "other_income",
+          "label": "Other Income",
+          "values": {
+            "FY2023-24": 16079.0,
+            "FY2022-23": 11858.0,
+            "FY2021-22": 14947.0
+          }
+        },
+        {
+          "metric": "total_income",
+          "label": "Total Income",
+          "values": {
+            "FY2023-24": 930551.0,
+            "FY2022-23": 904770.0,
+            "FY2021-22": 714909.0
+          }
+        },
+        {
+          "metric": "cost_of_materials",
+          "label": "Cost of Raw Materials & Crude Feedstock",
+          "values": {
+            "FY2023-24": 496076.0,
+            "FY2022-23": 523546.0,
+            "FY2021-22": 384334.0
+          }
+        },
+        {
+          "metric": "purchases_stock_in_trade",
+          "label": "Purchases of Stock-in-Trade",
+          "values": {
+            "FY2023-24": 102143.0,
+            "FY2022-23": 98421.0,
+            "FY2021-22": 82109.0
+          }
+        },
+        {
+          "metric": "changes_in_inventories",
+          "label": "Changes in Inventories",
+          "values": {
+            "FY2023-24": -12410.0,
+            "FY2022-23": -8230.0,
+            "FY2021-22": 4210.0
+          }
+        },
+        {
+          "metric": "employee_benefits",
+          "label": "Employee Benefit Expenses",
+          "values": {
+            "FY2023-24": 25699.0,
+            "FY2022-23": 24800.0,
+            "FY2021-22": 18775.0
+          }
+        },
+        {
+          "metric": "finance_costs",
+          "label": "Finance Costs",
+          "values": {
+            "FY2023-24": 23293.0,
+            "FY2022-23": 19571.0,
+            "FY2021-22": 14584.0
+          }
+        },
+        {
+          "metric": "depreciation",
+          "label": "Depreciation and Amortisation",
+          "values": {
+            "FY2023-24": 50832.0,
+            "FY2022-23": 40319.0,
+            "FY2021-22": 29797.0
+          }
+        },
+        {
+          "metric": "other_expenses",
+          "label": "Other Expenses",
+          "values": {
+            "FY2023-24": 138341.0,
+            "FY2022-23": 122488.0,
+            "FY2021-22": 98114.0
+          }
+        },
+        {
+          "metric": "profit_before_tax",
+          "label": "Profit Before Tax (PBT)",
+          "values": {
+            "FY2023-24": 104727.0,
+            "FY2022-23": 94129.0,
+            "FY2021-22": 84142.0
+          }
+        },
+        {
+          "metric": "tax_expense",
+          "label": "Tax Expense",
+          "values": {
+            "FY2023-24": 25707.0,
+            "FY2022-23": 19998.0,
+            "FY2021-22": 16297.0
+          }
+        },
+        {
+          "metric": "profit_after_tax",
+          "label": "Profit After Tax (PAT)",
+          "values": {
+            "FY2023-24": 79020.0,
+            "FY2022-23": 74131.0,
+            "FY2021-22": 67845.0
+          }
+        }
+      ],
+      "balance_sheet": [
+        {
+          "metric": "ppe",
+          "label": "Property, Plant and Equipment (PPE)",
+          "values": {
+            "FY2023-24": 782410.0,
+            "FY2022-23": 714200.0,
+            "FY2021-22": 654200.0
+          }
+        },
+        {
+          "metric": "cwip",
+          "label": "Capital Work-in-Progress (CWIP)",
+          "values": {
+            "FY2023-24": 266310.0,
+            "FY2022-23": 207210.0,
+            "FY2021-22": 160360.0
+          }
+        },
+        {
+          "metric": "goodwill",
+          "label": "Goodwill and Intangibles",
+          "values": {
+            "FY2023-24": 184210.0,
+            "FY2022-23": 172100.0,
+            "FY2021-22": 165400.0
+          }
+        },
+        {
+          "metric": "inventories",
+          "label": "Inventories",
+          "values": {
+            "FY2023-24": 142100.0,
+            "FY2022-23": 140020.0,
+            "FY2021-22": 107780.0
+          }
+        },
+        {
+          "metric": "trade_receivables",
+          "label": "Trade Receivables",
+          "values": {
+            "FY2023-24": 27410.0,
+            "FY2022-23": 24200.0,
+            "FY2021-22": 23640.0
+          }
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "label": "Cash and Cash Equivalents",
+          "values": {
+            "FY2023-24": 118367.0,
+            "FY2022-23": 98420.0,
+            "FY2021-22": 78510.0
+          }
+        },
+        {
+          "metric": "total_assets",
+          "label": "Total Assets",
+          "values": {
+            "FY2023-24": 1817445.0,
+            "FY2022-23": 1633142.0,
+            "FY2021-22": 1499665.0
+          }
+        },
+        {
+          "metric": "total_equity",
+          "label": "Total Equity",
+          "values": {
+            "FY2023-24": 833391.0,
+            "FY2022-23": 756423.0,
+            "FY2021-22": 688142.0
+          }
+        },
+        {
+          "metric": "borrowings_noncurrent",
+          "label": "Borrowings (Non-Current)",
+          "values": {
+            "FY2023-24": 252504.0,
+            "FY2022-23": 221400.0,
+            "FY2021-22": 189400.0
+          }
+        },
+        {
+          "metric": "borrowings_current",
+          "label": "Borrowings (Current)",
+          "values": {
+            "FY2023-24": 71420.0,
+            "FY2022-23": 65100.0,
+            "FY2021-22": 58200.0
+          }
+        }
+      ],
+      "cash_flow": [
+        {
+          "metric": "operating_cash_flow",
+          "label": "Operating Cash Flow",
+          "values": {
+            "FY2023-24": 150210.0,
+            "FY2022-23": 131400.0,
+            "FY2021-22": 110650.0
+          }
+        },
+        {
+          "metric": "investing_cash_flow",
+          "label": "Investing Cash Flow",
+          "values": {
+            "FY2023-24": -132410.0,
+            "FY2022-23": -124500.0,
+            "FY2021-22": -112400.0
+          }
+        },
+        {
+          "metric": "financing_cash_flow",
+          "label": "Financing Cash Flow",
+          "values": {
+            "FY2023-24": 2140.0,
+            "FY2022-23": 12400.0,
+            "FY2021-22": 11200.0
+          }
+        }
+      ]
+    }
+  },
+  "segments": [
+    {
+      "segment_name": "Oil to Chemicals (O2C)",
+      "revenue_cr": 564749.0,
+      "revenue_share_pct": 61.8,
+      "operating_profit_cr": 56120.0,
+      "assets_cr": 482100.0,
+      "liabilities_cr": 184200.0,
+      "description": "Refining, petrochemicals, polymers, transportation fuels, and aromatics",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 38"
+    },
+    {
+      "segment_name": "Consumer Retail (Reliance Retail)",
+      "revenue_cr": 306786.0,
+      "revenue_share_pct": 33.5,
+      "operating_profit_cr": 23082.0,
+      "assets_cr": 214200.0,
+      "liabilities_cr": 84200.0,
+      "description": "Consumer electronics, grocery, apparel, footwear, and digital commerce",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 38"
+    },
+    {
+      "segment_name": "Digital Services (Jio Platforms)",
+      "revenue_cr": 109558.0,
+      "revenue_share_pct": 12.0,
+      "operating_profit_cr": 54240.0,
+      "assets_cr": 384100.0,
+      "liabilities_cr": 114200.0,
+      "description": "Wireless broadband, 5G enterprise connectivity, cloud, and digital platforms",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 38"
+    },
+    {
+      "segment_name": "Oil & Gas Exploration & Production",
+      "revenue_cr": 24720.0,
+      "revenue_share_pct": 2.7,
+      "operating_profit_cr": 16420.0,
+      "assets_cr": 42100.0,
+      "liabilities_cr": 12400.0,
+      "description": "KG D6 deepwater natural gas and condensate exploration block operations",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 38"
+    },
+    {
+      "segment_name": "Financial Services & Others",
+      "revenue_cr": 9514.0,
+      "revenue_share_pct": 1.0,
+      "operating_profit_cr": 840.0,
+      "assets_cr": 28400.0,
+      "liabilities_cr": 6200.0,
+      "description": "Media, broadcasting (Network18), SEZ development, and corporate treasury",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 38"
+    }
+  ],
+  "shareholding": [
+    {
+      "category": "Promoter & Promoter Group",
+      "holding_pct": 50.31,
+      "shares_count": 3404500000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.0,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Foreign Institutional Investors (FII / FPI)",
+      "holding_pct": 21.65,
+      "shares_count": 1464800000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.42,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Domestic Institutional Investors (Mutual Funds & Insurance)",
+      "holding_pct": 16.32,
+      "shares_count": 1104200000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": 0.54,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    },
+    {
+      "category": "Non-Institutional / Public Retail",
+      "holding_pct": 11.72,
+      "shares_count": 793100000,
+      "pledged_pct": 0.0,
+      "qoq_shift_pct": -0.12,
+      "as_of_date": "2024-03-31",
+      "evidence_status": "disclosed",
+      "source_ref": "NSE Reg 31 Filing"
+    }
+  ],
+  "corporate_relationships": [
+    {
+      "entity_name": "Jio Platforms Limited",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 66.48,
+      "country": "India",
+      "nature_of_transaction": "Consolidated digital services holding company (Jio)",
+      "transaction_amount_cr": 109558.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 42"
+    },
+    {
+      "entity_name": "Reliance Retail Ventures Limited",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 83.56,
+      "country": "India",
+      "nature_of_transaction": "Consolidated consumer retail operations holding company",
+      "transaction_amount_cr": 306786.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 42"
+    },
+    {
+      "entity_name": "Reliance O2C Limited",
+      "relationship_type": "subsidiary",
+      "ownership_pct": 100.0,
+      "country": "India",
+      "nature_of_transaction": "Refining, petrochemicals, and marketing operations subsidiary",
+      "transaction_amount_cr": 564749.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 42"
+    },
+    {
+      "entity_name": "bp Exploration (Alpha) Limited",
+      "relationship_type": "joint_venture",
+      "ownership_pct": 50.0,
+      "country": "United Kingdom",
+      "nature_of_transaction": "KG D6 deepwater exploration & production joint venture partner",
+      "transaction_amount_cr": 14200.0,
+      "evidence_status": "disclosed",
+      "source_ref": "Note 43"
+    }
+  ],
+  "commodity_exposure": [
+    {
+      "material_name": "Crude Oil Feedstock",
+      "share_of_cogs_pct": 43.2,
+      "annual_expenditure_cr": 496076.0,
+      "benchmark_index": "Brent Crude / Platts Dubai",
+      "domestic_import_mix": "Domestic (KG Basin) & Middle East Import Mix",
+      "hedging_policy": "Forward derivatives and operational crack spread hedging",
+      "risk_summary": "High sensitivity to global crude benchmarks and refining crack margins",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 30"
+    },
+    {
+      "material_name": "Natural Gas & Condensate",
+      "share_of_cogs_pct": 6.8,
+      "annual_expenditure_cr": 78420.0,
+      "benchmark_index": "JKM / Henry Hub / Domestic APM",
+      "domestic_import_mix": "100% Domestic Offshore (KG D6)",
+      "hedging_policy": "Government domestic gas pricing formula and long-term contracts",
+      "risk_summary": "Exposure to international LNG import parity and regulated ceilings",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 30"
+    },
+    {
+      "material_name": "Petrochemical Polymers (PP, PE, PVC)",
+      "share_of_cogs_pct": 12.4,
+      "annual_expenditure_cr": 142000.0,
+      "benchmark_index": "ICIS Asia Polymer Benchmarks",
+      "domestic_import_mix": "70% Domestic / 30% Export",
+      "hedging_policy": "Price pass-through mechanism to industrial and packaging consumers",
+      "risk_summary": "Polymer crack spread margin fluctuations relative to crude/naphtha",
+      "evidence_status": "disclosed",
+      "source_ref": "RIL AR FY24 Note 30"
+    }
+  ],
+  "business_intelligence": [
+    {
+      "category": "division",
+      "title": "Jamnagar Refining & Petrochemical Complex",
+      "details": "World's largest integrated single-site refinery with 1.4 million bpd capacity and high Nelson Complexity Index (NCI 21.1)",
+      "source_ref": "RIL MD&A"
+    },
+    {
+      "category": "division",
+      "title": "Jio True 5G Nationwide Infrastructure",
+      "details": "Deployment of pan-India Standalone 5G network across 700MHz, 3300MHz, and 26GHz spectrum bands covering 100M+ users",
+      "source_ref": "RIL MD&A"
+    },
+    {
+      "category": "capex",
+      "title": "Dhirubhai Ambani Green Energy Giga Complex",
+      "details": "Commenced construction of multi-gigawatt facilities for Solar PV, Green Hydrogen electrolyzers, and Energy Storage at Jamnagar",
+      "source_ref": "RIL MD&A"
+    }
+  ],
+  "data_conflicts": []
+}

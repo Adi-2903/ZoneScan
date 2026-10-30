@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-10-30T18:46:38.816383+05:30",
+  "company_info": {
+    "company_name": "Jio Financial Services Limited",
+    "symbol": "JIOFIN",
+    "bse_code": "543940",
+    "isin": "INE758E01017",
+    "cin": "L65990MH1999PLC120918",
+    "sector": "Financial Services",
+    "industry": "Non-Banking Financial Company (NBFC)",
+    "incorporation_year": 1980,
+    "registered_office": ""
+  },
+  "documents_count": 4,
+  "documents": [
+    {
+      "doc_id": "doc_JIOFIN_FY2023-24_annual_report_AR_24864_JIOFIN_2023_2024_0808202401621",
+      "title": "https://nsearchives.nseindia.com/annual_reports/AR_24864_JIOFIN_2023_2024_0808202401621.pdf Jio Financial Services Limited 2023-2024",
+      "document_type": "annual_report",
+      "reporting_period": "FY2023-24",
+      "source_url": "https://nsearchives.nseindia.com/annual_reports/AR_24864_JIOFIN_2023_2024_0808202401621.pdf",
+      "source_website": "nseindia.com",
+      "publication_date": null,
+      "download_timestamp": "2026-10-30T18:46:37.459285+05:30",
+      "file_type": "pdf",
+      "local_path": "data\\company_intelligence\\JIOFIN\\raw\\AR_24864_JIOFIN_2023_2024_0808202401621.pdf",
+      "sha256_hash": "c893f50f962762bc4a14bd93cb9b106fb1a41383d0979ab8531adee1ed9dfc32",
+      "file_size_bytes": 11928908,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_JIOFIN_annual_report_index",
+      "title": "NSE India Annual Reports API",
+      "document_type": "annual_report_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/annual-reports?index=equities&symbol=JIOFIN",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:46:38.481048+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\JIOFIN\\raw\\nse_annual_reports.json",
+      "sha256_hash": "b2ea9a94093e868eb3d76f4c3f8e60cd633ea49c43ebc8a76c22f9620fac95a2",
+      "file_size_bytes": 1284,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_JIOFIN_financial_results_index",
+      "title": "NSE India Corporate Results API",
+      "document_type": "financial_results_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol=JIOFIN",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:46:38.623861+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\JIOFIN\\raw\\nse_financial_results.json",
+      "sha256_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "file_size_bytes": 2,
+      "extraction_status": "downloaded",
+      "error_message": null
+    },
+    {
+      "doc_id": "doc_nse_JIOFIN_announcements_index",
+      "title": "NSE India Corporate Announcements API",
+      "document_type": "announcements_index",
+      "reporting_period": "Multi-Period",
+      "source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=JIOFIN",
+      "source_website": "NSE India",
+      "publication_date": "2026-10-30",
+      "download_timestamp": "2026-10-30T18:46:38.812305+05:30",
+      "file_type": "json",
+      "local_path": "data\\company_intelligence\\JIOFIN\\raw\\nse_announcements.json",
+      "sha256_hash": "5bb0b669d97303040a3ecbdef774f2ac2d086c5d59dd3dcf81f07de26382d924",
+      "file_size_bytes": 243133,
+      "extraction_status": "downloaded",
+      "error_message": null
+    }
+  ],
+  "extraction_issues_count": 0,
+  "extraction_issues": []
+}

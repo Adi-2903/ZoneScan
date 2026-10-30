@@ -1,0 +1,37 @@
+{
+  "data": [
+    {
+      "companyName": "Jio Financial Services Limited",
+      "fromYr": "2025",
+      "toYr": "2026",
+      "submission_type": "New",
+      "broadcast_dttm": "03-AUG-2026 13:01:14",
+      "disseminationDateTime": "03-AUG-2026 13:01:17",
+      "timeTaken": "00:00:03",
+      "fileName": "https://nsearchives.nseindia.com/annual_reports/AR_30141_JIOFIN_2025_2026_A_8079244_03082026130114.pdf",
+      "attFileSize": "7.70 MB"
+    },
+    {
+      "companyName": "Jio Financial Services Limited",
+      "fromYr": "2024",
+      "toYr": "2025",
+      "submission_type": "New",
+      "broadcast_dttm": "05-AUG-2025 12:50:59",
+      "disseminationDateTime": "05-AUG-2025 12:51:01",
+      "timeTaken": "00:00:02",
+      "fileName": "https://nsearchives.nseindia.com/annual_reports/AR_27276_JIOFIN_2024_2025_A_05082025125059.pdf",
+      "attFileSize": null
+    },
+    {
+      "companyName": "Jio Financial Services Limited",
+      "fromYr": "2023",
+      "toYr": "2024",
+      "submission_type": "-",
+      "broadcast_dttm": "-",
+      "disseminationDateTime": "-",
+      "timeTaken": "::",
+      "fileName": "https://nsearchives.nseindia.com/annual_reports/AR_24864_JIOFIN_2023_2024_0808202401621.pdf",
+      "attFileSize": null
+    }
+  ]
+}

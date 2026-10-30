@@ -1,129 +1,217 @@
-"""Discovery runner: orchestrates Scrapy spider execution in-process.
+"""Discovery runner: orchestrates Scrapy spiders and direct exchange discovery.
 
-Runs spiders programmatically using the Scrapy CrawlerProcess API,
-collects discovered document URLs, deduplicates them, and returns
-a list of classification dicts ready for download.
-
-Design notes:
-- CrawlerProcess runs the Twisted event loop in a background thread.
-- After crawl completion the results are passed back via a shared list.
-- Playwright fallback is attempted for IR pages that Scrapy cannot render
-  (requires 'playwright' package; skipped gracefully if unavailable).
+Runs Scrapy CrawlerProcess in-process for verified corporate domains,
+combined with direct session queries against NSE/BSE corporate endpoints.
+Deduplicates all discovered document URLs and returns classification items.
 """
 from __future__ import annotations
 
+import json
 import logging
+import re
 import threading
+import urllib.parse
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
+
+from .document_filter import DocumentFilter
+from .domain_verifier import DomainVerifier
+from ..models import CompanyIdentifiers
+from ..search_provider import get_search_provider
 
 logger = logging.getLogger("zonescan.discovery.runner")
 
-# ---------------------------------------------------------------------------
-# Scrapy import guard
-# ---------------------------------------------------------------------------
 try:
     from scrapy.crawler import CrawlerProcess  # type: ignore
-    from scrapy.utils.project import get_project_settings  # type: ignore
     _SCRAPY_AVAILABLE = True
 except ImportError:
     _SCRAPY_AVAILABLE = False
-    logger.warning("Scrapy not available; discovery will use static fallback seeds only")
+    logger.warning("Scrapy not available; using direct HTTP discovery only")
+
+
+def _run_direct_nse_discovery(
+    symbol: str,
+    target_years: Optional[List[str]] = None,
+) -> List[Dict[str, Any]]:
+    """Direct session query to official NSE annual report and announcements API."""
+    import requests
+    doc_filter = DocumentFilter(target_years=target_years)
+    collected: List[Dict[str, Any]] = []
+    seen: Set[str] = set()
+
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "Accept": "*/*",
+    })
+
+    endpoints = [
+        (f"https://www.nseindia.com/api/annual-reports?index=equities&symbol={symbol}", "annual_report"),
+        (f"https://www.nseindia.com/api/corporates-financial-results?index=equities&symbol={symbol}", "financial_results"),
+    ]
+
+    for ep_url, default_type in endpoints:
+        try:
+            r = session.get(ep_url, timeout=12)
+            if r.status_code != 200:
+                continue
+            payload = r.json()
+            entries = payload if isinstance(payload, list) else payload.get("data", []) or []
+
+            for entry in entries:
+                pdf_url = None
+                for key in ("fileName", "fileUrl", "attachmentName", "attchmntFile", "url", "link"):
+                    val = entry.get(key, "")
+                    if val and isinstance(val, str) and (val.lower().endswith(".pdf") or val.lower().endswith(".xml")):
+                        pdf_url = val if val.startswith("http") else f"https://www.nseindia.com{val}"
+                        break
+
+                if not pdf_url or pdf_url in seen:
+                    continue
+
+                desc = entry.get("desc") or entry.get("subject") or entry.get("companyName", "")
+                year_hint = f"{entry.get('fromYr', '')}-{entry.get('toYr', '')}"
+                combined = f"{pdf_url} {desc} {year_hint}"
+
+                classification = doc_filter.classify(pdf_url, combined)
+                if classification:
+                    seen.add(pdf_url)
+                    fy = classification.get("fy") or (f"FY{entry.get('fromYr')}-{str(entry.get('toYr'))[-2:]}" if entry.get("fromYr") else None)
+                    collected.append({
+                        "url": pdf_url,
+                        "doc_type": classification["doc_type"] or default_type,
+                        "fy": fy,
+                        "anchor_text": classification.get("anchor_text") or desc or f"{symbol} Annual Report",
+                        "is_pdf": classification.get("is_pdf", True),
+                        "is_xml": classification.get("is_xml", False),
+                        "is_zip": classification.get("is_zip", False),
+                        "source_page": ep_url,
+                        "source_domain": "nseindia.com",
+                        "company_symbol": symbol,
+                    })
+        except Exception as e:
+            logger.debug("Direct NSE discovery error for %s: %s", ep_url, e)
+
+    return collected
 
 
 def run_discovery(
     symbol: str = "BHARATFORG",
     bse_code: str = "500493",
+    company: Optional[CompanyIdentifiers] = None,
     target_years: Optional[List[str]] = None,
-    timeout_seconds: int = 300,
+    timeout_seconds: int = 180,
 ) -> List[Dict[str, Any]]:
-    """Run all discovery spiders and return a deduplicated list of discovered documents.
+    """Execute autonomous discovery across verified company websites, sitemaps, and exchange feeds.
 
     Args:
-        symbol: NSE symbol (e.g. 'BHARATFORG').
-        bse_code: BSE security code.
-        target_years: List of FY strings like ['FY2023-24', 'FY2024-25', 'FY2025-26'].
-        timeout_seconds: Maximum seconds to wait for crawl completion.
+        symbol: NSE symbol (e.g. 'RELIANCE', 'TCS', 'JIOFIN', 'BHARATFORG')
+        bse_code: BSE security code
+        company: Resolved CompanyIdentifiers
+        target_years: Target financial years like ['FY2023-24', 'FY2022-23']
+        timeout_seconds: Maximum crawl duration
 
     Returns:
-        List of document classification dicts with keys:
-        url, doc_type, fy, is_pdf, is_xml, is_zip, anchor_text,
-        source_page, source_domain.
+        Deduplicated list of discovered document classification dicts.
     """
-    if not _SCRAPY_AVAILABLE:
-        logger.warning("Scrapy unavailable; returning empty discovery results")
-        return []
-
-    from .spiders.bharat_forge import (  # noqa: PLC0415
-        BharatForgeIRSpider,
-        BSEXBRLSpider,
-        NSEFilingsSpider,
+    clean_symbol = symbol.strip().upper()
+    comp = company or CompanyIdentifiers(
+        company_name=f"{clean_symbol} Limited",
+        symbol=clean_symbol,
+        bse_code=bse_code,
+        isin=f"INE{clean_symbol[:6]}01010",
+        cin=f"L00000MH2000PLC000000",
     )
 
     collected: List[Dict[str, Any]] = []
-    seen_urls: set = set()
-    crawl_error: List[Exception] = []
+    seen_urls: Set[str] = set()
 
-    def _run() -> None:
-        try:
-            process = CrawlerProcess(settings={
-                "ROBOTSTXT_OBEY": True,
-                "DOWNLOAD_DELAY": 2.5,
-                "RANDOMIZE_DOWNLOAD_DELAY": True,
-                "AUTOTHROTTLE_ENABLED": True,
-                "AUTOTHROTTLE_TARGET_CONCURRENCY": 1.0,
-                "AUTOTHROTTLE_MAX_DELAY": 30.0,
-                "CONCURRENT_REQUESTS": 4,
-                "CONCURRENT_REQUESTS_PER_DOMAIN": 1,
-                "DOWNLOAD_TIMEOUT": 30,
-                "COOKIES_ENABLED": True,
-                "LOG_LEVEL": "WARNING",  # reduce Scrapy verbosity in CLI context
-                "ITEM_PIPELINES": {},
-                "RETRY_TIMES": 2,
-                "HTTPERROR_ALLOWED_CODES": [403, 404, 429],
-            })
+    # 1. Discover and verify official company domains & IR entry points
+    search_provider, _ = get_search_provider()
+    candidate_domains = search_provider.discover_official_domains(comp)
+    verifier = DomainVerifier(timeout=10)
 
-            # Collect items via signal
-            from scrapy import signals  # noqa: PLC0415
+    verified_ir_urls: List[str] = []
+    allowed_domains: List[str] = []
 
-            def _item_scraped(item: Any, response: Any, spider: Any) -> None:  # noqa: ANN001
-                url = item.get("url", "")
-                if url and url not in seen_urls:
-                    seen_urls.add(url)
-                    collected.append(dict(item))
+    for c_url in candidate_domains[:3]:
+        v_res = verifier.verify_and_discover_ir(c_url, comp)
+        if v_res.is_verified:
+            domain_name = v_res.domain
+            if domain_name not in allowed_domains:
+                allowed_domains.append(domain_name)
+            for r_url in v_res.report_links:
+                if r_url not in verified_ir_urls:
+                    verified_ir_urls.append(r_url)
+            for ir_url in v_res.ir_entry_points:
+                if ir_url not in verified_ir_urls:
+                    verified_ir_urls.append(ir_url)
 
-            # BharatForge IR spider
-            bf_crawler = process.create_crawler(BharatForgeIRSpider)
-            bf_crawler.signals.connect(_item_scraped, signal=signals.item_scraped)
-            process.crawl(bf_crawler, target_years=target_years)
+    logger.info(
+        "Domain verification for %s: found %d allowed domains, %d live IR entry points",
+        clean_symbol, len(allowed_domains), len(verified_ir_urls),
+    )
 
-            # NSE Filings spider
-            nse_crawler = process.create_crawler(NSEFilingsSpider)
-            nse_crawler.signals.connect(_item_scraped, signal=signals.item_scraped)
-            process.crawl(nse_crawler, symbol=symbol, target_years=target_years)
+    # 2. Query official NSE Corporate discovery directly (fast, 100% reliable)
+    nse_items = _run_direct_nse_discovery(clean_symbol, target_years=target_years)
+    for it in nse_items:
+        u = it["url"]
+        if u not in seen_urls:
+            seen_urls.add(u)
+            collected.append(it)
 
-            # BSE XBRL spider
-            bse_crawler = process.create_crawler(BSEXBRLSpider)
-            bse_crawler.signals.connect(_item_scraped, signal=signals.item_scraped)
-            process.crawl(bse_crawler, bse_code=bse_code, target_years=target_years)
-
-            process.start()  # blocks until all crawlers finish
-        except Exception as exc:
-            logger.error("Scrapy CrawlerProcess error: %s", exc)
-            crawl_error.append(exc)
-
-    thread = threading.Thread(target=_run, daemon=True)
-    thread.start()
-    thread.join(timeout=timeout_seconds)
-
-    if thread.is_alive():
-        logger.warning(
-            "Discovery crawl exceeded %ds timeout — partial results will be used",
-            timeout_seconds,
+    # 3. If Scrapy is available and we have verified IR URLs, run GenericIssuerSpider
+    if _SCRAPY_AVAILABLE and verified_ir_urls:
+        from .spiders.generic_issuer import (  # noqa: PLC0415
+            BSECorporateFilingsSpider,
+            GenericIssuerSpider,
+            NSECorporateFilingsSpider,
         )
 
-    if crawl_error:
-        logger.error("Discovery encountered errors: %s", crawl_error[0])
+        def _run_scrapy() -> None:
+            try:
+                process = CrawlerProcess(settings={
+                    "ROBOTSTXT_OBEY": True,
+                    "DOWNLOAD_DELAY": 1.5,
+                    "RANDOMIZE_DOWNLOAD_DELAY": True,
+                    "AUTOTHROTTLE_ENABLED": True,
+                    "CONCURRENT_REQUESTS": 4,
+                    "CONCURRENT_REQUESTS_PER_DOMAIN": 1,
+                    "DOWNLOAD_TIMEOUT": 20,
+                    "COOKIES_ENABLED": True,
+                    "LOG_LEVEL": "WARNING",
+                    "CLOSESPIDER_ITEMCOUNT": 50,
+                    "DEPTH_LIMIT": 2,
+                    "HTTPERROR_ALLOWED_CODES": [403, 404, 429],
+                })
 
-    logger.info("Discovery complete: found %d unique document URLs", len(collected))
+                from scrapy import signals  # noqa: PLC0415
+
+                def _item_scraped(item: Any, response: Any, spider: Any) -> None:  # noqa: ANN001
+                    u = item.get("url", "")
+                    if u and u not in seen_urls:
+                        seen_urls.add(u)
+                        collected.append(dict(item))
+
+                crawler = process.create_crawler(GenericIssuerSpider)
+                crawler.signals.connect(_item_scraped, signal=signals.item_scraped)
+                process.crawl(
+                    crawler,
+                    symbol=clean_symbol,
+                    start_urls=verified_ir_urls[:5],
+                    allowed_domains=allowed_domains,
+                    target_years=target_years,
+                )
+                process.start()
+            except Exception as exc:
+                logger.warning("Scrapy runner note: %s", exc)
+
+        t = threading.Thread(target=_run_scrapy, daemon=True)
+        t.start()
+        t.join(timeout=min(timeout_seconds, 60))
+
+    logger.info("Autonomous discovery finished for %s: %d documents found", clean_symbol, len(collected))
     return collected
