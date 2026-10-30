@@ -427,13 +427,13 @@ export function RelationshipMap({
                 <i className="legend-dot dot-material" aria-hidden="true" /> Raw Material
               </span>
               <span className="legend-item line-legend">
-                <span className="line-solid" /> Disclosed
+                <span className="line-solid" /> Demo Disclosed
               </span>
               <span className="legend-item line-legend">
-                <span className="line-dashed" /> Inferred
+                <span className="line-dashed" /> Demo Inferred
               </span>
               <span className="legend-item line-legend">
-                <span className="line-dotted" /> Unconfirmed
+                <span className="line-dotted" /> Demo Unconfirmed
               </span>
             </div>
           </div>
@@ -444,10 +444,13 @@ export function RelationshipMap({
               <article className="selected-node-article">
                 <header className="node-detail-header">
                   <div>
-                    <span className="node-type-badge">{selectedRel.type.replace("_", " ").toUpperCase()}</span>
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center", marginBottom: "4px" }}>
+                      <span className="node-type-badge">{selectedRel.type.replace("_", " ").toUpperCase()}</span>
+                      <span className="code-pill symbol-pill" style={{ fontSize: "0.65rem" }}>DEMO NODE</span>
+                    </div>
                     <h4 className="node-name">{selectedRel.name}</h4>
                     {selectedRel.ticker && (
-                      <span className="node-ticker">Ticker: {selectedRel.ticker}</span>
+                      <span className="node-ticker">Fictional Ticker: {selectedRel.ticker}</span>
                     )}
                   </div>
                   <EvidenceBadge
@@ -460,7 +463,7 @@ export function RelationshipMap({
 
                 <div className="node-detail-body">
                   <div className="node-role-box">
-                    <strong>Commercial Role:</strong>
+                    <strong>Modelled Commercial Role:</strong>
                     <p>{selectedRel.roleDescription}</p>
                   </div>
 
@@ -468,8 +471,8 @@ export function RelationshipMap({
                     <div className="node-concentration-box">
                       <span className="concentration-label">
                         {selectedRel.type === "supplier" || selectedRel.type === "raw_material"
-                          ? "Share of Direct Spend (COGS):"
-                          : "Share of Total Sales (Revenue):"}
+                          ? "Modelled Share of Direct Spend (COGS):"
+                          : "Modelled Share of Total Sales (Revenue):"}
                       </span>
                       <strong className="concentration-value">
                         {selectedRel.concentrationPct.toFixed(1)}%
@@ -483,7 +486,7 @@ export function RelationshipMap({
                   </div>
 
                   <div className="node-source-box">
-                    <span className="source-label">Disclosure Reference:</span>
+                    <span className="source-label">Modelled Citation Reference:</span>
                     <p className="source-citation">{selectedRel.sourceReference}</p>
                   </div>
                 </div>
@@ -494,13 +497,13 @@ export function RelationshipMap({
                     className="btn-inspect-evidence"
                     onClick={() => onInspectSource(selectedRel.evidenceId)}
                   >
-                    Inspect Level 3 Disclosure ↗
+                    Inspect Modelled Citation ↗
                   </button>
                 </footer>
               </article>
             ) : (
               <div className="empty-node-state">
-                <p>Click on any node in the network to inspect its relationship details, concentration share, and statutory evidence.</p>
+                <p>Click on any node in the network to inspect its relationship details, concentration share, and synthetic citation.</p>
               </div>
             )}
           </div>
@@ -516,7 +519,7 @@ export function RelationshipMap({
                 <th scope="col">Commercial Role</th>
                 <th scope="col" className="col-num">Concentration</th>
                 <th scope="col">Evidence</th>
-                <th scope="col">Statutory Reference</th>
+                <th scope="col">Modelled Reference (Demo)</th>
               </tr>
             </thead>
             <tbody>

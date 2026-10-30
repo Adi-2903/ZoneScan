@@ -47,20 +47,51 @@ export function CompanyIntelligence({
   const activeEvidenceDetail = inspectingEvidenceId
     ? EVIDENCE_DETAILS_STORE[inspectingEvidenceId] ?? {
         id: inspectingEvidenceId,
-        itemName: "Statutory Citation Detail",
+        itemName: "Modelled Citation Detail (Synthetic Demo)",
         status: "disclosed",
-        statusExplanation: "Information verified against statutory disclosures.",
-        plainSummary: "Detailed evidence reference verified in statutory company filings.",
+        statusExplanation: "Modelled within synthetic demo scenario fixtures.",
+        plainSummary: "Detailed citation reference within synthetic demo data fixtures.",
+        isSynthetic: true,
+        origin: "synthetic_demo",
       }
     : null;
 
-  // Margin sparkline data points
+  // Derive margin sparkline data points dynamically from company's financial statements
+  const grossRow = company.financialStatements.find((r) => r.label === "Gross Margin %");
+  const ebitdaRow = company.financialStatements.find((r) => r.label === "EBITDA Margin %");
+  const patRow = company.financialStatements.find((r) => r.label === "PAT Margin %");
+
   const marginPoints = [
-    { period: "FY23", gross: 41.96, ebitda: 18.98, pat: 9.37 },
-    { period: "FY24", gross: 43.24, ebitda: 20.81, pat: 11.38 },
-    { period: "FY25", gross: 44.11, ebitda: 22.47, pat: 13.41 },
-    { period: "Q1FY26", gross: 44.39, ebitda: 22.98, pat: 14.01 },
-    { period: "Q2FY26", gross: 44.59, ebitda: 23.46, pat: 14.50 },
+    {
+      period: "FY23",
+      gross: grossRow?.fy23 ?? 41.96,
+      ebitda: ebitdaRow?.fy23 ?? 18.98,
+      pat: patRow?.fy23 ?? 9.37,
+    },
+    {
+      period: "FY24",
+      gross: grossRow?.fy24 ?? 43.24,
+      ebitda: ebitdaRow?.fy24 ?? 20.81,
+      pat: patRow?.fy24 ?? 11.38,
+    },
+    {
+      period: "FY25",
+      gross: grossRow?.fy25 ?? 44.11,
+      ebitda: ebitdaRow?.fy25 ?? 22.47,
+      pat: patRow?.fy25 ?? 13.41,
+    },
+    {
+      period: "Q1FY26",
+      gross: grossRow?.q1fy26 ?? 44.39,
+      ebitda: ebitdaRow?.q1fy26 ?? 22.98,
+      pat: patRow?.q1fy26 ?? 14.01,
+    },
+    {
+      period: "Q2FY26",
+      gross: grossRow?.q2fy26 ?? 44.59,
+      ebitda: ebitdaRow?.q2fy26 ?? 23.46,
+      pat: patRow?.q2fy26 ?? 14.50,
+    },
   ];
 
   return (
@@ -92,6 +123,9 @@ export function CompanyIntelligence({
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="company-title">{company.legalName}</h1>
+                  <span className="code-pill symbol-pill" style={{ fontSize: "0.65rem", padding: "2px 6px" }}>
+                    SYNTHETIC DEMO ENTITY
+                  </span>
                   <EvidenceBadge
                     status={company.evidenceStatus}
                     size="sm"
@@ -239,7 +273,7 @@ export function CompanyIntelligence({
                 <div>
                   <h2 className="section-title">Headline Financial KPIs</h2>
                   <p className="section-subtitle">
-                    Core audited figures with clear reporting units and evidence classification
+                    Modelled headline figures with clear reporting units and demo evidence classification
                   </p>
                 </div>
                 <div className="evidence-legend-compact">
@@ -281,7 +315,7 @@ export function CompanyIntelligence({
                 <div>
                   <h2 className="section-title">Operating Margin Evolution (3-Year Trend)</h2>
                   <p className="section-subtitle">
-                    Progression across gross, cash operating, and net profitability
+                    Modelled progression across gross, cash operating, and net profitability
                   </p>
                 </div>
                 <EvidenceBadge status="inferred" size="xs" />
@@ -293,21 +327,21 @@ export function CompanyIntelligence({
                   unit="%"
                   color="#38bdf8"
                   points={marginPoints.map((p) => ({ period: p.period, value: p.gross }))}
-                  summaryText="Value-addition expanded +263 bps from FY23 to Q2FY26"
+                  summaryText={`Gross margin: ${marginPoints[0].gross.toFixed(1)}% (FY23) → ${marginPoints[marginPoints.length - 1].gross.toFixed(1)}% (Q2FY26)`}
                 />
                 <MetricSparkline
                   title="Operating EBITDA Margin"
                   unit="%"
                   color="#44ce9a"
                   points={marginPoints.map((p) => ({ period: p.period, value: p.ebitda }))}
-                  summaryText="Operating leverage drove +448 bps cash margin improvement"
+                  summaryText={`EBITDA margin: ${marginPoints[0].ebitda.toFixed(1)}% (FY23) → ${marginPoints[marginPoints.length - 1].ebitda.toFixed(1)}% (Q2FY26)`}
                 />
                 <MetricSparkline
                   title="Net PAT Margin"
                   unit="%"
                   color="#818cf8"
                   points={marginPoints.map((p) => ({ period: p.period, value: p.pat }))}
-                  summaryText="Bottom-line net margin climbed from 9.4% to 14.5%"
+                  summaryText={`Net PAT margin: ${marginPoints[0].pat.toFixed(1)}% (FY23) → ${marginPoints[marginPoints.length - 1].pat.toFixed(1)}% (Q2FY26)`}
                 />
               </div>
             </section>
@@ -315,9 +349,9 @@ export function CompanyIntelligence({
             <section className="statement-table-section">
               <div className="section-title-row">
                 <div>
-                  <h2 className="section-title">Audited Financial Statements</h2>
+                  <h2 className="section-title">Multi-Period Financial Statements (Synthetic Demo)</h2>
                   <p className="section-subtitle">
-                    Multi-period statutory income statement and balance sheet schedules
+                    Multi-period synthetic income statement and balance sheet schedules for UI evaluation
                   </p>
                 </div>
               </div>

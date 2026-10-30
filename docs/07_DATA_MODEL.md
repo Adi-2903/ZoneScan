@@ -89,31 +89,72 @@ The in-memory `BoardSnapshot` contains `timestamp`, `session_date`, bullish and 
 
 ---
 
-## Part B — Financial Intelligence data model (planned; do not implement before data rights gates pass)
+## Part B — Financial Intelligence data model
 
-These tables are planning-level designs. They must not be created in a production database until the corresponding data licensing and legal gates in `docs/19_FINANCIAL_INTELLIGENCE.md` are resolved.
+Production broad scraping and bulk ingestion remain gated on Gate 3. In Milestone 1, the core **persistence foundation** (`financial_facts`, `companies`, and `company_identifiers`) is implemented with strict boundary validation and deterministic temporal mapping.
 
-### Company reference tables
+### Implemented persistence schemas (Milestone 1)
+
+Implemented in `services/api/src/zonescan/financial_facts.py` and `services/api/src/zonescan/entity_resolution.py`.
+
+#### `financial_facts`
+
+Stores individual, fully traceable financial statement items and metrics with complete provenance metadata:
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `fact_id` | TEXT | PRIMARY KEY | Unique fact identifier (e.g. `fact-bf-rev-fy24`) |
+| `company_id` | TEXT | NOT NULL, non-empty | Canonical company identifier / CIN |
+| `metric` | TEXT | NOT NULL, non-empty | Standard metric name (e.g. `revenue_from_operations`) |
+| `value` | REAL | NOT NULL, finite | Numerical value (e.g. `15682.07`) |
+| `unit` | TEXT | NOT NULL, non-empty | Unit denomination (e.g. `INR_CRORES`, `₹ Cr`) |
+| `financial_period` | TEXT | NOT NULL, non-empty | Reporting period (e.g. `FY2023-24`) |
+| `statement_scope` | TEXT | NOT NULL, CHECK IN (`consolidated`, `standalone`) | Consolidation boundary |
+| `source_document` | TEXT | NOT NULL, non-empty | Official document name (e.g. `Annual Report FY 2023-24`) |
+| `source_url` | TEXT | Nullable | Direct URL to public filing PDF/portal |
+| `page_note_table_reference`| TEXT | Nullable | Exact reference (e.g. `Consolidated P&L, Page 218, Note 23`) |
+| `document_date` | TEXT | NOT NULL (ISO date `YYYY-MM-DD`) | Date of source document / filing approval |
+| `retrieval_timestamp` | TEXT | NOT NULL (ISO 8601 with tz) | Exact timestamp when fact was ingested/extracted |
+| `extraction_method` | TEXT | NOT NULL | Extraction technique (`manual_audited_filing_extract`, `xbrl`) |
+| `evidence_status` | TEXT | NOT NULL, CHECK IN (`disclosed`, `verified`, `inferred`, `unconfirmed`, `unavailable`) | Fact provenance status |
+| `is_synthetic` | INTEGER | NOT NULL DEFAULT 0, CHECK IN (0, 1) | Strict flag isolating demo prototypes from real disclosures |
+| `verification_notes` | TEXT | Nullable | Audit details or calculation formula rationale |
+| `created_at` | TEXT | NOT NULL | Record creation timestamp |
+
+**Boundary Validation Rules:**
+- Ingestion boundary rejects writes missing `company_id`, `metric`, `unit`, `financial_period`, `source_document`, `document_date`, or `evidence_status`.
+- Both Python domain validator (`FactValidationError`) and SQLite table-level `CHECK` constraints enforce integrity.
 
 #### `companies`
 
-Canonical company record linking all identifiers.
+Canonical company master record:
 
-Suggested fields: `id`, `canonical_name`, `legal_name`, `bse_code`, `nse_symbol`, `isin`, `cin`, `listed_exchange`, `industry_code`, `sector_id`, `incorporated_date`, `registered_state`, `active`, `created_at`, `updated_at`.
-
-The `isin` is the primary cross-source joining key. `bse_code` and `nse_symbol` may differ from each other and from instruments in the market data tables; the entity resolver must maintain an explicit mapping.
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `company_id` | TEXT | PRIMARY KEY | Canonical company ID (e.g. `comp-bharat-forge`) |
+| `canonical_name` | TEXT | NOT NULL, non-empty | Primary display name |
+| `legal_name` | TEXT | NOT NULL, non-empty | Statutory registered name |
+| `cin` | TEXT | NOT NULL, UNIQUE, non-empty | 21-character MCA Corporate Identification Number |
+| `is_synthetic` | INTEGER | NOT NULL DEFAULT 0, CHECK IN (0, 1) | Flag separating demo companies from real entities |
+| `created_at` | TEXT | NOT NULL | Creation timestamp |
 
 #### `company_identifiers`
 
-Maps all known alternative IDs to the canonical company record.
+Point-in-time security identifier mapping enforcing temporal validity intervals and source citations (FI-007):
 
-Suggested fields: `id`, `company_id`, `identifier_type` (isin/cin/bse_code/nse_symbol/other), `identifier_value`, `valid_from`, `valid_to`, `source`.
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Internal record ID |
+| `company_id` | TEXT | NOT NULL, FOREIGN KEY -> `companies(company_id)` | Linked canonical company |
+| `identifier_type` | TEXT | NOT NULL, CHECK IN (`isin`, `cin`, `nse_symbol`, `bse_code`) | Identifier kind |
+| `identifier_value` | TEXT | NOT NULL, non-empty | Identifier string (e.g. `INE081A01020`) |
+| `valid_from` | TEXT | Nullable (ISO date) | Effective start date (inclusive) |
+| `valid_to` | TEXT | Nullable (ISO date), CHECK (`valid_to >= valid_from`) | Expiration date (inclusive); NULL if currently active |
+| `source` | TEXT | NOT NULL, non-empty | Evidence citation (e.g. BSE/NSE corporate action circular) |
+| `evidence_status` | TEXT | NOT NULL, CHECK IN (`disclosed`, `verified`, `inferred`, `unconfirmed`, `unavailable`) | Provenance classification |
+| `created_at` | TEXT | NOT NULL | Mapping timestamp |
 
-#### `company_descriptions`
-
-Plain-language business description, updated per filing period.
-
-Suggested fields: `id`, `company_id`, `description_text`, `source_filing_id`, `period`, `updated_at`.
+### Future planned tables (Gate 3+)
 
 ### Financial statement tables
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import type { CompanyProfile, RawMaterialProfile } from "@/lib/fixtures/company-intelligence";
+import { calculateCommodityImpact } from "@/lib/calculations/supply-chain-impact";
 import { EvidenceBadge } from "./EvidenceBadge";
 
 interface SupplyChainSimulatorProps {
@@ -20,18 +21,30 @@ export function SupplyChainSimulator({
 
   const selectedMat = rawMaterials[selectedMatIdx] ?? rawMaterials[0];
 
-  // Calculations based on FY25 Audited Revenue & COGS
-  const fy25Revenue = 1825.40; // ₹ Cr
-  const fy25COGS = 1020.20; // ₹ Cr
-  const currentGrossMarginPct = company.headlineKPIs.find((k) => k.key === "gross_margin")?.value ?? 44.11;
+  // Dynamic baseline extraction from typed company fixtures (FY25 Annual)
+  const baselineRevenue =
+    company.financialStatements.find((r) => r.label === "Revenue from Operations" && r.category === "revenue")?.fy25 ??
+    company.headlineKPIs.find((k) => k.key === "revenue")?.value ??
+    1825.40;
 
-  // Material cost in ₹ Cr = COGS * (cogsSharePct / 100)
-  const currentMaterialCostCr = fy25COGS * (selectedMat.cogsSharePct / 100);
-  // Cost change in ₹ Cr = Material cost * (priceChangePct / 100)
-  const costImpactCr = currentMaterialCostCr * (priceChangePct / 100);
-  // Gross margin impact in percentage points = (costImpactCr / fy25Revenue) * 100
-  const marginImpactBps = (costImpactCr / fy25Revenue) * 10000;
-  const newGrossMarginPct = currentGrossMarginPct - (marginImpactBps / 100);
+  const baselineCOGS =
+    company.financialStatements.find((r) => r.label.includes("Cost of Materials Consumed"))?.fy25 ??
+    (baselineRevenue * 0.55);
+
+  // Pure deterministic mathematical calculation
+  const impact = calculateCommodityImpact({
+    annualRevenueCr: baselineRevenue,
+    annualCogsCr: baselineCOGS,
+    cogsSharePct: selectedMat.cogsSharePct,
+    priceChangePct,
+  });
+
+  const {
+    additionalCostCr,
+    marginCompressionBps,
+    modelledGrossMarginPct,
+    baselineGrossMarginPct,
+  } = impact;
 
   return (
     <div className="supply-chain-layout">
@@ -41,7 +54,7 @@ export function SupplyChainSimulator({
           <div>
             <h3 className="section-heading">Raw Material Cost Profile</h3>
             <span className="section-subheading">
-              Audited input dependency and commodity benchmarks (FY25 Financial Notes)
+              Modelled input dependency and commodity benchmarks (FY25 Synthetic Baseline)
             </span>
           </div>
           <EvidenceBadge
@@ -98,14 +111,14 @@ export function SupplyChainSimulator({
       <section className="scenario-simulator-card">
         <header className="simulator-header">
           <div className="simulator-title-group">
-            <span className="eyebrow">DETERMINISTIC SIMULATION</span>
+            <span className="eyebrow">DETERMINISTIC SIMULATION · DEMO ONLY</span>
             <h3 className="section-heading">Evidence-Based Commodity Stress Test</h3>
           </div>
-          <span className="simulation-tag">Illustrative Heuristic</span>
+          <span className="simulation-tag">Synthetic Sensitivity Heuristic</span>
         </header>
 
         <p className="simulator-intro">
-          Model how changes in global or domestic input prices propagate into Zenith&apos;s cost base and operating profitability.
+          Model how changes in global or domestic input prices propagate into {company.legalName}&apos;s cost base and operating profitability.
         </p>
 
         <div className="simulator-controls-box">
@@ -159,41 +172,44 @@ export function SupplyChainSimulator({
         <div className="impact-results-grid">
           <div className="result-metric-box">
             <span className="metric-title">Cost Base Impact</span>
-            <strong className={`metric-big ${costImpactCr > 0 ? "cost-increase" : "cost-decrease"}`}>
-              {costImpactCr >= 0 ? `+₹${costImpactCr.toFixed(1)}` : `-₹${Math.abs(costImpactCr).toFixed(1)}`} Cr
+            <strong className={`metric-big ${additionalCostCr > 0 ? "cost-increase" : "cost-decrease"}`}>
+              {additionalCostCr >= 0 ? `+₹${additionalCostCr.toFixed(1)}` : `-₹${Math.abs(additionalCostCr).toFixed(1)}`} Cr
             </strong>
-            <span className="metric-sub">Annual raw material expenditure delta</span>
+            <span className="metric-sub">Annual raw material expenditure delta (FY25 Baseline)</span>
           </div>
 
           <div className="result-metric-box">
             <span className="metric-title">Gross Margin Compression</span>
-            <strong className={`metric-big ${marginImpactBps > 0 ? "cost-increase" : "cost-decrease"}`}>
-              {marginImpactBps >= 0 ? `-${marginImpactBps.toFixed(0)}` : `+${Math.abs(marginImpactBps).toFixed(0)}`} bps
+            <strong className={`metric-big ${marginCompressionBps > 0 ? "cost-increase" : "cost-decrease"}`}>
+              {marginCompressionBps >= 0 ? `-${marginCompressionBps.toFixed(0)}` : `+${Math.abs(marginCompressionBps).toFixed(0)}`} bps
             </strong>
-            <span className="metric-sub">Assumes zero customer pricing pass-through</span>
+            <span className="metric-sub">Denominator: FY25 Revenue (₹{baselineRevenue.toFixed(1)} Cr)</span>
           </div>
 
           <div className="result-metric-box">
             <span className="metric-title">Modelled Gross Margin</span>
             <strong className="metric-big text-accent">
-              {newGrossMarginPct.toFixed(2)}%
+              {modelledGrossMarginPct.toFixed(2)}%
             </strong>
-            <span className="metric-sub">Baseline: {currentGrossMarginPct.toFixed(2)}%</span>
+            <span className="metric-sub">Baseline: {baselineGrossMarginPct.toFixed(2)}%</span>
           </div>
         </div>
 
         {/* Audit / Formula Disclosure */}
         <div className="formula-explanation-box">
-          <span className="formula-label">Exact Formula:</span>
+          <span className="formula-label">Exact Heuristic Formula:</span>
           <code>
-            Impact = Annual COGS (₹{fy25COGS.toFixed(1)} Cr) × Material Share ({selectedMat.cogsSharePct.toFixed(1)}%) × Price Change ({priceChangePct > 0 ? `+${priceChangePct}` : priceChangePct}%) = {costImpactCr >= 0 ? `+₹${costImpactCr.toFixed(2)}` : `-₹${Math.abs(costImpactCr).toFixed(2)}`} Cr
+            Cost Impact = FY25 COGS (₹{baselineCOGS.toFixed(1)} Cr) × Share ({selectedMat.cogsSharePct.toFixed(1)}%) × Shock ({priceChangePct > 0 ? `+${priceChangePct}` : priceChangePct}%) = {additionalCostCr >= 0 ? `+₹${additionalCostCr.toFixed(2)}` : `-₹${Math.abs(additionalCostCr).toFixed(2)}`} Cr
+          </code>
+          <code style={{ display: "block", marginTop: "4px" }}>
+            Margin Compression = ({additionalCostCr >= 0 ? `+₹${additionalCostCr.toFixed(2)}` : `-₹${Math.abs(additionalCostCr).toFixed(2)}`} Cr / Revenue ₹{baselineRevenue.toFixed(1)} Cr) × 10,000 = {marginCompressionBps.toFixed(0)} bps
           </code>
         </div>
 
         <div className="scenario-disclaimer">
-          <strong>LEGAL &amp; ANALYTICAL DISCLAIMER:</strong>
+          <strong>SYNTHETIC MODEL DISCLAIMER:</strong>
           <p>
-            Illustrative scenario based strictly on disclosed procurement weights. Assumes unhedged purchases, static production volume, and zero immediate OEM pass-through. This is a heuristic risk calculation, not a financial forecast or investment advisory call.
+            Illustrative scenario based on synthetic procurement weights and fictional baseline financials. Assumes unhedged purchases, static volume, and zero immediate customer pricing pass-through. This is a heuristic simulation for UI demonstration, not a financial forecast or investment advisory call.
           </p>
         </div>
       </section>

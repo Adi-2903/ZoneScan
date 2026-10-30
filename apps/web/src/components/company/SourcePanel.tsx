@@ -33,11 +33,13 @@ export function SourcePanel({ detail, isOpen, onClose }: SourcePanelProps) {
       >
         <header className="source-panel-header">
           <div className="source-panel-header-info">
-            <span className="source-eyebrow">LEVEL 3 DISCLOSURE &amp; AUDIT TRAIL</span>
+            <span className="source-eyebrow">
+              {detail.isSynthetic ? "LEVEL 3 AUDIT TRAIL · SYNTHETIC DEMO CITATION" : "LEVEL 3 AUDIT TRAIL · STATUTORY DISCLOSURE"}
+            </span>
             <h2 id="source-panel-title">{detail.itemName}</h2>
           </div>
           <div className="source-panel-header-actions">
-            <EvidenceBadge status={detail.status} size="md" />
+            <EvidenceBadge status={detail.status} size="md" isSynthetic={detail.isSynthetic} />
             <button
               type="button"
               className="source-panel-close"
@@ -50,18 +52,20 @@ export function SourcePanel({ detail, isOpen, onClose }: SourcePanelProps) {
         </header>
 
         <div className="source-panel-body">
-          <div className="synthetic-notice-box">
-            <strong>SYNTHETIC DEMO CITATION</strong>
-            <p>
-              This audit trail references a synthetic demo fixture. ZoneScan never invents real statutory filings or commercial relationships without licensed verification.
-            </p>
-          </div>
+          {detail.isSynthetic && (
+            <div className="synthetic-notice-box" role="status">
+              <strong>SYNTHETIC DEMO CITATION · NOT REAL REGULATORY DATA</strong>
+              <p>
+                All citations, numbers, formulas, and references in this panel belong to synthetic demo fixtures designed to evaluate user experience and progressive disclosure flows. ZoneScan never invents real corporate filings or commercial links.
+              </p>
+            </div>
+          )}
 
           <section className="source-section">
             <h3 className="section-title">Evidence Classification</h3>
             <div className="evidence-explanation-card">
               <div className="evidence-status-pill">
-                <EvidenceBadge status={detail.status} size="sm" />
+                <EvidenceBadge status={detail.status} size="sm" isSynthetic={detail.isSynthetic} />
               </div>
               <p className="explanation-text">{detail.statusExplanation}</p>
             </div>
@@ -80,7 +84,9 @@ export function SourcePanel({ detail, isOpen, onClose }: SourcePanelProps) {
           )}
 
           <section className="source-section">
-            <h3 className="section-title">Primary Regulatory Source</h3>
+            <h3 className="section-title">
+              {detail.isSynthetic ? "Modelled Citation Reference (Demo Only)" : "Primary Regulatory Source"}
+            </h3>
             <dl className="source-metadata-grid">
               <div>
                 <dt>Document</dt>
@@ -109,7 +115,9 @@ export function SourcePanel({ detail, isOpen, onClose }: SourcePanelProps) {
 
           {detail.verbatimExcerpt && (
             <section className="source-section">
-              <h3 className="section-title">Statutory Excerpt</h3>
+              <h3 className="section-title">
+                {detail.isSynthetic ? "Modelled Excerpt (Synthetic Citation)" : "Statutory Excerpt"}
+              </h3>
               <blockquote className="verbatim-quote">
                 &ldquo;{detail.verbatimExcerpt}&rdquo;
               </blockquote>
@@ -118,7 +126,9 @@ export function SourcePanel({ detail, isOpen, onClose }: SourcePanelProps) {
 
           {detail.verificationSource && (
             <section className="source-section">
-              <h3 className="section-title">Independent Verification Cross-Check</h3>
+              <h3 className="section-title">
+                {detail.isSynthetic ? "Cross-Check Scenario (Demo Only)" : "Independent Verification Cross-Check"}
+              </h3>
               <p className="verification-text">{detail.verificationSource}</p>
             </section>
           )}

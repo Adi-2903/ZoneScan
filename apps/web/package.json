@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "node --test src/lib/calculations/supply-chain-impact.test.ts src/lib/fixtures/company-intelligence.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

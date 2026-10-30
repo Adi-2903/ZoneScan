@@ -119,3 +119,30 @@ Before public launch, run a minimum proposed four-week market-day paper-observat
 - Restore database and configuration from backups in a scheduled test.
 
 Never claim that a load target has been met until test results, date, environment and scenario are recorded.
+
+## 8. Data Foundation & Integrity Verification (Milestone 1)
+
+These tests run in CI to enforce data integrity, provenance, and prevent realism drift before broader ingestion pipelines are introduced:
+
+### 8.1 Fixture Realism Drift Guard
+- **Frontend suite:** `apps/web/src/lib/fixtures/company-intelligence.test.ts` (Node test runner)
+- **Backend suite:** `services/api/tests/test_fixtures_synthetic_guard.py` (unittest)
+- **Coverage:** Verifies all synthetic companies, identifiers (`SYN-` prefix, `(Demo)` suffix), filings (`[Synthetic Demo]`), and evidence citations (`[Synthetic Fixture]`, `(Demo)`) carry explicit demo markers.
+- **Drift regression:** Explicit negative mutation tests assert immediate failure if `(Demo)` or `SYN-` markers are stripped from any record.
+
+### 8.2 Fact Provenance & Ingestion Boundary Validation
+- **Backend suite:** `services/api/tests/test_financial_facts.py`
+- **Coverage:**
+  - Relational schema initialization and check constraint verification.
+  - Successful persistence and retrieval of genuine audited fact (`fact-bf-rev-fy24`, Bharat Forge Limited FY24 Consolidated Revenue ₹15,682.07 Cr, Annual Report FY24 Page 218 Note 23, disclosed).
+  - Mandatory boundary validation: rejects writes missing company_id, metric, unit, financial_period, source_document, document_date, or evidence_status.
+  - Rejection of invalid evidence status, non-finite values (NaN/Inf), invalid statement scope, and naive timestamps.
+  - Direct database-level SQL `CHECK` constraint rejection.
+  - Strict partitioning between real (`is_synthetic=0`) and synthetic (`is_synthetic=1`) records.
+
+### 8.3 Entity Resolution & Corporate Action Mapping (FI-007)
+- **Backend suite:** `services/api/tests/test_entity_resolution.py`
+- **Coverage:**
+  - Deterministic point-in-time security identifier resolution enforcing validity windows `[valid_from, valid_to]`.
+  - Regression test on real 10:1 stock split corporate action: Tata Steel Limited (`L27100MH1907PLC000260`), pre-split `INE081A01012` (valid to 2022-07-28) and post-split `INE081A01020` (valid from 2022-07-29).
+  - Similar-name merge prevention: strictly isolates `Tata Steel Limited` from `Tata Steel Long Products Limited` based on statutory CIN and unique canonical IDs, rejecting fuzzy string merges.

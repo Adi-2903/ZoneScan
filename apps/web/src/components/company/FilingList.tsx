@@ -23,9 +23,9 @@ export function FilingList({ filings, onInspectSource }: FilingListProps) {
     <div className="filings-container">
       <header className="filings-header">
         <div>
-          <h3 className="section-heading">Regulatory Filings &amp; Corporate Disclosures</h3>
+          <h3 className="section-heading">Fictional Filings &amp; Modelled Disclosures</h3>
           <span className="section-subheading">
-            Official announcements submitted to exchanges under SEBI (LODR) Regulations
+            Synthetic announcement stream formatted after SEBI (LODR) disclosures for UI testing
           </span>
         </div>
 
@@ -101,7 +101,7 @@ export function FilingList({ filings, onInspectSource }: FilingListProps) {
 
             <footer className="filing-card-footer">
               <span className="filing-source-tag">
-                Exchange Submission · Verified Statutory Record
+                Synthetic Demo Model · Fictional Disclosure
               </span>
               <button
                 type="button"
@@ -111,7 +111,7 @@ export function FilingList({ filings, onInspectSource }: FilingListProps) {
                   onInspectSource(filing.evidenceId);
                 }}
               >
-                Inspect Statutory Excerpt ↗
+                Inspect Modelled Excerpt ↗
               </button>
             </footer>
           </article>

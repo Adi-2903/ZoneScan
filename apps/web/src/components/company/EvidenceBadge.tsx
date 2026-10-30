@@ -8,18 +8,25 @@ interface EvidenceBadgeProps {
   onClick?: (event: React.MouseEvent) => void;
   title?: string;
   className?: string;
+  /**
+   * When true (default in demo fixtures), displays explicit demo-only classifications
+   * to prevent confusing synthetic models with genuine statutory records.
+   */
+  isSynthetic?: boolean;
 }
 
-const statusConfig: Record<EvidenceStatus, {
+interface StatusItemConfig {
   label: string;
   glyph: string;
   description: string;
   classes: string;
-}> = {
+}
+
+const realStatusConfig: Record<EvidenceStatus, StatusItemConfig> = {
   disclosed: {
     label: "Disclosed",
     glyph: "✓",
-    description: "Official statutory regulatory filing or audited annual report",
+    description: "Official statutory regulatory filing or audited financial statement",
     classes: "badge-disclosed",
   },
   verified: {
@@ -48,6 +55,39 @@ const statusConfig: Record<EvidenceStatus, {
   },
 };
 
+const syntheticDemoStatusConfig: Record<EvidenceStatus, StatusItemConfig> = {
+  disclosed: {
+    label: "Demo Disclosed",
+    glyph: "DEMO ✓",
+    description: "Synthetic demo figure formatted after statutory filing structures. NOT an official corporate record.",
+    classes: "badge-disclosed is-demo-badge",
+  },
+  verified: {
+    label: "Demo Verified",
+    glyph: "DEMO ✓✓",
+    description: "Synthetic benchmark cross-check within prototype models. NOT a licensed regulatory verification.",
+    classes: "badge-verified is-demo-badge",
+  },
+  inferred: {
+    label: "Demo Inferred",
+    glyph: "DEMO fx",
+    description: "Derived by arithmetic formula from synthetic baseline inputs.",
+    classes: "badge-inferred is-demo-badge",
+  },
+  unconfirmed: {
+    label: "Demo Unconfirmed",
+    glyph: "DEMO ?",
+    description: "Fictional unconfirmed report for UI/UX interaction testing.",
+    classes: "badge-unconfirmed is-demo-badge",
+  },
+  unavailable: {
+    label: "Unavailable",
+    glyph: "—",
+    description: "Information not disclosed or unavailable in fixture; never substituted with zero",
+    classes: "badge-unavailable",
+  },
+};
+
 export function EvidenceBadge({
   status,
   size = "sm",
@@ -55,8 +95,10 @@ export function EvidenceBadge({
   onClick,
   title,
   className = "",
+  isSynthetic = true,
 }: EvidenceBadgeProps) {
-  const config = statusConfig[status] ?? statusConfig.unavailable;
+  const configMap = isSynthetic ? syntheticDemoStatusConfig : realStatusConfig;
+  const config = configMap[status] ?? configMap.unavailable;
   const tooltipText = title ?? `${config.label}: ${config.description}`;
 
   const baseClasses = `evidence-badge evidence-badge-${size} ${config.classes} ${interactive ? "is-interactive" : ""} ${className}`;
@@ -70,7 +112,7 @@ export function EvidenceBadge({
           e.stopPropagation();
           onClick(e);
         }}
-        title={`${tooltipText} (Click to inspect evidence source)`}
+        title={`${tooltipText} (Click to inspect source citation)`}
         aria-label={`${config.label} evidence. ${config.description}. Click to open source disclosure details.`}
       >
         <span className="badge-glyph" aria-hidden="true">{config.glyph}</span>

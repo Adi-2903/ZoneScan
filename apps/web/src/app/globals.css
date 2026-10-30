@@ -450,6 +450,9 @@ tr:hover .row-arrow { opacity: 1; }
   color: #9aa9bb;
   border-color: rgba(154, 169, 187, 0.24);
 }
+.evidence-badge.is-demo-badge {
+  border-style: dashed;
+}
 
 .evidence-badge.is-interactive {
   cursor: pointer;

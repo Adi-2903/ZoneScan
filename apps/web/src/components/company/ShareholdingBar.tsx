@@ -23,7 +23,7 @@ export function ShareholdingBar({ shareholding, onInspectSource }: ShareholdingB
         <div>
           <h3 className="section-heading">Shareholding Pattern</h3>
           <span className="section-subheading">
-            Quarterly distribution as of {shareholding.asOfDate}
+            Quarterly distribution as of {shareholding.asOfDate} (Synthetic Demo Model)
           </span>
         </div>
         <div className="header-badge-wrap">

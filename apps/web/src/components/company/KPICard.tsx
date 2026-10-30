@@ -80,7 +80,7 @@ export function KPICard({ metric, onInspectSource }: KPICardProps) {
       </div>
 
       <footer className="kpi-footer">
-        <span className="kpi-source-prompt">Inspect source &amp; derivation ↗</span>
+        <span className="kpi-source-prompt">Inspect derivation &amp; citation ↗</span>
       </footer>
     </article>
   );

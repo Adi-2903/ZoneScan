@@ -83,6 +83,9 @@ export function FinancialTable({ rows, onInspectSource }: FinancialTableProps) {
         </div>
 
         <div className="toolbar-right">
+          <span className="code-pill symbol-pill" style={{ marginRight: "8px", fontSize: "0.7rem" }}>
+            SYNTHETIC DEMO STATEMENTS
+          </span>
           <span className="unit-indicator">Currency: INR (₹ Crore)</span>
         </div>
       </div>
@@ -100,23 +103,23 @@ export function FinancialTable({ rows, onInspectSource }: FinancialTableProps) {
               {showAnnual && (
                 <>
                   <th scope="col" className="col-num">
-                    FY23 <span className="col-sub">Audited</span>
+                    FY23 <span className="col-sub">Demo Model</span>
                   </th>
                   <th scope="col" className="col-num">
-                    FY24 <span className="col-sub">Audited</span>
+                    FY24 <span className="col-sub">Demo Model</span>
                   </th>
                   <th scope="col" className="col-num">
-                    FY25 <span className="col-sub">Audited</span>
+                    FY25 <span className="col-sub">Demo Model</span>
                   </th>
                 </>
               )}
               {showQuarterly && (
                 <>
                   <th scope="col" className="col-num col-quarter">
-                    Q1 FY26 <span className="col-sub">Unaudited</span>
+                    Q1 FY26 <span className="col-sub">Demo Q1</span>
                   </th>
                   <th scope="col" className="col-num col-quarter">
-                    Q2 FY26 <span className="col-sub">Unaudited</span>
+                    Q2 FY26 <span className="col-sub">Demo Q2</span>
                   </th>
                 </>
               )}

@@ -23,7 +23,7 @@ export function SegmentChart({ segments, onInspectSource }: SegmentChartProps) {
         <div>
           <h3 className="section-heading">Business Segment Breakdown</h3>
           <span className="section-subheading">
-            Audited segment revenue &amp; margins (Ind AS 108 Operating Segments)
+            Modelled segment revenue &amp; margins (Ind AS 108 Synthetic Structure)
           </span>
         </div>
         <div className="header-actions-wrap">

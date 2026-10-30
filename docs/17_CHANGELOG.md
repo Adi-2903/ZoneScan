@@ -1,3 +1,69 @@
+## 2026-10-30 — Data Foundation Milestone 1: Close Integrity Flags
+
+**Data integrity foundation; persistence schema, boundary validation, entity resolution, and fixture guard implementation; 139 total tests passing across backend and frontend.**
+
+- **Flag 1 (Fixture Realism Drift): CLOSED**
+  - Added CI test suites in frontend (`apps/web/src/lib/fixtures/company-intelligence.test.ts`) and backend (`services/api/tests/test_fixtures_synthetic_guard.py`).
+  - Enforced that every synthetic company, CIN/ISIN identifier, filing, and evidence citation carries explicit `(Demo)` or `SYN-` markers.
+  - Implemented regression drift tests verifying that mutating/stripping `(Demo)` or `SYN-` markers causes immediate test assertion failure.
+- **Flag 2 (Fact Provenance): CLOSED**
+  - Implemented the actual `financial_facts` relational persistence schema (`services/api/src/zonescan/financial_facts.py`) using Python standard library SQLite with strict database-level constraints.
+  - Schema covers 13 mandatory provenance fields: `company_id`, `metric`, `value`, `unit`, `financial_period`, `statement_scope`, `source_document`, `source_url`, `page_note_table_reference`, `document_date`, `retrieval_timestamp`, `extraction_method`, and `evidence_status`.
+  - Persisted genuine, individually traceable fact from official permitted source: **Bharat Forge Limited** Audited Consolidated Revenue FY2023-24 (₹15,682.07 Cr, BSE Annual Report FY24 Page 218 Note 23, disclosed, `fact-bf-rev-fy24`).
+- **Flag 3 (Ingestion Validation): CLOSED**
+  - Added boundary validation function `validate_financial_fact()` and SQLite `CHECK` constraints on table `financial_facts`.
+  - Rejects writes missing company identity, metric, unit, financial period, source document, source date, or evidence status.
+  - Rejects non-finite values (NaN/Inf), invalid statement scopes, and non-timezone-aware retrieval timestamps.
+  - Added test suite (`services/api/tests/test_financial_facts.py`) testing successful persistence and all rejected write failure cases, including direct raw SQL constraint violations.
+- **Flag 4 (Entity Resolution - FI-007): CLOSED**
+  - Implemented deterministic entity resolution engine (`services/api/src/zonescan/entity_resolution.py`) mapping security identifiers to canonical companies with temporal validity windows `[valid_from, valid_to]`.
+  - Added regression test on real, independently verified corporate action: **Tata Steel Limited** (CIN: `L27100MH1907PLC000260`) 10:1 stock split on 2022-07-29 (pre-split `INE081A01012` valid through 2022-07-28; post-split `INE081A01020` valid from 2022-07-29).
+  - Enforced strict invariant preventing merging companies with similar names (`Tata Steel Limited` vs `Tata Steel Long Products Limited`; `Bharat Forge Limited` vs `Bharat Electronics Limited`).
+- **Documentation & Architecture Decisions**:
+  - Updated `docs/07_DATA_MODEL.md` with implemented persistence schemas and validation rules.
+  - Added D-028 (financial facts schema), D-029 (deterministic entity resolution), and D-030 (fixture realism drift guard) to `docs/12_DECISIONS.md`.
+  - Updated `FI-007` in `docs/13_OPEN_QUESTIONS.md` to `Resolved provisionally; regression-tested`.
+  - Documented integrity verification test suites in `docs/09_TESTING_BACKTESTING.md`.
+
+## 2026-10-30 — Company Intelligence Technical Reference & Implementation Guide
+
+**Documentation and code-audit task only; authored comprehensive technical reference for Company Intelligence; zero application code changes.**
+
+- **Created Technical Reference (`docs/20_COMPANY_INTELLIGENCE_IMPLEMENTATION.md`)**:
+  - Authored super-detailed, 12-section technical reference document covering the actual Company Intelligence frontend implementation.
+  - Documented complete architecture, Next.js 16/React 19 component tree, workspace navigation flows, and 3-level progressive disclosure pattern.
+  - Documented company fixtures (`apps/web/src/lib/fixtures/company-intelligence.ts`), covering `ZENITHFAB` and `APEXALLOY`, reporting periods (FY23–FY25, Q1/Q2 FY26), business segments (Ind AS 108), shareholding distributions (SEBI Reg 31), and 13 mapped ecosystem entities.
+  - Formatted all core TypeScript interfaces, enums (`EvidenceStatus`, `RecordOrigin`), and data models.
+  - Documented exact mathematical formulas, units, and worked numerical calculations for Gross Margin, EBITDA Margin, PAT Margin, ROCE, Debt/Equity, and the commodity sensitivity calculator (`apps/web/src/lib/calculations/supply-chain-impact.ts`), validating the period and denominator invariant identity.
+  - Detailed Cytoscape.js concentric visualizer implementation (`apps/web/src/components/company/RelationshipMap.tsx`), node/edge styling, directed arrow semantics, and accessible HTML adjacency table fallback.
+  - Documented regulatory filings feed (`apps/web/src/components/company/FilingList.tsx`), Level 3 progressive disclosure drawer (`SourcePanel.tsx`), and synthetic notice restrictions.
+  - Catalogued complete 11-component inventory with file paths, responsibilities, props, and progressive disclosure levels.
+  - Documented installed dependencies (`cytoscape`, `@types/cytoscape`), automated test suite (`node --test`), build verification results, and canvas inspection boundaries.
+  - Summarized integrity audit findings, resolved label issues, and remaining implementation gaps.
+  - Detailed the real-data readiness transition path to replace demo fixtures with source-backed Indian company data post-Gate 3.
+  - Provided feature status matrix and a prioritized list of the next five development tasks.
+
+## 2026-10-30 — Company Intelligence Integrity Audit & Pilot Provenance Specification
+
+**Frontend integrity refactor; synthetic demo classification separation; mathematical simulator audit; zero backend/database changes.**
+
+- **Separated Synthetic Demo Presentation from Statutory Records**:
+  - Refactored `EvidenceBadge` to support explicit demo classifications (`Demo Disclosed`, `Demo Verified`, `Demo Inferred`, `Demo Unconfirmed`, `Unavailable`) with dashed border styling and explicit `aria-label` tags, preventing any confusion with genuine statutory records.
+  - Kept production-grade evidence classification types (`disclosed`, `verified`, `inferred`, `unconfirmed`, `unavailable`) ready for future live data feeds.
+  - Replaced misleading labels (`Audited`, `Verified Statutory Record`, `Exchange Submission`) in `FinancialTable`, `FilingList`, `RelationshipMap`, and `SourcePanel` with explicit synthetic demo identifiers (`Demo Model`, `Synthetic Demo Model · Fictional Disclosure`, `Modelled Citation Reference`).
+  - Added fictional identification to corporate identity badges (`SYN-L28910MH2012PLC987654 (Demo)`, `SYN-INE999X01099 (Demo)`, `SYNTHETIC DEMO ENTITY`).
+- **Mathematical Sensitivity Simulator Audit**:
+  - Created pure mathematical utility `apps/web/src/lib/calculations/supply-chain-impact.ts` computing raw material cost deltas, modelled COGS, and gross margin compression basis points with identical annual revenue and COGS periods and denominators.
+  - Created automated test suite `apps/web/src/lib/calculations/supply-chain-impact.test.ts` running via `node --test` (5 passing tests). Added `npm test` script to `package.json`.
+  - Replaced hardcoded Zenith numbers in `SupplyChainSimulator.tsx` with dynamic company baseline figures (`baselineRevenue`, `baselineCOGS`, dynamic `${company.legalName}`, dynamic formula display).
+- **Fixture Reconciliation & Dynamic Profiling**:
+  - Reconciled Apex Ferrous (`APEXALLOY`) valuation metrics: Market Cap ₹2,178.00 Cr, PE 16.50, Total Equity ₹575.00 Cr, Enterprise Value ₹2,383.00 Cr, Debt/Equity 0.43×.
+  - Expanded Apex financial statements to include complete 5-period Income Statement, Balance Sheet Highlights, and margin ratios matching Zenith's schema.
+  - Made margin sparklines in `CompanyIntelligence.tsx` dynamic, pulling real statement rows instead of static constants.
+- **Real-Data Readiness Pilot Documentation**:
+  - Authored `docs/20_REAL_DATA_PILOT_SPEC.md` documenting an end-to-end provenance contract for **Bharat Forge Limited** (NSE: `BHARATFORG` / BSE: `500493`), mapping official source URLs, document dates, reporting periods, metrics, units, extraction locations, retrieval dates, and evidence classifications across Master Data, P&L, Segments, Shareholding, and Raw Material Notes without scraping or downloading external data (Gate 3 compliant).
+- Verified `npm test` (5/5 passed), `npm run typecheck` (`tsc --noEmit`), `npm run lint` (`eslint .`), `npm run build` (`next build`), and `git diff --check`.
+
 ## 2026-10-30 — Company Intelligence UI Prototype
 
 **Frontend-only prototype; synthetic demo fixtures only; no production database or backend changes.**

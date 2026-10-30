@@ -274,6 +274,7 @@ Official Sources
 3. **Period alignment.** Financial statements from different periods must not be silently combined. Each row carries its exact reporting period (e.g., "FY2025" or "Q2 FY2026").
 4. **No re-serving without rights.** Displaying aggregated filing data commercially requires legal confirmation; keep extraction behind an internal-use gate until rights are confirmed.
 5. **Evidence tagging is not optional.** The evidence status field is required on every displayed value, not a nice-to-have.
+6. **Real-data pilot contract.** See `docs/20_REAL_DATA_PILOT_SPEC.md` for the exact fact provenance, source URLs, extraction notes, and evidence classifications prepared for the Bharat Forge Limited pilot ahead of Gate 3 clearance.
 
 ---
 
